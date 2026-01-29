@@ -1,26 +1,24 @@
 
-
 <!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oncology Quiz | Final Stable</title>
+    <title>Oncology Quiz | Participant</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root { --purple: #9d50bb; --pink: #ec4899; --glass-bg: rgba(255, 255, 255, 0.08); --glass-border: rgba(255, 255, 255, 0.12); --correct: #10b981; --wrong: #ef4444; }
-        body { margin: 0; font-family: 'Poppins', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #050505; color: #fff; background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'); background-size: cover; background-position: center; overflow-x: hidden; }
+        body { margin: 0; font-family: 'Poppins', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #050505; color: #fff; background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'); background-size: cover; background-position: center; }
         .glass-ui { width: 90%; max-width: 650px; background: var(--glass-bg); backdrop-filter: blur(25px); border: 1px solid var(--glass-border); border-radius: 40px; padding: 45px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
         .hidden { display: none !important; }
         input { width: 85%; padding: 18px; border-radius: 15px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.4); color: #fff; text-align: center; font-size: 1.2rem; margin: 25px 0; outline: none; }
         .action-btn { width: 240px; padding: 16px; border-radius: 50px; border: none; background: #fff; color: #000; font-weight: 700; cursor: pointer; transition: 0.3s; }
-        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        #timer-box { font-size: 2.2rem; font-weight: 800; margin-bottom: 20px; }
+        #timer-box { font-size: 2.5rem; font-weight: 800; margin-bottom: 20px; }
         #options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .opt-card { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); padding: 20px; border-radius: 18px; color: #fff; cursor: pointer; transition: 0.2s; }
-        .active-pink { background: var(--pink) !important; border-color: #fff; box-shadow: 0 0 15px var(--pink); }
-        .active-purple { background: var(--purple) !important; border-color: #fff; box-shadow: 0 0 15px var(--purple); }
-        .correction-item { text-align: left; background: rgba(255,255,255,0.05); border-radius: 15px; padding: 15px; margin-top: 15px; }
+        .opt-card { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); padding: 20px; border-radius: 18px; cursor: pointer; transition: 0.2s; }
+        .active-pink { background: var(--pink) !important; box-shadow: 0 0 15px var(--pink); }
+        .active-purple { background: var(--purple) !important; box-shadow: 0 0 15px var(--purple); }
+        .correction-item { text-align: left; background: rgba(255,255,255,0.05); border-radius: 15px; padding: 15px; margin-top: 15px; border-left: 5px solid transparent; }
     </style>
 </head>
 <body>
@@ -38,20 +36,17 @@
 
         <div id="quiz-screen" class="hidden">
             <div id="timer-box">01:00</div>
-            <div id="q-text" style="font-size: 1.2rem; font-weight: 600; margin-bottom: 20px;"></div>
+            <div id="q-text" style="font-size: 1.2rem; margin-bottom: 20px;"></div>
             <div id="options-grid"></div>
             <button class="action-btn" id="next-btn" disabled onclick="handleNext()" style="margin-top: 30px;">CONFIRMER</button>
         </div>
 
-        <div id="wait-results" class="hidden">
-            <h1 id="end-status-title">TERMINÉ</h1>
-            <p>Veuillez patienter pour les résultats...</p>
-        </div>
+        <div id="wait-results" class="hidden"><h1>TERMINÉ</h1><p>Patientez pour les résultats...</p></div>
 
         <div id="result-screen" class="hidden">
             <h1>RÉSULTAT FINAL</h1>
-            <div id="score-val" style="font-size: 5rem; font-weight: 800;">0</div>
-            <button class="action-btn" onclick="showCorrection()">VOIR LA CORRECTION 🔍</button>
+            <div id="score-val" style="font-size: 5rem;">0</div>
+            <button class="action-btn" onclick="showCorrection()">CORRECTION 🔍</button>
         </div>
 
         <div id="correction-screen" class="hidden">
@@ -68,36 +63,38 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref('competition');
 
-        // هوية فريدة للمتصفح لمنع التداخل
-        let myBrowserId = localStorage.getItem('myBrowserId') || 'ID_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('myBrowserId', myBrowserId);
+        // هوية المتصفح الفريدة
+        let myId = localStorage.getItem('myId') || 'U' + Math.random().toString(36).substr(2, 7);
+        localStorage.setItem('myId', myId);
 
         let myColor = '', myName = '', current = 0, score = 0, selected = null, userHistory = [], timerInterval = null;
-
         const questions = [
             { q: "Quel gène est surnommé 'Le gardien du génome' ?", opts: ["p53", "BRCA1", "KRAS", "MYC"], a: "p53", exp: "p53 est un suppresseur de tumeur clé." },
-            { q: "Marqueur spécifique au cancer de l'ovaire ?", opts: ["CA-125", "PSA", "CEA", "AFP"], a: "CA-125", exp: "Le CA-125 est utilisé en oncologie gynécologique." }
+            { q: "Marqueur spécifique au cancer de l'ovaire ?", opts: ["CA-125", "PSA", "CEA", "AFP"], a: "CA-125", exp: "Le CA-125 est utilisé pour l'ovaire." }
         ];
 
-        // الاستماع للتغييرات بدون "تصفير" الجلسة الحالية
         db.on('value', snap => {
             const data = snap.val(); if(!data) return;
 
-            // إذا ضغط الأدمن Reset
-            if(data.status === 'waiting' && myName !== '') {
-                localStorage.removeItem('myName'); 
-                location.reload(); 
-                return;
+            // 1. استعادة الجلسة (لضمان عدم طلب الاسم مرة أخرى)
+            if(!myName) {
+                if(data.userPink === myId) setup(data.teamPink, 'pink');
+                else if(data.userPurple === myId) setup(data.teamPurple, 'purple');
             }
 
-            // إذا بدأ الأدمن المسابقة وكان المتسابق مسجلاً
-            if(data.status === 'start' && myName && current === 0 && !timerInterval) {
+            // 2. تصفير عند الـ Reset (فقط إذا كان المستخدم مسجلاً)
+            if(data.status === 'waiting' && myName && data.userPink !== myId && data.userPurple !== myId) {
+                localStorage.removeItem('myName'); location.reload();
+            }
+
+            // 3. بدء الكويز
+            if(data.status === 'start' && myName && !timerInterval) {
                 document.getElementById('waiting-screen').classList.add('hidden');
                 document.getElementById('quiz-screen').classList.remove('hidden');
-                startQuizTimer(data.startTime);
+                runTimer(data.startTime);
             }
 
-            // إذا عرض الأدمن النتائج
+            // 4. إظهار النتائج
             if(data.showResults && myName) {
                 clearInterval(timerInterval);
                 document.getElementById('quiz-screen').classList.add('hidden');
@@ -108,54 +105,52 @@
         });
 
         async function registerTeam() {
-            const nameInput = document.getElementById('team-name-input').value.trim();
-            if(!nameInput) return alert("Veuillez entrer un nom !");
+            const name = document.getElementById('team-name-input').value.trim();
+            if(!name) return;
 
-            db.transaction((curr) => {
-                if(!curr) return { teamPink: nameInput, userPink: myBrowserId, status: 'waiting' };
-                if(!curr.userPink) { curr.userPink = myBrowserId; curr.teamPink = nameInput; }
-                else if(!curr.userPurple && curr.userPink !== myBrowserId) { curr.userPurple = myBrowserId; curr.teamPurple = nameInput; }
-                return curr;
-            }, (err, commit, snap) => {
-                if(commit) {
-                    const d = snap.val();
-                    if(d.userPink === myBrowserId) setupUser('pink', nameInput);
-                    else if(d.userPurple === myBrowserId) setupUser('purple', nameInput);
-                    else alert("Désolé, les deux places sont déjà prises !");
-                }
-            });
+            const snap = await db.once('value');
+            const data = snap.val() || {};
+
+            // حجز المكان المتاح فقط
+            if(!data.userPink || data.userPink === "") {
+                db.update({ userPink: myId, teamPink: name });
+                setup(name, 'pink');
+            } else if(!data.userPurple || data.userPurple === "") {
+                db.update({ userPurple: myId, teamPurple: name });
+                setup(name, 'purple');
+            } else {
+                alert("Session pleine !");
+            }
         }
 
-        function setupUser(color, name) {
-            myColor = color; myName = name;
+        function setup(n, c) {
+            myName = n; myColor = c;
             document.getElementById('reg-screen').classList.add('hidden');
             document.getElementById('waiting-screen').classList.remove('hidden');
-            const title = document.getElementById('assigned-team-name');
-            title.innerText = "TEAM " + (color === 'pink' ? "ROSE" : "VIOLETTE");
-            title.style.color = `var(--${color})`;
+            const t = document.getElementById('assigned-team-name');
+            t.innerText = "TEAM " + (c === 'pink' ? "ROSE" : "VIOLETTE");
+            t.style.color = `var(--${c})`;
         }
 
-        function startQuizTimer(st) {
+        function runTimer(st) {
             render();
             timerInterval = setInterval(() => {
                 const rem = 60 - Math.floor((Date.now() - st) / 1000);
                 document.getElementById('timer-box').innerText = `00:${rem > 0 ? rem.toString().padStart(2,'0') : '00'}`;
-                if(rem <= 0) forceFinish(true);
+                if(rem <= 0) finish();
             }, 1000);
         }
 
         function render() {
             const q = questions[current];
             document.getElementById('q-text').innerText = q.q;
-            const grid = document.getElementById('options-grid');
-            grid.innerHTML = '';
+            const grid = document.getElementById('options-grid'); grid.innerHTML = '';
             document.getElementById('next-btn').disabled = true;
-            q.opts.forEach(opt => {
-                const b = document.createElement('div');
-                b.className = 'opt-card'; b.innerText = opt;
+            q.opts.forEach(o => {
+                const b = document.createElement('div'); b.className = 'opt-card'; b.innerText = o;
                 b.onclick = () => {
                     document.querySelectorAll('.opt-card').forEach(x => x.classList.remove('active-pink', 'active-purple'));
-                    b.classList.add(`active-${myColor}`); selected = opt;
+                    b.classList.add(`active-${myColor}`); selected = o;
                     document.getElementById('next-btn').disabled = false;
                 };
                 grid.appendChild(b);
@@ -166,12 +161,12 @@
             userHistory.push(selected);
             if(selected === questions[current].a) score++;
             current++; selected = null;
-            if(current < questions.length) render(); else forceFinish(false);
+            if(current < questions.length) render(); else finish();
         }
 
-        function forceFinish(isT) {
+        function finish() {
             clearInterval(timerInterval);
-            const upd = {};
+            let upd = {};
             upd[myColor === 'pink' ? 'scorePink' : 'scorePurple'] = score;
             upd[myColor === 'pink' ? 'finishedPink' : 'finishedPurple'] = true;
             db.update(upd);
@@ -183,14 +178,14 @@
             document.getElementById('result-screen').classList.add('hidden');
             document.getElementById('correction-screen').classList.remove('hidden');
             const list = document.getElementById('correction-list'); list.innerHTML = '';
-            questions.forEach((item, i) => {
+            questions.forEach((q, i) => {
                 const userAns = userHistory[i] || '---';
-                const isC = userAns === item.a;
-                list.innerHTML += `<div class="correction-item" style="border-left:4px solid ${isC?'var(--correct)':'var(--wrong)'}">
-                    <div style="font-weight:600;">${i+1}. ${item.q}</div>
-                    <div style="color:${isC?'var(--correct)':'var(--wrong)'}">Votre réponse: ${userAns}</div>
-                    ${!isC?`<div style="color:var(--correct)">La bonne réponse: ${item.a}</div>`:''}
-                    <div style="font-size:0.8rem; opacity:0.6; margin-top:5px;">💡 ${item.exp}</div>
+                const isC = userAns === q.a;
+                list.innerHTML += `<div class="correction-item" style="border-left-color: ${isC?'var(--correct)':'var(--wrong)'}">
+                    <b>${i+1}. ${q.q}</b><br>
+                    <span style="color:${isC?'var(--correct)':'var(--wrong)'}">Réponse: ${userAns}</span><br>
+                    ${!isC ? `<span style="color:var(--correct)">Correcte: ${q.a}</span><br>` : ''}
+                    <small>💡 ${q.exp}</small>
                 </div>`;
             });
         }
