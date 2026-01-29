@@ -44,7 +44,7 @@
         // هنا تضع إعدادات Firebase الخاصة بك (سأشرحها لك في الأسفل)
         const firebaseConfig = { databaseURL: "https://quiz-8016b-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
-        const dbRef = firebase.database().ref('competition');
+        const db = firebase.database().ref('competition');
 
         // مراقبة الأوامر من الأدمن
         dbRef.on('value', (snapshot) => {
@@ -62,4 +62,5 @@
     </script>
 </body>
 </html>
+
 
