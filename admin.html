@@ -4,123 +4,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oncology Quiz | ADMIN GLASS</title>
+    <title>Oncology Quiz | ADMIN PRO</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --purple: #9d50bb; 
-            --pink: #ec4899; 
-            --glass-bg: rgba(255, 255, 255, 0.08); 
-            --glass-border: rgba(255, 255, 255, 0.12); 
+            --purple: #9d50bb; --pink: #ec4899; 
+            --glass-bg: rgba(255, 255, 255, 0.08); --glass-border: rgba(255, 255, 255, 0.12); 
         }
 
         body { 
             margin: 0; font-family: 'Poppins', sans-serif; min-height: 100vh; 
             display: flex; align-items: center; justify-content: center; 
-            background: #050505; color: #fff; 
-            background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'); 
-            background-size: cover; background-position: center; 
-            background-attachment: fixed;
+            background: #000; color: #fff; overflow: hidden;
+            background-image: url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
+            background-size: cover; background-position: center;
         }
 
-        /* حاوية الأدمن الزجاجية - مطابقة لـ Index */
         .glass-ui { 
-            width: 90%; max-width: 800px; 
-            background: var(--glass-bg); backdrop-filter: blur(25px); 
+            width: 90%; max-width: 800px; z-index: 10;
+            background: var(--glass-bg); backdrop-filter: blur(20px); 
             border: 1px solid var(--glass-border); border-radius: 40px; 
-            padding: 45px; text-align: center; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
+            padding: 45px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
         }
 
-        .status-grid { 
-            display: flex; gap: 20px; justify-content: center; margin-bottom: 30px; 
-        }
-
-        /* كروت الفرق الزجاجية */
-        .team-card { 
-            flex: 1; background: rgba(0,0,0,0.3); 
-            border: 1px solid var(--glass-border); 
-            border-radius: 25px; padding: 20px; 
-            transition: 0.3s;
-        }
-
-        .status-tag { 
-            font-size: 0.7rem; font-weight: 600; text-transform: uppercase; 
-            background: rgba(255,255,255,0.1); padding: 5px 12px; 
-            border-radius: 50px; display: inline-block; margin-bottom: 10px;
-        }
-
-        /* تأثير النقاط المتحركة */
-        .dots::after { content: ''; animation: dots 1.5s infinite; }
-        @keyframes dots { 0% { content: '.'; } 33% { content: '..'; } 66% { content: '...'; } }
-
-        .score-val { font-size: 3.5rem; font-weight: 800; line-height: 1; margin-top: 10px; }
-
-        /* الأزرار الزجاجية الشفافة - مطابقة لـ Index */
-        .controls { 
-            display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; 
-            margin-top: 20px; border-top: 1px solid var(--glass-border); padding-top: 30px;
-        }
+        .status-grid { display: flex; gap: 20px; justify-content: center; margin-bottom: 30px; }
+        .team-card { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: 25px; padding: 20px; }
+        .score-val { font-size: 3.5rem; font-weight: 800; }
 
         .glass-btn { 
-            padding: 15px 30px; border-radius: 50px; border: 1px solid var(--glass-border); 
+            padding: 15px 35px; border-radius: 50px; border: 1px solid var(--glass-border); 
             background: rgba(255,255,255,0.05); color: #fff; font-weight: 700; 
             cursor: pointer; transition: 0.3s; text-transform: uppercase; 
-            font-size: 0.85rem; letter-spacing: 1px;
         }
-
         .glass-btn:hover { background: rgba(255,255,255,0.15); transform: translateY(-3px); }
-        .glass-btn:active { transform: scale(0.95); }
 
-        /* ألوان تمييز الأزرار عند الحوم */
-        .btn-reset:hover { border-color: #ef4444; color: #ef4444; }
-        .btn-start:hover { border-color: #10b981; color: #10b981; }
-        .btn-results:hover { border-color: #3b82f6; color: #3b82f6; }
-
-        /* شاشة الفائز الفضية */
-        #winner-screen {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(30px);
+        /* شاشة الفائز الضبابية */
+        #winner-overlay {
+            position: fixed; inset: 0; 
+            background: rgba(0, 0, 0, 0.7); 
+            backdrop-filter: blur(40px); /* الضبابية المطلوبة */
             display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000;
         }
-        .silver-medal {
-            background: linear-gradient(135deg, #bdc3c7 0%, #ffffff 50%, #8e9eab 100%);
-            color: #1a1a1a; padding: 60px; border-radius: 40px; text-align: center;
-            box-shadow: 0 0 50px rgba(255,255,255,0.3); border: 6px solid #d1d1d1;
-            animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+
+        #winner-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.8; }
+        
+        .winner-content { position: relative; z-index: 2100; text-align: center; }
+
+        #countdown { font-size: 10rem; font-weight: 900; color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.3); }
+
+        /* تأثير الضوء المتحرك على الاسم */
+        .shining-name {
+            font-size: 6rem; font-weight: 900; margin: 10px 0; text-transform: uppercase;
+            background: linear-gradient(90deg, transparent, #fff, transparent);
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: shine 3s infinite linear;
+            position: relative;
         }
-        @keyframes popIn { 0% { transform: scale(0.5); } 100% { transform: scale(1); } }
+
+        @keyframes shine {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
     <div class="glass-ui">
-        <h1 style="font-weight: 800; letter-spacing: 3px; margin-bottom: 30px; font-size: 1.5rem;">PANNEAU DE CONTRÔLE</h1>
-
+        <h1 style="letter-spacing: 5px; font-size: 1rem; opacity: 0.6; margin-bottom: 30px;">ADMINISTRATION</h1>
         <div class="status-grid">
-            <div class="team-card" id="card-p">
-                <div id="status-p" class="status-tag">في الانتظار</div>
-                <h2 id="name-p" style="color: var(--pink); margin: 10px 0;">الفريق الوردي</h2>
+            <div class="team-card">
+                <h2 style="color: var(--pink); font-size: 1.2rem;">الفريق الوردي</h2>
                 <div class="score-val" id="score-p" style="color: var(--pink);">0</div>
             </div>
-
-            <div class="team-card" id="card-v">
-                <div id="status-v" class="status-tag">في الانتظار</div>
-                <h2 id="name-v" style="color: var(--purple); margin: 10px 0;">الفريق البنفسجي</h2>
+            <div class="team-card">
+                <h2 style="color: var(--purple); font-size: 1.2rem;">الفريق البنفسجي</h2>
                 <div class="score-val" id="score-v" style="color: var(--purple);">0</div>
             </div>
         </div>
-
-        <div class="controls">
-            <button class="glass-btn btn-reset" onclick="resetComp()">Réinitialiser</button>
-            <button class="glass-btn btn-start" onclick="startQuiz()">Lancer le Quiz</button>
-            <button class="glass-btn btn-results" onclick="showFinal()">Afficher Résultats</button>
+        <div style="display:flex; gap:15px; justify-content:center;">
+            <button class="glass-btn" onclick="resetComp()" style="border-color: #ff4b2b;">Reset</button>
+            <button class="glass-btn" onclick="startQuiz()">Lancer</button>
+            <button class="glass-btn" onclick="showFinal()">Results</button>
         </div>
     </div>
 
-    <div id="winner-screen">
-        <div id="countdown" style="font-size: 10rem; font-weight: 900; color: #fff;">10</div>
-        <div id="result-box" class="hidden"></div>
+    <div id="winner-overlay">
+        <canvas id="winner-canvas"></canvas>
+        <div class="winner-content">
+            <div id="countdown">10</div>
+            <div id="winner-announcement" class="hidden">
+                <h3 style="letter-spacing: 10px; opacity: 0.8; margin-bottom: -10px;">LE GAGNANT EST</h3>
+                <h1 id="winner-name" class="shining-name"></h1>
+                <h2 id="winner-score" style="font-size: 3rem; font-weight: 300; letter-spacing: 3px;"></h2>
+            </div>
+        </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -130,64 +111,81 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref('competition');
 
-        function resetComp() { 
-            if(confirm("⚠ Reset ?")) {
-                db.set({ status: 'waiting', teamPink: "", teamPurple: "", scorePink: 0, scorePurple: 0, showResults: false, finishedPink: false, finishedPurple: false }); 
-            }
-        }
+        function resetComp() { db.set({ status: 'waiting', teamPink: "", teamPurple: "", scorePink: 0, scorePurple: 0, showResults: false }); }
         function startQuiz() { db.update({ status: 'start', startTime: Date.now() }); }
         function showFinal() { db.update({ showResults: true }); }
 
         db.on('value', snap => {
             const d = snap.val(); if(!d) return;
-            document.getElementById('name-p').innerText = d.teamPink || "الفريق الوردي";
             document.getElementById('score-p').innerText = d.scorePink || 0;
-            document.getElementById('name-v').innerText = d.teamPurple || "الفريق البنفسجي";
             document.getElementById('score-v').innerText = d.scorePurple || 0;
-
-            updateUIStatus('status-p', d.teamPink, d.status, d.finishedPink);
-            updateUIStatus('status-v', d.teamPurple, d.status, d.finishedPurple);
-
-            if(d.showResults) triggerCelebration(d);
+            if(d.showResults) runWinnerSequence(d);
         });
 
-        function updateUIStatus(id, name, status, finished) {
-            const el = document.getElementById(id);
-            if(!name) { el.innerText = "في الانتظار"; el.classList.remove('dots'); el.style.color = "#fff"; }
-            else if(finished) { el.innerText = "أنهى ✅"; el.style.color = "#10b981"; el.classList.remove('dots'); }
-            else if(status === 'start') { el.innerText = "يجيب"; el.classList.add('dots'); el.style.color = "#3b82f6"; }
-            else { el.innerText = "جاهز"; el.style.color = "#f1c40f"; }
-        }
-
-        function triggerCelebration(d) {
-            const screen = document.getElementById('winner-screen');
-            screen.style.display = 'flex';
+        function runWinnerSequence(d) {
+            const overlay = document.getElementById('winner-overlay');
+            overlay.style.display = 'flex';
             let sec = 10;
             const timer = setInterval(() => {
                 sec--;
                 document.getElementById('countdown').innerText = sec;
                 if(sec <= 0) {
                     clearInterval(timer);
-                    displayWinner(d);
+                    document.getElementById('countdown').classList.add('hidden');
+                    revealWinner(d);
                 }
             }, 1000);
         }
 
-        function displayWinner(d) {
-            document.getElementById('countdown').classList.add('hidden');
-            const winner = d.scorePink >= d.scorePurple ? 
-                {n: d.teamPink || "Rose", s: d.scorePink} : {n: d.teamPurple || "Violette", s: d.scorePurple};
+        function revealWinner(d) {
+            const isPink = d.scorePink >= d.scorePurple;
+            const name = isPink ? d.teamPink : d.teamPurple;
+            const color = isPink ? "#ec4899" : "#9d50bb";
             
-            const box = document.getElementById('result-box');
-            box.classList.remove('hidden');
-            box.innerHTML = `
-                <div class="silver-medal">
-                    <h3 style="margin:0; opacity:0.6; letter-spacing:2px;">CHAMPION</h3>
-                    <h1 style="font-size:4rem; margin:10px 0; text-transform:uppercase;">${winner.n}</h1>
-                    <div style="font-size:2.5rem; font-weight:800; border-top:1px solid rgba(0,0,0,0.1); padding-top:10px;">
-                        SCORE: ${winner.s}
-                    </div>
-                </div>`;
+            const nameEl = document.getElementById('winner-name');
+            nameEl.innerText = name || "EQUIPE";
+            // جعل اللون الأساسي للاسم هو لون الفريق مع إضافة لمعان أبيض متحرك
+            nameEl.style.color = color;
+            nameEl.style.textShadow = `0 0 30px ${color}`;
+            
+            document.getElementById('winner-score').innerText = `SCORE: ${isPink ? d.scorePink : d.scorePurple}`;
+            document.getElementById('winner-announcement').classList.remove('hidden');
+            initSphere(color);
+        }
+
+        function initSphere(ballColor) {
+            const canvas = document.getElementById('winner-canvas');
+            const ctx = canvas.getContext('2d');
+            let w = canvas.width = window.innerWidth;
+            let h = canvas.height = window.innerHeight;
+            const particles = [];
+            for (let i = 0; i < 1000; i++) {
+                particles.push({
+                    phi: Math.acos(-1 + (2 * i) / 1000),
+                    theta: Math.sqrt(1000 * Math.PI) * Math.acos(-1 + (2 * i) / 1000),
+                    r: 220
+                });
+            }
+            let angle = 0;
+            function draw() {
+                ctx.clearRect(0, 0, w, h);
+                ctx.save();
+                ctx.translate(w / 2, h / 2);
+                angle += 0.008;
+                particles.forEach(p => {
+                    const x = p.r * Math.sin(p.phi + angle) * Math.cos(p.theta + angle);
+                    const y = p.r * Math.sin(p.phi + angle) * Math.sin(p.theta + angle);
+                    const z = p.r * Math.cos(p.phi + angle);
+                    const scale = 500 / (500 - z);
+                    ctx.fillStyle = ballColor;
+                    ctx.beginPath();
+                    ctx.arc(x * scale, y * scale, scale * 1.2, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                ctx.restore();
+                requestAnimationFrame(draw);
+            }
+            draw();
         }
     </script>
 </body>
