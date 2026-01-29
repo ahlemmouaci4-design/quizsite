@@ -13,6 +13,7 @@
         .hidden { display: none !important; }
         input { width: 85%; padding: 18px; border-radius: 15px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.4); color: #fff; text-align: center; font-size: 1.2rem; margin: 25px 0; outline: none; }
         .action-btn { width: 240px; padding: 16px; border-radius: 50px; border: none; background: #fff; color: #000; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         #timer-box { font-size: 2.2rem; font-weight: 800; margin-bottom: 20px; }
         #options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
         .opt-card { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); padding: 20px; border-radius: 18px; color: #fff; cursor: pointer; transition: 0.2s; }
@@ -28,25 +29,30 @@
             <input type="text" id="team-name-input" placeholder="Nom de l'équipe...">
             <br><button class="action-btn" onclick="registerTeam()">REJOINDRE</button>
         </div>
+
         <div id="waiting-screen" class="hidden">
             <h1 id="assigned-team-name"></h1>
             <p>Attente du signal de l'admin...</p>
         </div>
+
         <div id="quiz-screen" class="hidden">
             <div id="timer-box">01:00</div>
             <div id="q-text" style="font-size: 1.2rem; font-weight: 600; margin-bottom: 20px;"></div>
             <div id="options-grid"></div>
             <button class="action-btn" id="next-btn" disabled onclick="handleNext()" style="margin-top: 30px;">CONFIRMER</button>
         </div>
+
         <div id="wait-results" class="hidden">
             <h1 id="end-status-title"></h1>
             <p>Résultats bientôt affichés...</p>
         </div>
+
         <div id="result-screen" class="hidden">
             <h1>RÉSULTAT FINAL</h1>
             <div id="score-val" style="font-size: 5rem; font-weight: 800;">0</div>
             <button class="action-btn" onclick="showCorrection()">VOIR LA CORRECTION 🔍</button>
         </div>
+
         <div id="correction-screen" class="hidden">
             <h2>CORRECTION</h2>
             <div id="correction-list" style="max-height: 400px; overflow-y: auto;"></div>
@@ -61,7 +67,8 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref('competition');
 
-        let myColor = '', myName = '', current = 0, score = 0, selected = null, userHistory = [], timerInterval;
+        let myColor = '', myName = '', current = 0, score = 0, selected = null, userHistory = [], timerInterval = null;
+        
         const questions = [
             { q: "Quel gène est surnommé 'Le gardien du génome' ?", opts: ["p53", "BRCA1", "KRAS", "MYC"], a: "p53", exp: "p53 est un suppresseur de tumeur clé." },
             { q: "Marqueur spécifique au cancer de l'ovaire ?", opts: ["CA-125", "PSA", "CEA", "AFP"], a: "CA-125", exp: "Le CA-125 est utilisé en oncologie gynécologique." }
@@ -72,9 +79,11 @@
             if(!name) return alert("Nom requis!");
             const snap = await db.once('value');
             const data = snap.val() || {};
+            
             if(!data.teamPink) { myColor = 'pink'; await db.update({ teamPink: name }); }
             else if(!data.teamPurple) { myColor = 'purple'; await db.update({ teamPurple: name }); }
             else return alert("Session pleine!");
+            
             myName = name;
             document.getElementById('reg-screen').classList.add('hidden');
             document.getElementById('waiting-screen').classList.remove('hidden');
@@ -85,28 +94,45 @@
 
         db.on('value', snap => {
             const data = snap.val(); if(!data) return;
+
+            // منطق إعادة الضبط (Reset)
+            if(data.status === 'waiting' && myName !== '') {
+                clearInterval(timerInterval);
+                location.reload(); 
+            }
+
+            // منطق بدء المسابقة
             if(data.status === 'start' && myName && current === 0 && !timerInterval) {
                 document.getElementById('waiting-screen').classList.add('hidden');
                 document.getElementById('quiz-screen').classList.remove('hidden');
                 startQuizTimer(data.startTime);
             }
-            if(data.showResults && myName && !document.getElementById('wait-results').classList.contains('hidden')) {
+
+            // منطق ظهور النتائج (Results)
+            if(data.showResults && myName) {
+                clearInterval(timerInterval);
+                document.getElementById('quiz-screen').classList.add('hidden');
                 document.getElementById('wait-results').classList.add('hidden');
                 document.getElementById('result-screen').classList.remove('hidden');
                 document.getElementById('score-val').innerText = `${score}/${questions.length}`;
             }
-            if(data.status === 'waiting' && myName !== '' && current > 0) location.reload();
         });
 
         function render() {
-            const q = questions[current]; document.getElementById('q-text').innerText = q.q;
-            const grid = document.getElementById('options-grid'); grid.innerHTML = '';
+            const q = questions[current]; 
+            document.getElementById('q-text').innerText = q.q;
+            const grid = document.getElementById('options-grid'); 
+            grid.innerHTML = '';
             document.getElementById('next-btn').disabled = true;
+
             q.opts.forEach(opt => {
-                const b = document.createElement('div'); b.className = 'opt-card'; b.innerText = opt;
+                const b = document.createElement('div'); 
+                b.className = 'opt-card'; 
+                b.innerText = opt;
                 b.onclick = () => {
                     document.querySelectorAll('.opt-card').forEach(x => x.classList.remove('active-pink', 'active-purple'));
-                    b.classList.add(`active-${myColor}`); selected = opt;
+                    b.classList.add(`active-${myColor}`); 
+                    selected = opt;
                     document.getElementById('next-btn').disabled = false;
                 };
                 grid.appendChild(b);
@@ -115,17 +141,22 @@
 
         function startQuizTimer(st) {
             render();
+            if(timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 const rem = 60 - Math.floor((Date.now() - st) / 1000);
-                document.getElementById('timer-box').innerText = `00:${rem > 0 ? rem.toString().padStart(2,'0') : '00'}`;
+                const display = document.getElementById('timer-box');
+                if(display) display.innerText = `00:${rem > 0 ? rem.toString().padStart(2,'0') : '00'}`;
                 if(rem <= 0) forceFinish(true);
             }, 1000);
         }
 
         function handleNext() {
-            userHistory.push(selected); if(selected === questions[current].a) score++;
-            current++; selected = null;
-            if(current < questions.length) render(); else forceFinish(false);
+            userHistory.push(selected); 
+            if(selected === questions[current].a) score++;
+            current++; 
+            selected = null;
+            if(current < questions.length) render(); 
+            else forceFinish(false);
         }
 
         function forceFinish(isT) {
@@ -134,6 +165,7 @@
             upd[myColor === 'pink' ? 'scorePink' : 'scorePurple'] = score;
             upd[myColor === 'pink' ? 'finishedPink' : 'finishedPurple'] = true;
             db.update(upd);
+            
             document.getElementById('quiz-screen').classList.add('hidden');
             document.getElementById('wait-results').classList.remove('hidden');
             document.getElementById('end-status-title').innerText = isT ? "TEMPS ÉCOULÉ !" : "TERMINÉ !";
@@ -142,13 +174,15 @@
         function showCorrection() {
             document.getElementById('result-screen').classList.add('hidden');
             document.getElementById('correction-screen').classList.remove('hidden');
-            const list = document.getElementById('correction-list'); list.innerHTML = '';
+            const list = document.getElementById('correction-list'); 
+            list.innerHTML = '';
             questions.forEach((item, i) => {
-                const isC = userHistory[i] === item.a;
+                const userAns = userHistory[i] || "Aucune";
+                const isC = userAns === item.a;
                 list.innerHTML += `<div class="correction-item" style="border-left:4px solid ${isC?'var(--correct)':'var(--wrong)'}">
                     <div style="font-weight:600;">${i+1}. ${item.q}</div>
-                    <div style="color:${isC?'var(--correct)':'var(--wrong)'}">Réponse: ${userHistory[i]}</div>
-                    ${!isC?`<div style="color:var(--correct)">Bonne: ${item.a}</div>`:''}
+                    <div style="color:${isC?'var(--correct)':'var(--wrong)'}">Votre réponse: ${userAns}</div>
+                    ${!isC?`<div style="color:var(--correct)">Bonne réponse: ${item.a}</div>`:''}
                     <div style="font-size:0.8rem; opacity:0.6; margin-top:5px;">💡 ${item.exp}</div>
                 </div>`;
             });
