@@ -3,139 +3,113 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Oncology Quiz | ADMIN PRO</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oncology Quiz | ADMIN ULTIMATE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;900&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --btn-reset: linear-gradient(135deg, #ff4b2b 0%, #ff416c 100%);
+            --btn-start: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --btn-results: linear-gradient(135deg, #00b4db 0%, #0083b0 100%);
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
         body { 
             font-family: 'Poppins', sans-serif; 
-            background: #0a0a0a; 
-            color: white; 
-            text-align: center; 
-            background-image: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'); 
-            background-size: cover;
-            min-height: 100vh;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            margin: 0; background: #050505; color: white;
+            min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background-image: radial-gradient(circle at center, rgba(157, 80, 187, 0.1) 0%, transparent 70%),
+                              linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), 
+                              url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
+            background-size: cover; background-position: center;
         }
 
-        h1 { font-weight: 800; letter-spacing: 2px; margin-bottom: 30px; text-transform: uppercase; }
-
-        .panel { 
-            background: rgba(255, 255, 255, 0.05); 
-            backdrop-filter: blur(15px);
-            margin: 20px auto; 
-            padding: 35px; 
-            width: 85%; 
-            max-width: 800px;
-            border-radius: 25px; 
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        .main-card {
+            background: var(--glass); backdrop-filter: blur(30px);
+            border: 1px solid var(--border); border-radius: 40px;
+            padding: 50px; width: 90%; max-width: 850px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.7);
+            text-align: center;
         }
 
-        /* --- الأزرار الاحترافية الجديدة --- */
-        .btn-container {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
+        h1 { font-weight: 900; font-size: 2rem; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 40px; opacity: 0.9; }
 
-        button { 
-            padding: 15px 30px; 
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-radius: 12px; 
-            border: 1px solid rgba(255,255,255,0.1); 
-            font-weight: 700; 
-            cursor: pointer; 
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            backdrop-filter: blur(5px);
-            position: relative;
+        /* --- الأزرار الاحترافية (Design Pro) --- */
+        .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; margin-bottom: 50px; }
+
+        .pro-btn {
+            position: relative; border: none; padding: 20px; border-radius: 20px;
+            font-weight: 700; font-size: 0.95rem; color: white; cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+            text-transform: uppercase; letter-spacing: 1px;
             overflow: hidden;
         }
 
-        button:active { transform: scale(0.95); }
-
-        /* زر الحذف - أحمر شفاف */
-        .reset-btn { 
-            background: rgba(239, 68, 68, 0.15); 
-            color: #ff6b6b; 
-            border-color: rgba(239, 68, 68, 0.3);
-        }
-        .reset-btn:hover { 
-            background: rgba(239, 68, 68, 0.8); 
-            color: white; 
-            box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+        .pro-btn::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
         }
 
-        /* زر البدء - أخضر شفاف */
-        .start-btn { 
-            background: rgba(16, 185, 129, 0.15); 
-            color: #2ecc71; 
-            border-color: rgba(16, 185, 129, 0.3);
-        }
-        .start-btn:hover { 
-            background: rgba(16, 185, 129, 0.8); 
-            color: white; 
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
-            transform: translateY(-5px);
+        .pro-btn:hover::before { left: 100%; }
+        .pro-btn:hover { transform: translateY(-7px); box-shadow: 0 15px 30px rgba(0,0,0,0.3); }
+        .pro-btn:active { transform: scale(0.95); }
+
+        .btn-red { background: var(--btn-reset); box-shadow: 0 10px 20px rgba(255, 75, 43, 0.3); }
+        .btn-green { background: var(--btn-start); box-shadow: 0 10px 20px rgba(56, 239, 125, 0.3); }
+        .btn-blue { background: var(--btn-results); box-shadow: 0 10px 20px rgba(0, 180, 219, 0.3); }
+
+        /* --- حالة الفرق (Status) --- */
+        .status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border);
+            border-radius: 30px; padding: 30px; transition: 0.3s;
         }
 
-        /* زر النتائج - أزرق شفاف */
-        .results-btn { 
-            background: rgba(59, 130, 246, 0.15); 
-            color: #60a5fa; 
-            border-color: rgba(59, 130, 246, 0.3);
-        }
-        .results-btn:hover { 
-            background: rgba(59, 130, 246, 0.8); 
-            color: white; 
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
-            transform: translateY(-5px);
-        }
+        .status-card h3 { margin: 0; font-size: 0.9rem; opacity: 0.6; letter-spacing: 2px; }
+        .team-name { font-size: 1.4rem; font-weight: 600; margin: 15px 0; display: block; }
+        .score-box { font-size: 3.5rem; font-weight: 900; line-height: 1; }
 
-        /* --- تنسيق صناديق الفرق --- */
-        .team-box { 
-            display: inline-block; 
-            width: 42%; 
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.05); 
-            padding: 20px; 
-            margin: 10px; 
-            border-radius: 20px;
-            transition: 0.3s;
-        }
-        
-        #pink-status { border-bottom: 4px solid #ec4899; }
-        #purple-status { border-bottom: 4px solid #9d50bb; }
-
-        .score-num { font-size: 2.5rem; font-weight: 800; display: block; margin-top: 10px; }
+        #pink-card { border-top: 5px solid #ec4899; }
+        #purple-card { border-top: 5px solid #9d50bb; }
     </style>
 </head>
 <body>
-    <h1>Panneau Admin</h1>
-    
-    <div class="panel">
-        <div class="btn-container">
-            <button class="reset-btn" onclick="resetComp()">🔄 Reset System</button>
-            <button class="start-btn" onclick="startQuiz()">🚀 Lancer le Quiz</button>
-            <button class="results-btn" onclick="showResults()">📊 Afficher Score</button>
-        </div>
-    </div>
 
-    <div class="panel">
-        <div class="team-box" id="pink-status">
-            <h3 style="color: #ec4899;">TEAM ROSE</h3>
-            <p>Nom: <span id="p-name">---</span></p>
-            <span class="score-num" id="p-score" style="color: #ec4899;">0</span>
+    <div class="main-card">
+        <h1>Control Center</h1>
+
+        <div class="controls">
+            <button class="pro-btn btn-red" onclick="resetComp()">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z"/></svg>
+                Reset Session
+            </button>
+            
+            <button class="pro-btn btn-green" onclick="startQuiz()">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M8,5.14V19.14L19,12.14L8,5.14Z"/></svg>
+                Lancer le Quiz
+            </button>
+            
+            <button class="pro-btn btn-blue" onclick="showResults()">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M16,11V7H12V11H16M10,11V7H6V11H10M16,17V13H12V17H16M10,17V13H6V17H10M21,5V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5C3,3.89 3.89,3 5,3H19A2,2 0 0,1 21,5Z"/></svg>
+                Show Results
+            </button>
         </div>
-        <div class="team-box" id="purple-status">
-            <h3 style="color: #9d50bb;">TEAM VIOLETTE</h3>
-            <p>Nom: <span id="v-name">---</span></p>
-            <span class="score-num" id="v-score" style="color: #9d50bb;">0</span>
+
+        <div class="status-grid">
+            <div class="status-card" id="pink-card">
+                <h3>TEAM ROSE</h3>
+                <span class="team-name" id="p-name">---</span>
+                <div class="score-box" id="p-score" style="color: #ec4899;">0</div>
+            </div>
+            <div class="status-card" id="purple-card">
+                <h3>TEAM VIOLETTE</h3>
+                <span class="team-name" id="v-name">---</span>
+                <div class="score-box" id="v-score" style="color: #9d50bb;">0</div>
+            </div>
         </div>
     </div>
 
@@ -147,23 +121,16 @@
         const db = firebase.database().ref('competition');
 
         function resetComp() {
-            if(confirm("Voulez-vous vraiment tout réinitialiser ?")) {
+            if(confirm("⚠ Réinitialiser toute la compétition ?")) {
                 db.set({
-                    status: 'waiting',
-                    teamPink: "", userPink: "", scorePink: 0, finishedPink: false,
-                    teamPurple: "", userPurple: "", scorePurple: 0, finishedPurple: false,
-                    startTime: 0, showResults: false
+                    status: 'waiting', teamPink: "", userPink: "", scorePink: 0,
+                    teamPurple: "", userPurple: "", scorePurple: 0, startTime: 0, showResults: false
                 });
             }
         }
 
-        function startQuiz() {
-            db.update({ status: 'start', startTime: Date.now() });
-        }
-
-        function showResults() {
-            db.update({ showResults: true });
-        }
+        function startQuiz() { db.update({ status: 'start', startTime: Date.now() }); }
+        function showResults() { db.update({ showResults: true }); }
 
         db.on('value', snap => {
             const d = snap.val(); if(!d) return;
