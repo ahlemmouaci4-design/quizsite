@@ -8,7 +8,7 @@
     <style>
         :root { 
             --purple: #9d50bb; --pink: #ec4899; 
-            --glass-bg: rgba(255, 255, 255, 0.08); --glass-border: rgba(255, 255, 255, 0.12); 
+            --glass-bg: rgba(255, 255, 255, 0.08); --glass-border: rgba(255, 255, 255, 0.15); 
         }
 
         body { 
@@ -35,12 +35,19 @@
             letter-spacing: 1px; display: block; margin-bottom: 5px;
         }
 
+        /* توحيد تصميم الأزرار بحدود واضحة */
         .glass-btn { 
-            padding: 15px 35px; border-radius: 50px; border: 1px solid var(--glass-border); 
-            background: rgba(255,255,255,0.05); color: #fff; font-weight: 700; 
-            cursor: pointer; transition: 0.3s; text-transform: uppercase; 
+            padding: 12px 30px; border-radius: 15px; /* حدود محدودة الحواف */
+            border: 2px solid var(--glass-border); 
+            background: rgba(255,255,255,0.02); color: #fff; font-weight: 700; 
+            cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 0.8rem;
         }
-        .glass-btn:hover { background: rgba(255,255,255,0.15); transform: translateY(-3px); }
+        
+        .btn-red { border-color: #ff4b2b; color: #ff4b2b; }
+        .btn-green { border-color: #10b981; color: #10b981; }
+        .btn-blue { border-color: #3b82f6; color: #3b82f6; }
+
+        .glass-btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
 
         #winner-overlay {
             position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(40px);
@@ -65,7 +72,7 @@
 <body>
 
     <div class="glass-ui">
-        <h1 style="letter-spacing: 5px; font-size: 1rem; opacity: 0.6; margin-bottom: 30px;">PANNEAU D'ADMINISTRATION</h1>
+        <h1 style="letter-spacing: 5px; font-size: 1rem; opacity: 0.6; margin-bottom: 30px;">ADMINISTRATION DU QUIZ</h1>
         
         <div class="status-grid">
             <div class="team-card">
@@ -82,9 +89,9 @@
         </div>
 
         <div style="display:flex; gap:15px; justify-content:center;">
-            <button class="glass-btn" onclick="resetComp()" style="border-color: #ff4b2b;">Réinitialiser</button>
-            <button class="glass-btn" onclick="startQuiz()">Lancer le Quiz</button>
-            <button class="glass-btn" onclick="showFinal()">Afficher Résultats</button>
+            <button class="glass-btn btn-red" onclick="resetComp()">Réinitialiser</button>
+            <button class="glass-btn btn-green" onclick="startQuiz()">Lancer le Quiz</button>
+            <button class="glass-btn btn-blue" onclick="showFinal()">Afficher Résultats</button>
         </div>
     </div>
 
@@ -107,55 +114,63 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref('competition');
 
+        let isAnnouncing = false; // لمنع تكرار الإعلان
+
         function resetComp() { 
-            if(confirm("Réinitialiser toute la compétition ?")) {
-                db.set({ status: 'waiting', teamPink: "", teamPurple: "", scorePink: 0, scorePurple: 0, showResults: false, finishedPink: false, finishedPurple: false }); 
+            if(confirm("Réinitialiser et recommencer le quiz ?")) {
+                isAnnouncing = false; // إعادة ضبط الحالة
+                document.getElementById('winner-overlay').style.display = 'none'; // إخفاء شاشة الفائز فوراً
+                document.getElementById('winner-announcement').classList.add('hidden');
+                document.getElementById('countdown').classList.remove('hidden');
+                
+                db.set({ 
+                    status: 'waiting', teamPink: "", teamPurple: "", 
+                    scorePink: 0, scorePurple: 0, showResults: false, 
+                    finishedPink: false, finishedPurple: false 
+                }); 
             }
         }
+
         function startQuiz() { db.update({ status: 'start', startTime: Date.now() }); }
         function showFinal() { db.update({ showResults: true }); }
 
         db.on('value', snap => {
             const d = snap.val(); if(!d) return;
             
-            // تحديث الأسماء المسجلة
             document.getElementById('display-name-p').innerText = d.teamPink || "Équipe Rose";
             document.getElementById('display-name-v').innerText = d.teamPurple || "Équipe Violette";
-            
-            // تحديث النقاط
             document.getElementById('score-p').innerText = d.scorePink || 0;
             document.getElementById('score-v').innerText = d.scorePurple || 0;
 
-            // تحديث نصوص الحالة بالفرنسية (بدون رموز)
             updateStatusLabel('label-p', d.teamPink, d.status, d.finishedPink);
             updateStatusLabel('label-v', d.teamPurple, d.status, d.finishedPurple);
 
-            if(d.showResults) runWinnerSequence(d);
+            // تشغيل الإعلان فقط إذا كانت القيمة true ولم يتم تشغيله مسبقاً في هذه الجلسة
+            if(d.showResults && !isAnnouncing) {
+                runWinnerSequence(d);
+            } else if (!d.showResults) {
+                document.getElementById('winner-overlay').style.display = 'none';
+                isAnnouncing = false;
+            }
         });
 
         function updateStatusLabel(id, name, status, isFinished) {
             const el = document.getElementById(id);
-            if(!name) {
-                el.innerText = "EN ATTENTE";
-                el.style.color = "#aaa";
-            } else if(isFinished) {
-                el.innerText = "TERMINÉ";
-                el.style.color = "#10b981"; // أخضر
-            } else if(status === 'start') {
-                el.innerText = "RÉPOND EN CE MOMENT";
-                el.style.color = "#3b82f6"; // أزرق
-            } else {
-                el.innerText = "PRÊT";
-                el.style.color = "#f1c40f"; // أصفر
-            }
+            if(!name) { el.innerText = "EN ATTENTE"; el.style.color = "#aaa"; }
+            else if(isFinished) { el.innerText = "TERMINÉ"; el.style.color = "#10b981"; }
+            else if(status === 'start') { el.innerText = "RÉPOND EN CE MOMENT"; el.style.color = "#3b82f6"; }
+            else { el.innerText = "PRÊT"; el.style.color = "#f1c40f"; }
         }
 
-        // دالة الـ Winner والـ Canvas تبقى كما هي في الإصدار السابق
         function runWinnerSequence(d) {
+            isAnnouncing = true; 
             const overlay = document.getElementById('winner-overlay');
             overlay.style.display = 'flex';
             let sec = 10;
+            document.getElementById('countdown').innerText = sec;
+            
             const timer = setInterval(() => {
+                if (!isAnnouncing) { clearInterval(timer); return; } // توقف إذا تم عمل Reset
                 sec--;
                 document.getElementById('countdown').innerText = sec;
                 if(sec <= 0) {
@@ -179,6 +194,7 @@
             initSphere(color);
         }
 
+        // سكريبت الكرة يبقى كما هو
         function initSphere(ballColor) {
             const canvas = document.getElementById('winner-canvas');
             const ctx = canvas.getContext('2d');
@@ -194,22 +210,19 @@
             }
             let angle = 0;
             function draw() {
+                if (!isAnnouncing) return; // توقف الرسم إذا تم عمل Reset
                 ctx.clearRect(0, 0, w, h);
-                ctx.save();
-                ctx.translate(w / 2, h / 2);
+                ctx.save(); ctx.translate(w / 2, h / 2);
                 angle += 0.008;
                 particles.forEach(p => {
                     const x = p.r * Math.sin(p.phi + angle) * Math.cos(p.theta + angle);
                     const y = p.r * Math.sin(p.phi + angle) * Math.sin(p.theta + angle);
                     const z = p.r * Math.cos(p.phi + angle);
                     const scale = 500 / (500 - z);
-                    ctx.fillStyle = ballColor;
-                    ctx.beginPath();
-                    ctx.arc(x * scale, y * scale, scale * 1.2, 0, Math.PI * 2);
-                    ctx.fill();
+                    ctx.fillStyle = ballColor; ctx.beginPath();
+                    ctx.arc(x * scale, y * scale, scale * 1.2, 0, Math.PI * 2); ctx.fill();
                 });
-                ctx.restore();
-                requestAnimationFrame(draw);
+                ctx.restore(); requestAnimationFrame(draw);
             }
             draw();
         }
