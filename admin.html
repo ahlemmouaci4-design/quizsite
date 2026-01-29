@@ -2,67 +2,72 @@
 <html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <title>Oncology Show | Live Reveal</title>
+    <title>Oncology Admin | Final Victory</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root { --purple: #9d50bb; --pink: #ec4899; --glass: rgba(255, 255, 255, 0.08); }
         body { margin: 0; font-family: 'Poppins', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #050505; color: #fff; background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'); background-size: cover; background-attachment: fixed; overflow: hidden; }
         
         .admin-ui { width: 90%; max-width: 950px; background: var(--glass); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.15); border-radius: 40px; padding: 50px; text-align: center; position: relative; }
         
-        #timer-display { font-size: 8rem; font-weight: 800; margin: 10px 0; text-shadow: 0 0 30px rgba(255,255,255,0.2); }
+        #timer-display { font-size: 7rem; font-weight: 800; margin: 10px 0; }
         
-        /* شاشة التشويق */
         #suspense-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #050505; border-radius: 40px; display: flex; align-items: center; justify-content: center; z-index: 100; display: none; }
-        .suspense-text { font-size: 4rem; font-weight: 800; animation: heartBeat 0.5s infinite; color: #ffd700; }
+        .suspense-text { font-size: 4rem; font-weight: 800; animation: heartBeat 0.6s infinite; color: #ffd700; }
 
         .teams-container { display: flex; justify-content: space-around; margin-top: 30px; gap: 25px; }
-        .team-slot { padding: 35px; border-radius: 30px; background: rgba(255, 255, 255, 0.03); width: 45%; border: 1px solid rgba(255,255,255,0.1); transition: 0.5s; }
-        .team-pink { border-top: 8px solid var(--pink); }
-        .team-purple { border-top: 8px solid var(--purple); }
+        .team-slot { padding: 30px; border-radius: 25px; background: rgba(255, 255, 255, 0.03); width: 45%; border: 1px solid rgba(255,255,255,0.1); transition: 0.8s; }
+        .team-pink { border-top: 6px solid var(--pink); }
+        .team-purple { border-top: 6px solid var(--purple); }
 
-        .score-val { font-size: 6rem; font-weight: 800; margin-top: 15px; display: none; }
-        .winner-glow { animation: goldGlow 2s infinite; color: #ffd700 !important; transform: scale(1.1); }
+        .score-val { font-size: 5rem; font-weight: 800; margin-top: 10px; display: none; }
+        .winner-glow { animation: goldGlow 2s infinite; border-color: #ffd700; background: rgba(255, 215, 0, 0.05); }
 
-        @keyframes heartBeat { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-        @keyframes goldGlow { 0% { text-shadow: 0 0 10px #ffd700; } 50% { text-shadow: 0 0 40px #ffd700, 0 0 60px #ffae00; } 100% { text-shadow: 0 0 10px #ffd700; } }
-        @keyframes reveal { from { opacity: 0; transform: translateY(30px); filter: blur(10px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
+        @keyframes heartBeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        @keyframes goldGlow { 0%, 100% { box-shadow: 0 0 20px rgba(255,215,0,0.2); } 50% { box-shadow: 0 0 50px rgba(255,215,0,0.5); } }
+        @keyframes reveal { from { opacity: 0; transform: scale(0.5); filter: blur(10px); } to { opacity: 1; transform: scale(1); filter: blur(0); } }
         
-        .reveal-effect { animation: reveal 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .reveal-effect { animation: reveal 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         .hidden { display: none !important; }
-        
-        button { padding: 15px 30px; border-radius: 50px; border: none; font-weight: 700; cursor: pointer; margin: 10px; transition: 0.3s; }
-        .btn-results { background: #fff; color: #000; font-size: 1.1rem; box-shadow: 0 0 20px rgba(255,255,255,0.3); }
+
+        /* الأزرار بالقياسات السابقة المتناسقة */
+        .controls { margin-top: 50px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        button { padding: 18px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1); font-weight: 700; cursor: pointer; transition: 0.3s; color: white; background: rgba(157, 80, 187, 0.4); font-family: 'Poppins'; }
+        button:hover { transform: translateY(-3px); background: var(--purple); }
+        .btn-go { background: rgba(16, 185, 129, 0.2); } .btn-go:hover { background: #10b981; }
+        .btn-results { background: #fff; color: #000; } .btn-results:hover { background: #ddd; }
+        .btn-reset { background: rgba(239, 68, 68, 0.1); } .btn-reset:hover { background: #ef4444; }
     </style>
 </head>
 <body>
 
     <div class="admin-ui">
-        <div id="suspense-overlay"><div class="suspense-text">CALCUL...</div></div>
+        <div id="suspense-overlay"><div class="suspense-text">RÉSULTATS...</div></div>
 
-        <h1 id="header-title" style="letter-spacing: 4px; opacity: 0.8;">ONCOLOGY CHAMPIONSHIP</h1>
+        <h1 id="header-title" style="letter-spacing: 2px; opacity: 0.7;">ONCOLOGY LIVE SHOW</h1>
         <div id="timer-display">01:00</div>
 
         <div class="teams-container">
             <div class="team-slot team-pink" id="card-pink">
-                <h3 style="color: var(--pink); margin: 0;">Team Rose</h3>
-                <div id="name-pink" style="font-size: 1.5rem; font-weight: 600;">En attente...</div>
-                <div id="status-pink" style="font-size: 0.9rem; color: #10b981; margin-top:10px;"></div>
+                <h3 style="color: var(--pink); margin-bottom: 5px;">Team Rose</h3>
+                <div id="name-pink" style="font-size: 1.4rem; font-weight: 600;">En attente...</div>
+                <div id="status-pink" style="font-weight: bold; color: #10b981; margin-top:10px;"></div>
                 <div id="score-pink" class="score-val">0</div>
             </div>
 
             <div class="team-slot team-purple" id="card-purple">
-                <h3 style="color: var(--purple); margin: 0;">Team Violette</h3>
-                <div id="name-purple" style="font-size: 1.5rem; font-weight: 600;">En attente...</div>
-                <div id="status-purple" style="font-size: 0.9rem; color: #10b981; margin-top:10px;"></div>
+                <h3 style="color: var(--purple); margin-bottom: 5px;">Team Violette</h3>
+                <div id="name-purple" style="font-size: 1.4rem; font-weight: 600;">En attente...</div>
+                <div id="status-purple" style="font-weight: bold; color: #10b981; margin-top:10px;"></div>
                 <div id="score-purple" class="score-val">0</div>
             </div>
         </div>
 
-        <div style="margin-top: 40px;">
-            <button onclick="triggerAction('start')" style="background: #10b981; color: white;">LANCER</button>
-            <button class="btn-results" onclick="startDramaticReveal()">RÉSULTATS</button>
-            <button onclick="triggerAction('reset')" style="background: #ef4444; color: white;">RESET</button>
+        <div class="controls">
+            <button class="btn-go" onclick="triggerAction('start')">START</button>
+            <button class="btn-results" onclick="startDramaticReveal()">RESULTS</button>
+            <button class="btn-reset" onclick="triggerAction('reset')">RESET</button>
         </div>
     </div>
 
@@ -76,11 +81,10 @@
 
         db.on('value', snap => {
             const data = snap.val(); if(!data) return;
-            
             if(data.teamPink) document.getElementById('name-pink').innerText = data.teamPink;
             if(data.teamPurple) document.getElementById('name-purple').innerText = data.teamPurple;
-            if(data.finishedPink) document.getElementById('status-pink').innerText = "PRÊT ✓";
-            if(data.finishedPurple) document.getElementById('status-purple').innerText = "PRÊT ✓";
+            if(data.finishedPink) document.getElementById('status-pink').innerText = "TERMINE ✓";
+            if(data.finishedPurple) document.getElementById('status-purple').innerText = "TERMINE ✓";
 
             if(data.status === 'start') startTimer(data.startTime);
             if(data.showResults) { performFinalReveal(data); }
@@ -92,25 +96,19 @@
             interval = setInterval(() => {
                 const rem = 60 - Math.floor((Date.now() - st) / 1000);
                 document.getElementById('timer-display').innerText = `00:${rem > 0 ? rem.toString().padStart(2,'0') : '00'}`;
-                if(rem <= 0) clearInterval(interval);
             }, 1000);
         }
 
-        // دالة إثارة الحماس قبل عرض النتيجة
-        function startDramaticReveal() {
-            db.update({ showResults: true });
-        }
+        function startDramaticReveal() { db.update({ showResults: true }); }
 
         function performFinalReveal(data) {
             const overlay = document.getElementById('suspense-overlay');
             overlay.style.display = 'flex';
             
-            // صوت ضربات قلب (تخيلي) أو مجرد تأثير بصري لمدة 2 ثانية
             setTimeout(() => {
                 overlay.style.display = 'none';
                 document.getElementById('timer-display').classList.add('hidden');
-                document.getElementById('status-pink').classList.add('hidden');
-                document.getElementById('status-purple').classList.add('hidden');
+                document.querySelectorAll('[id^="status-"]').forEach(el => el.classList.add('hidden'));
 
                 const sP = data.scorePink || 0;
                 const sV = data.scorePurple || 0;
@@ -122,12 +120,21 @@
                 elP.style.display = 'block'; elV.style.display = 'block';
                 elP.classList.add('reveal-effect'); elV.classList.add('reveal-effect');
 
-                // تحديد الفائز
+                // تأثير انفجار القنبلة الملونة
+                let winnerColor = sP > sV ? '#ec4899' : (sV > sP ? '#9d50bb' : ['#ec4899', '#9d50bb']);
+                
+                confetti({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: Array.isArray(winnerColor) ? winnerColor : [winnerColor, '#ffffff']
+                });
+
                 if(sP > sV) document.getElementById('card-pink').classList.add('winner-glow');
                 else if(sV > sP) document.getElementById('card-purple').classList.add('winner-glow');
                 
-                document.getElementById('header-title').innerText = "AND THE WINNER IS...";
-            }, 2500); // مدة الانتظار المشوق
+                document.getElementById('header-title').innerText = "FÉLICITATIONS !";
+            }, 2500);
         }
 
         function triggerAction(act) {
