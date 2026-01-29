@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <title>لوحة التحكم للأدمن</title>
+    <style>
+        body { background: #050505; color: white; font-family: 'Cairo'; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .panel { background: rgba(255,255,255,0.05); padding: 40px; border-radius: 20px; border: 1px solid #9d50bb; text-align: center; }
+        button { padding: 15px 30px; margin: 10px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; }
+        .btn-start { background: #10b981; color: white; }
+        .btn-stop { background: #ef4444; color: white; }
+        .btn-result { background: #9d50bb; color: white; }
+    </style>
+</head>
+<body>
+    <div class="panel">
+        <h1>لوحة تحكم المسابقة 2026</h1>
+        <hr><br>
+        <button class="btn-start" onclick="updateStatus('start')">إطلاق المسابقة للجميع</button>
+        <button class="btn-result" onclick="updateStatus('showResults')">إظهار النتائج للطلاب</button>
+        <br>
+        <button class="btn-stop" onclick="updateStatus('reset')">إعادة ضبط المسابقة (تصفير)</button>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script>
+        const firebaseConfig = { databaseURL: "https://YOUR-PROJECT-ID.firebaseio.com" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database().ref('competition');
+
+        function updateStatus(action) {
+            if(action === 'start') db.update({ status: 'start', showResults: false });
+            if(action === 'showResults') db.update({ showResults: true });
+            if(action === 'reset') db.set({ status: 'waiting', showResults: false });
+            alert("تم إرسال الأمر بنجاح!");
+        }
+    </script>
+</body>
+</html>
