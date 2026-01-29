@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oncology Masterclass | Review Edition</title>
+    <title>Oncology Elite | Correction Mode</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -39,15 +39,14 @@
             background: var(--glass); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 40px; 
             padding: 40px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8); text-align: center;
-            max-height: 90vh; overflow-y: auto;
+            max-height: 85vh; overflow-y: auto;
         }
 
-        /* تخصيص شريط التمرير ليناسب التصميم الزجاجي */
-        .glass-ui::-webkit-scrollbar { width: 5px; }
+        .glass-ui::-webkit-scrollbar { width: 4px; }
         .glass-ui::-webkit-scrollbar-thumb { background: var(--purple); border-radius: 10px; }
 
         .pulse-line {
-            width: 200px; height: 2px; background: rgba(255,255,255,0.1);
+            width: 150px; height: 2px; background: rgba(255,255,255,0.1);
             margin: 0 auto 20px; position: relative; overflow: hidden;
         }
         .pulse-line::after {
@@ -57,37 +56,38 @@
         }
         @keyframes scan { 100% { left: 100%; } }
 
-        h1 { font-size: 2.2rem; font-weight: 900; margin-bottom: 10px; }
+        h1 { font-size: 2rem; font-weight: 900; margin-bottom: 10px; }
         .purple-gradient { background: linear-gradient(to left, #fff, var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        .progress-box { margin: 20px 0; font-size: 0.8rem; color: rgba(255,255,255,0.5); }
-        .track { width: 100%; height: 2px; background: rgba(255,255,255,0.1); margin: 10px 0; }
-        .fill { height: 100%; width: 0%; background: var(--purple); box-shadow: 0 0 15px var(--purple); transition: 0.5s; }
+        .progress-box { margin-bottom: 20px; font-size: 0.8rem; color: rgba(255,255,255,0.5); }
+        .track { width: 100%; height: 2px; background: rgba(255,255,255,0.1); margin: 8px 0; }
+        .fill { height: 100%; width: 0%; background: var(--purple); box-shadow: 0 0 10px var(--purple); transition: 0.4s; }
 
-        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px; }
         .opt-card {
             background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 18px; border-radius: 15px; color: #fff; cursor: pointer;
+            padding: 20px; border-radius: 18px; color: #fff; cursor: pointer;
             font-family: 'Cairo'; font-size: 1rem; transition: 0.3s;
         }
-        .opt-card:hover { background: rgba(157, 80, 187, 0.15); border-color: var(--purple); }
+        .opt-card:hover { background: rgba(157, 80, 187, 0.12); border-color: var(--purple); }
         .opt-card.active { background: var(--purple); border-color: var(--purple); font-weight: 900; }
 
         .action-btn {
-            margin-top: 30px; width: 200px; padding: 15px; border-radius: 50px;
+            margin-top: 30px; width: 220px; padding: 16px; border-radius: 50px;
             border: none; background: #fff; color: #000; font-family: 'Cairo';
-            font-weight: 900; cursor: pointer; box-shadow: 0 10px 20px rgba(255,255,255,0.2);
+            font-weight: 900; cursor: pointer; font-size: 1rem;
+            box-shadow: 0 10px 20px rgba(255,255,255,0.2);
         }
-        .action-btn.secondary { background: transparent; border: 1px solid #fff; color: #fff; margin-top: 10px; }
+        /* تصميم زر المراجعة */
+        .review-btn { background: transparent; border: 1.5px solid var(--purple); color: #fff; margin-top: 15px; }
+        .review-btn:hover { background: var(--purple); }
 
-        /* مراجعة الإجابات */
-        .review-item {
+        .correction-card {
             text-align: right; background: rgba(255,255,255,0.03); 
-            border-radius: 20px; padding: 20px; margin-top: 20px; border-right: 4px solid var(--purple);
+            border-radius: 20px; padding: 20px; margin-top: 15px; 
+            border-right: 4px solid var(--purple);
         }
-        .review-q { font-weight: 700; margin-bottom: 10px; color: var(--purple); }
-        .review-a { font-size: 0.9rem; margin-bottom: 5px; }
-        .explanation { font-size: 0.85rem; color: #aaa; font-style: italic; margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; }
+        .explanation { font-size: 0.85rem; color: #bbb; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); }
 
         .hidden { display: none; }
     </style>
@@ -100,117 +100,108 @@
         <div class="pulse-line"></div>
 
         <div id="start-screen">
-            <h1>Oncology <span class="purple-gradient">Masterclass</span></h1>
-            <p style="opacity: 0.6;">دليلك المعرفي في الأورام 2026</p>
-            <button class="action-btn" onclick="start()">دخول المنصة</button>
+            <h1>Oncology <span class="purple-gradient">Expertise</span></h1>
+            <p style="opacity: 0.6; font-weight: 300;">Advanced Assessment System 2026</p>
+            <button class="action-btn" onclick="startQuiz()">ابدأ التقييم</button>
         </div>
 
         <div id="quiz-screen" class="hidden">
             <div class="progress-box">
-                <div style="display: flex; justify-content: space-between;"><span id="q-idx">1 / 25</span><span>PROGRESS</span></div>
+                <div style="display: flex; justify-content: space-between;"><span id="q-counter">1 / 25</span><span>PROGRESS</span></div>
                 <div class="track"><div class="fill" id="bar"></div></div>
             </div>
-            <div id="question" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 25px;"></div>
-            <div class="options-grid" id="options"></div>
-            <button class="action-btn" id="next" disabled onclick="handleNext()">التالي</button>
+            <div id="q-text" style="font-size: 1.3rem; font-weight: 700;"></div>
+            <div class="options-grid" id="o-grid"></div>
+            <button class="action-btn" id="next-btn" disabled onclick="nextStep()">السؤال التالي</button>
         </div>
 
         <div id="result-screen" class="hidden">
             <h1 class="purple-gradient">النتيجة النهائية</h1>
-            <div id="final-score" style="font-size: 5rem; font-weight: 900;">0</div>
-            <button class="action-btn" onclick="showReview()">مراجعة الإجابات 🔍</button>
-            <button class="action-btn secondary" onclick="location.reload()">إعادة الاختبار</button>
+            <div id="score-val" style="font-size: 5rem; font-weight: 900; margin: 10px 0;">0</div>
+            
+            <button class="action-btn" onclick="showCorrection()">عرض التصحيح والشرح 🔍</button>
+            <br>
+            <button class="action-btn review-btn" onclick="location.reload()">إعادة الاختبار</button>
         </div>
 
-        <div id="review-screen" class="hidden">
-            <h2 class="purple-gradient" style="margin-bottom: 20px;">تقرير الأداء الطبي</h2>
-            <div id="review-list"></div>
-            <button class="action-btn" onclick="location.reload()">إنهاء المراجعة</button>
+        <div id="correction-screen" class="hidden">
+            <h2 class="purple-gradient" style="margin-bottom: 20px;">مراجعة الأخطاء والصواب</h2>
+            <div id="correction-list"></div>
+            <button class="action-btn" onclick="location.reload()">العودة للرئيسية</button>
         </div>
     </div>
 
     <script>
-        const questions = [
-            { 
-                q: "ما هو الجين الملقب بـ 'حارس الجينوم' دكتور؟", 
-                opts: ["p53", "BRCA1", "KRAS", "MYC"], 
-                a: "p53",
-                exp: "جين p53 هو بروتين يمنع طفرات الجينوم ويعمل ككابت للأورام."
-            },
-            { 
-                q: "أي من الواسمات التالية هو الأنسب لسرطان المبيض؟", 
-                opts: ["CA-125", "PSA", "CEA", "AFP"], 
-                a: "CA-125",
-                exp: "CA-125 هو بروتين يتواجد بتركيزات عالية في دم النساء المصابات بسرطان المبيض."
-            }
-            // أضف بقية الـ 23 سؤالاً هنا مع إضافة حقل exp للشرح
+        // مصفوفة الأسئلة مع الشرح (exp)
+        const db = [
+            { q: "ما هو الجين الملقب بـ 'حارس الجينوم' دكتور؟", opts: ["p53", "BRCA1", "KRAS", "MYC"], a: "p53", exp: "يعمل p53 ككابت للأورام من خلال تنظيم دورة الخلية وإصلاح الحمض النووي." },
+            { q: "أي من الواسمات التالية هو الأنسب لسرطان المبيض؟", opts: ["CA-125", "PSA", "CEA", "AFP"], a: "CA-125", exp: "يعتبر CA-125 الواسم الذهبي لمتابعة سرطان المبيض سريرياً." }
         ];
 
-        let current = 0, score = 0, selected = null;
-        let userAnswers = [];
+        let idx = 0, score = 0, userSelection = null, history = [];
 
-        function start() {
+        function startQuiz() {
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('quiz-screen').classList.remove('hidden');
-            render();
+            loadQ();
         }
 
-        function render() {
-            const data = questions[current];
-            document.getElementById('q-idx').innerText = `${current + 1} / ${questions.length}`;
-            document.getElementById('bar').style.width = `${(current / questions.length) * 100}%`;
-            document.getElementById('question').innerText = data.q;
-            const grid = document.getElementById('options');
+        function loadQ() {
+            const currentQ = db[idx];
+            document.getElementById('q-counter').innerText = `${idx + 1} / ${db.length}`;
+            document.getElementById('bar').style.width = `${(idx / db.length) * 100}%`;
+            document.getElementById('q-text').innerText = currentQ.q;
+            
+            const grid = document.getElementById('o-grid');
             grid.innerHTML = '';
-            document.getElementById('next').disabled = true;
+            document.getElementById('next-btn').disabled = true;
 
-            data.opts.forEach(o => {
-                const b = document.createElement('button');
-                b.className = 'opt-card';
-                b.innerText = o;
-                b.onclick = () => {
-                    document.querySelectorAll('.opt-card').forEach(x => x.classList.remove('active'));
-                    b.classList.add('active');
-                    selected = o;
-                    document.getElementById('next').disabled = false;
+            currentQ.opts.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-card';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    document.querySelectorAll('.opt-card').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    userSelection = opt;
+                    document.getElementById('next-btn').disabled = false;
                 };
-                grid.appendChild(b);
+                grid.appendChild(btn);
             });
         }
 
-        function handleNext() {
-            userAnswers.push(selected);
-            if (selected === questions[current].a) score++;
-            current++;
-            if (current < questions.length) render();
-            else finish();
+        function nextStep() {
+            history.push(userSelection);
+            if (userSelection === db[idx].a) score++;
+            idx++;
+            if (idx < db.length) loadQ();
+            else showResult();
         }
 
-        function finish() {
+        function showResult() {
             document.getElementById('quiz-screen').classList.add('hidden');
             document.getElementById('result-screen').classList.remove('hidden');
-            document.getElementById('final-score').innerText = `${score} / ${questions.length}`;
+            document.getElementById('score-val').innerText = `${score} / ${db.length}`;
         }
 
-        function showReview() {
+        function showCorrection() {
             document.getElementById('result-screen').classList.add('hidden');
-            document.getElementById('review-screen').classList.remove('hidden');
-            const list = document.getElementById('review-list');
+            document.getElementById('correction-screen').classList.remove('hidden');
+            const list = document.getElementById('correction-list');
             list.innerHTML = '';
 
-            questions.forEach((q, i) => {
-                const isCorrect = userAnswers[i] === q.a;
-                const div = document.createElement('div');
-                div.className = 'review-item';
-                div.innerHTML = `
-                    <div class="review-q">${i + 1}. ${q.q}</div>
-                    <div class="review-a" style="color: ${isCorrect ? 'var(--correct)' : 'var(--wrong)'}">
-                        إجابتك: ${userAnswers[i]} ${isCorrect ? '✓' : '✗'}
+            db.forEach((item, i) => {
+                const correct = history[i] === item.a;
+                list.innerHTML += `
+                    <div class="correction-card">
+                        <div style="font-weight: 700; color: var(--purple);">${i+1}. ${item.q}</div>
+                        <div style="color: ${correct ? 'var(--correct)' : 'var(--wrong)'}; margin-top: 5px;">
+                            إجابتك: ${history[i]} ${correct ? '✓' : '✗'}
+                        </div>
+                        ${!correct ? `<div style="color: var(--correct)">الجواب الصحيح: ${item.a}</div>` : ''}
+                        <div class="explanation">💡 <b>الشرح:</b> ${item.exp}</div>
                     </div>
-                    ${!isCorrect ? `<div class="review-a" style="color: var(--correct)">الإجابة الصحيحة: ${q.a}</div>` : ''}
-                    <div class="explanation">💡 الشرح: ${q.exp}</div>
                 `;
-                list.appendChild(div);
             });
         }
     </script>
