@@ -1,209 +1,64 @@
+
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oncology Elite | Correction Mode</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --purple: #9d50bb;
-            --glass: rgba(255, 255, 255, 0.03);
-            --correct: #10b981;
-            --wrong: #ef4444;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; scroll-behavior: smooth; }
-
-        body {
-            margin: 0; font-family: 'Cairo', sans-serif;
-            min-height: 100vh; display: flex; align-items: center; justify-content: center;
-            background-color: #050505;
-            background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
-                              url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
-            background-size: cover; background-position: center; background-attachment: fixed;
-            color: #fff; overflow-x: hidden;
-        }
-
-        .ambient-glow {
-            position: absolute; width: 300px; height: 300px;
-            background: var(--purple); filter: blur(150px);
-            border-radius: 50%; z-index: 1; opacity: 0.2;
-            animation: moveGlow 10s infinite alternate;
-        }
-
-        @keyframes moveGlow { from { top: 10%; left: 10%; } to { bottom: 10%; right: 10%; } }
-
-        .glass-ui {
-            position: relative; z-index: 10; width: 92%; max-width: 750px;
-            background: var(--glass); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 40px; 
-            padding: 40px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8); text-align: center;
-            max-height: 85vh; overflow-y: auto;
-        }
-
-        .glass-ui::-webkit-scrollbar { width: 4px; }
-        .glass-ui::-webkit-scrollbar-thumb { background: var(--purple); border-radius: 10px; }
-
-        .pulse-line {
-            width: 150px; height: 2px; background: rgba(255,255,255,0.1);
-            margin: 0 auto 20px; position: relative; overflow: hidden;
-        }
-        .pulse-line::after {
-            content: ""; position: absolute; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, var(--purple), transparent);
-            animation: scan 2s linear infinite;
-        }
-        @keyframes scan { 100% { left: 100%; } }
-
-        h1 { font-size: 2rem; font-weight: 900; margin-bottom: 10px; }
-        .purple-gradient { background: linear-gradient(to left, #fff, var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        .progress-box { margin-bottom: 20px; font-size: 0.8rem; color: rgba(255,255,255,0.5); }
-        .track { width: 100%; height: 2px; background: rgba(255,255,255,0.1); margin: 8px 0; }
-        .fill { height: 100%; width: 0%; background: var(--purple); box-shadow: 0 0 10px var(--purple); transition: 0.4s; }
-
-        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px; }
-        .opt-card {
-            background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 20px; border-radius: 18px; color: #fff; cursor: pointer;
-            font-family: 'Cairo'; font-size: 1rem; transition: 0.3s;
-        }
-        .opt-card:hover { background: rgba(157, 80, 187, 0.12); border-color: var(--purple); }
-        .opt-card.active { background: var(--purple); border-color: var(--purple); font-weight: 900; }
-
-        .action-btn {
-            margin-top: 30px; width: 220px; padding: 16px; border-radius: 50px;
-            border: none; background: #fff; color: #000; font-family: 'Cairo';
-            font-weight: 900; cursor: pointer; font-size: 1rem;
-            box-shadow: 0 10px 20px rgba(255,255,255,0.2);
-        }
-        /* تصميم زر المراجعة */
-        .review-btn { background: transparent; border: 1.5px solid var(--purple); color: #fff; margin-top: 15px; }
-        .review-btn:hover { background: var(--purple); }
-
-        .correction-card {
-            text-align: right; background: rgba(255,255,255,0.03); 
-            border-radius: 20px; padding: 20px; margin-top: 15px; 
-            border-right: 4px solid var(--purple);
-        }
-        .explanation { font-size: 0.85rem; color: #bbb; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); }
-
-        .hidden { display: none; }
+        /* إضافة شاشة الانتظار */
+        #waiting-screen { text-align: center; padding: 50px; }
+        .loader { border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--purple); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
-
     <div class="ambient-glow"></div>
-
     <div class="glass-ui">
-        <div class="pulse-line"></div>
+        <div id="status-tag" style="font-size: 0.7rem; color: var(--purple); margin-bottom: 10px;">متصل بالخادم..</div>
 
-        <div id="start-screen">
-            <h1>Oncology <span class="purple-gradient">Expertise</span></h1>
-            <p style="opacity: 0.6; font-weight: 300;">Advanced Assessment System 2026</p>
-            <button class="action-btn" onclick="startQuiz()">ابدأ التقييم</button>
+        <div id="waiting-screen">
+            <h1 class="purple-gradient">في انتظار إشارة البدء...</h1>
+            <div class="loader"></div>
+            <p>سيبدأ التحدي لجميع الفرق في وقت واحد فور إذن الإدارة.</p>
         </div>
 
         <div id="quiz-screen" class="hidden">
-            <div class="progress-box">
-                <div style="display: flex; justify-content: space-between;"><span id="q-counter">1 / 25</span><span>PROGRESS</span></div>
-                <div class="track"><div class="fill" id="bar"></div></div>
             </div>
-            <div id="q-text" style="font-size: 1.3rem; font-weight: 700;"></div>
-            <div class="options-grid" id="o-grid"></div>
-            <button class="action-btn" id="next-btn" disabled onclick="nextStep()">السؤال التالي</button>
+
+        <div id="wait-results" class="hidden">
+            <h1 class="purple-gradient">أحسنت!</h1>
+            <p>تم إرسال إجاباتك. انتظر إعلان النتائج من قبل الأدمن.</p>
         </div>
 
         <div id="result-screen" class="hidden">
             <h1 class="purple-gradient">النتيجة النهائية</h1>
-            <div id="score-val" style="font-size: 5rem; font-weight: 900; margin: 10px 0;">0</div>
-            
-            <button class="action-btn" onclick="showCorrection()">عرض التصحيح والشرح 🔍</button>
-            <br>
-            <button class="action-btn review-btn" onclick="location.reload()">إعادة الاختبار</button>
-        </div>
-
-        <div id="correction-screen" class="hidden">
-            <h2 class="purple-gradient" style="margin-bottom: 20px;">مراجعة الأخطاء والصواب</h2>
-            <div id="correction-list"></div>
-            <button class="action-btn" onclick="location.reload()">العودة للرئيسية</button>
+            <div id="score-val" style="font-size: 5rem; font-weight: 900;">0</div>
+            <button class="action-btn" onclick="showCorrection()">عرض التصحيح</button>
         </div>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
     <script>
-        // مصفوفة الأسئلة مع الشرح (exp)
-        const db = [
-            { q: "ما هو الجين الملقب بـ 'حارس الجينوم' دكتور؟", opts: ["p53", "BRCA1", "KRAS", "MYC"], a: "p53", exp: "يعمل p53 ككابت للأورام من خلال تنظيم دورة الخلية وإصلاح الحمض النووي." },
-            { q: "أي من الواسمات التالية هو الأنسب لسرطان المبيض؟", opts: ["CA-125", "PSA", "CEA", "AFP"], a: "CA-125", exp: "يعتبر CA-125 الواسم الذهبي لمتابعة سرطان المبيض سريرياً." }
-        ];
+        // هنا تضع إعدادات Firebase الخاصة بك (سأشرحها لك في الأسفل)
+        const firebaseConfig = { databaseURL: "https://YOUR-PROJECT-ID.firebaseio.com" };
+        firebase.initializeApp(firebaseConfig);
+        const dbRef = firebase.database().ref('competition');
 
-        let idx = 0, score = 0, userSelection = null, history = [];
+        // مراقبة الأوامر من الأدمن
+        dbRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data.status === 'start') {
+                document.getElementById('waiting-screen').classList.add('hidden');
+                document.getElementById('quiz-screen').classList.remove('hidden');
+            } else if (data.showResults && current >= questions.length) {
+                document.getElementById('wait-results').classList.add('hidden');
+                document.getElementById('result-screen').classList.remove('hidden');
+            }
+        });
 
-        function startQuiz() {
-            document.getElementById('start-screen').classList.add('hidden');
-            document.getElementById('quiz-screen').classList.remove('hidden');
-            loadQ();
-        }
-
-        function loadQ() {
-            const currentQ = db[idx];
-            document.getElementById('q-counter').innerText = `${idx + 1} / ${db.length}`;
-            document.getElementById('bar').style.width = `${(idx / db.length) * 100}%`;
-            document.getElementById('q-text').innerText = currentQ.q;
-            
-            const grid = document.getElementById('o-grid');
-            grid.innerHTML = '';
-            document.getElementById('next-btn').disabled = true;
-
-            currentQ.opts.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = 'opt-card';
-                btn.innerText = opt;
-                btn.onclick = () => {
-                    document.querySelectorAll('.opt-card').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    userSelection = opt;
-                    document.getElementById('next-btn').disabled = false;
-                };
-                grid.appendChild(btn);
-            });
-        }
-
-        function nextStep() {
-            history.push(userSelection);
-            if (userSelection === db[idx].a) score++;
-            idx++;
-            if (idx < db.length) loadQ();
-            else showResult();
-        }
-
-        function showResult() {
-            document.getElementById('quiz-screen').classList.add('hidden');
-            document.getElementById('result-screen').classList.remove('hidden');
-            document.getElementById('score-val').innerText = `${score} / ${db.length}`;
-        }
-
-        function showCorrection() {
-            document.getElementById('result-screen').classList.add('hidden');
-            document.getElementById('correction-screen').classList.remove('hidden');
-            const list = document.getElementById('correction-list');
-            list.innerHTML = '';
-
-            db.forEach((item, i) => {
-                const correct = history[i] === item.a;
-                list.innerHTML += `
-                    <div class="correction-card">
-                        <div style="font-weight: 700; color: var(--purple);">${i+1}. ${item.q}</div>
-                        <div style="color: ${correct ? 'var(--correct)' : 'var(--wrong)'}; margin-top: 5px;">
-                            إجابتك: ${history[i]} ${correct ? '✓' : '✗'}
-                        </div>
-                        ${!correct ? `<div style="color: var(--correct)">الجواب الصحيح: ${item.a}</div>` : ''}
-                        <div class="explanation">💡 <b>الشرح:</b> ${item.exp}</div>
-                    </div>
-                `;
-            });
-        }
+        // (باقي دوال المسابقة السابقة مع تعديل دوال الانتقال)
     </script>
 </body>
 </html>
