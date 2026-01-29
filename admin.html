@@ -1,102 +1,76 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oncology Quiz | ADMIN PRO</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --pink-glow: #ec4899;
-            --purple-glow: #9d50bb;
-            --glass: rgba(255, 255, 255, 0.05);
-            --border: rgba(255, 255, 255, 0.12);
-        }
-
+        :root { --pink: #ec4899; --purple: #9d50bb; --glass: rgba(255, 255, 255, 0.05); }
         body { 
-            font-family: 'Poppins', sans-serif; 
-            margin: 0; background: #050505; color: white;
+            font-family: 'Poppins', sans-serif; margin: 0; background: #050505; color: white;
             min-height: 100vh; display: flex; flex-direction: column; align-items: center;
-            background-image: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), 
-                              url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
-            background-size: cover; background-position: center; background-attachment: fixed;
+            background-image: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
+            background-size: cover; background-attachment: fixed;
         }
-
-        /* --- صناديق الفرق في الأعلى (الترتيب الذي تفضله) --- */
-        .top-status {
-            display: flex; justify-content: center; gap: 20px; width: 90%; margin-top: 40px;
+        .top-status { display: flex; justify-content: center; gap: 20px; width: 90%; margin-top: 40px; }
+        .team-card { flex: 1; max-width: 400px; background: var(--glass); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 25px; padding: 25px; text-align: center; transition: 0.5s; }
+        
+        /* تأثير النقاط المتحركة */
+        .dots::after { content: ''; animation: dots 1.5s infinite; }
+        @keyframes dots { 0% { content: '.'; } 33% { content: '..'; } 66% { content: '...'; } }
+        
+        .status-badge { font-size: 0.8rem; padding: 5px 15px; border-radius: 50px; background: rgba(255,255,255,0.1); margin-bottom: 10px; display: inline-block; }
+        .score-val { font-size: 3.5rem; font-weight: 900; }
+        
+        .admin-panel { background: var(--glass); backdrop-filter: blur(30px); border-radius: 35px; padding: 30px; margin-top: 30px; width: 85%; max-width: 800px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+        .controls { display: flex; justify-content: center; gap: 15px; }
+        .btn { padding: 15px 25px; border-radius: 15px; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; text-transform: uppercase; }
+        .btn-reset { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .btn-start { background: #10b981; color: white; }
+        .btn-results { background: #3b82f6; color: white; }
+        
+        /* شاشة الفائز الفضية */
+        #winner-overlay {
+            position: fixed; top:0; left:0; width:100%; height:100%; 
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(20px);
+            display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000;
         }
-
-        .team-card {
-            flex: 1; max-width: 400px; background: var(--glass); backdrop-filter: blur(20px);
-            border: 1px solid var(--border); border-radius: 25px; padding: 25px;
-            text-align: center; position: relative; transition: 0.3s;
+        .silver-card {
+            background: linear-gradient(145deg, #bdc3c7, #ffffff, #8e9eab);
+            color: #2c3e50; padding: 50px; border-radius: 30px;
+            box-shadow: 0 0 50px rgba(255,255,255,0.3), inset 0 0 20px rgba(0,0,0,0.2);
+            text-align: center; border: 4px solid #ecf0f1;
+            transform: scale(0.8); animation: celebrate 1s forwards;
         }
-
-        .team-card h3 { margin: 0; font-size: 0.8rem; letter-spacing: 2px; opacity: 0.7; text-transform: uppercase; }
-        .team-name { font-size: 1.5rem; font-weight: 800; margin: 10px 0; display: block; }
-        .score-val { font-size: 3.5rem; font-weight: 900; line-height: 1; }
-
-        #pink-card { border-bottom: 5px solid var(--pink-glow); box-shadow: 0 10px 30px rgba(236, 72, 153, 0.2); }
-        #purple-card { border-bottom: 5px solid var(--purple-glow); box-shadow: 0 10px 30px rgba(157, 80, 187, 0.2); }
-
-        /* --- لوحة التحكم الوسطى --- */
-        .admin-panel {
-            background: var(--glass); backdrop-filter: blur(30px);
-            border: 1px solid var(--border); border-radius: 35px;
-            padding: 40px; margin-top: 30px; width: 85%; max-width: 800px;
-            text-align: center;
-        }
-
-        h1 { font-weight: 900; letter-spacing: 5px; text-transform: uppercase; font-size: 1.2rem; margin-bottom: 30px; }
-
-        /* --- الأزرار الاحترافية (Glass-Pro) --- */
-        .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
-
-        .btn {
-            border: 1px solid rgba(255,255,255,0.1); padding: 18px; border-radius: 18px;
-            font-weight: 700; color: white; cursor: pointer;
-            transition: all 0.3s ease; text-transform: uppercase; font-size: 0.85rem;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-        }
-
-        .btn:hover { transform: translateY(-5px); }
-        .btn:active { transform: scale(0.98); }
-
-        .btn-reset { background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: rgba(239, 68, 68, 0.3); }
-        .btn-reset:hover { background: #ef4444; color: white; box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
-
-        .btn-start { background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: rgba(16, 185, 129, 0.3); }
-        .btn-start:hover { background: #10b981; color: white; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
-
-        .btn-results { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border-color: rgba(59, 130, 246, 0.3); }
-        .btn-results:hover { background: #3b82f6; color: white; box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
+        @keyframes celebrate { to { transform: scale(1.1); } }
     </style>
 </head>
 <body>
 
     <div class="top-status">
-        <div class="team-card" id="pink-card">
-            <h3>Team Rose</h3>
-            <span class="team-name" id="p-name">---</span>
-            <div class="score-val" id="p-score" style="color: var(--pink-glow);">0</div>
+        <div class="team-card" id="card-pink">
+            <div id="stat-p" class="status-badge">En attente</div>
+            <h3 id="n-p">---</h3>
+            <div class="score-val" id="s-p" style="color: var(--pink);">0</div>
         </div>
-        
-        <div class="team-card" id="purple-card">
-            <h3>Team Violette</h3>
-            <span class="team-name" id="v-name">---</span>
-            <div class="score-val" id="v-score" style="color: var(--purple-glow);">0</div>
+        <div class="team-card" id="card-purple">
+            <div id="stat-v" class="status-badge">En attente</div>
+            <h3 id="n-v">---</h3>
+            <div class="score-val" id="s-v" style="color: var(--purple);">0</div>
         </div>
     </div>
 
     <div class="admin-panel">
-        <h1>Control Panel</h1>
         <div class="controls">
-            <button class="btn btn-reset" onclick="resetComp()">🔄 Reset System</button>
-            <button class="btn btn-start" onclick="startQuiz()">🚀 Start Quiz</button>
-            <button class="btn btn-results" onclick="showResults()">📊 Show Results</button>
+            <button class="btn btn-reset" onclick="resetComp()">Reset</button>
+            <button class="btn btn-start" onclick="startQuiz()">Lancer le Quiz</button>
+            <button class="btn btn-results" onclick="showFinal()">Afficher Résultats</button>
         </div>
+    </div>
+
+    <div id="winner-overlay">
+        <h1 id="countdown" style="font-size: 8rem; color: #bdc3c7;">10</h1>
+        <div id="final-box" class="hidden"></div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -106,25 +80,60 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref('competition');
 
-        function resetComp() {
-            if(confirm("⚠ Réinitialiser toute la session ?")) {
-                db.set({
-                    status: 'waiting', teamPink: "", userPink: "", scorePink: 0,
-                    teamPurple: "", userPurple: "", scorePurple: 0, startTime: 0, showResults: false
-                });
-            }
-        }
-
+        function resetComp() { db.set({ status: 'waiting', teamPink: "", teamPurple: "", scorePink: 0, scorePurple: 0, showResults: false }); }
         function startQuiz() { db.update({ status: 'start', startTime: Date.now() }); }
-        function showResults() { db.update({ showResults: true }); }
+        function showFinal() { db.update({ showResults: true }); }
 
         db.on('value', snap => {
             const d = snap.val(); if(!d) return;
-            document.getElementById('p-name').innerText = d.teamPink || "---";
-            document.getElementById('p-score').innerText = d.scorePink || 0;
-            document.getElementById('v-name').innerText = d.teamPurple || "---";
-            document.getElementById('v-score').innerText = d.scorePurple || 0;
+            // تحديث البطاقات
+            document.getElementById('n-p').innerText = d.teamPink || "---";
+            document.getElementById('s-p').innerText = d.scorePink || 0;
+            document.getElementById('n-v').innerText = d.teamPurple || "---";
+            document.getElementById('s-v').innerText = d.scorePurple || 0;
+
+            // تحديث الحالة (يجيب/أنهى)
+            updateStatus('stat-p', d.teamPink, d.status, d.finishedPink);
+            updateStatus('stat-v', d.teamPurple, d.status, d.finishedPurple);
+
+            if(d.showResults) triggerWinnerFlow(d);
         });
+
+        function updateStatus(id, name, status, finished) {
+            const el = document.getElementById(id);
+            if(!name) el.innerText = "Vide";
+            else if(finished) { el.innerText = "Terminé ✅"; el.className = "status-badge"; el.style.color = "#10b981"; }
+            else if(status === 'start') { el.innerText = "Répond"; el.classList.add('dots'); el.style.color = "#3b82f6"; }
+            else el.innerText = "Prêt";
+        }
+
+        function triggerWinnerFlow(d) {
+            const overlay = document.getElementById('winner-overlay');
+            overlay.style.display = 'flex';
+            let count = 10;
+            const timer = setInterval(() => {
+                count--;
+                document.getElementById('countdown').innerText = count;
+                if(count <= 0) {
+                    clearInterval(timer);
+                    showWinner(d);
+                }
+            }, 1000);
+        }
+
+        function showWinner(d) {
+            document.getElementById('countdown').classList.add('hidden');
+            const winner = d.scorePink >= d.scorePurple ? 
+                {name: d.teamPink, score: d.scorePink} : {name: d.teamPurple, score: d.scorePurple};
+            
+            const box = document.getElementById('final-box');
+            box.classList.remove('hidden');
+            box.innerHTML = `<div class="silver-card">
+                <h2 style="margin:0; letter-spacing:3px;">VAINQUEUR</h2>
+                <h1 style="font-size:4rem; margin:10px 0;">${winner.name}</h1>
+                <div style="font-size:3rem; font-weight:900;">SCORE: ${winner.score}</div>
+            </div>`;
+        }
     </script>
 </body>
 </html>
