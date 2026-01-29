@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oncology Quiz | Smart Session</title>
+    <title>Oncology Quiz | Sync Fix</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root { --purple: #9d50bb; --pink: #ec4899; --glass-bg: rgba(255, 255, 255, 0.08); --glass-border: rgba(255, 255, 255, 0.12); --correct: #10b981; --wrong: #ef4444; }
@@ -23,13 +23,14 @@
     <div class="glass-ui">
         <div id="reg-screen">
             <h1>INSCRIPTION</h1>
+            <p id="reg-status" style="font-size: 0.9rem; opacity: 0.7;">Veuillez choisir un nom pour votre équipe</p>
             <input type="text" id="team-name-input" placeholder="Nom de l'équipe...">
-            <br><button class="action-btn" onclick="registerTeam()">REJOINDRE</button>
+            <br><button class="action-btn" id="reg-btn" onclick="registerTeam()">REJOINDRE</button>
         </div>
 
         <div id="waiting-screen" class="hidden">
             <h1 id="assigned-team-name"></h1>
-            <p>Session active. En attente du signal de l'admin...</p>
+            <p>Connecté avec succès. L'admin va lancer le quiz...</p>
         </div>
 
         <div id="quiz-screen" class="hidden">
@@ -40,7 +41,7 @@
         </div>
 
         <div id="wait-results" class="hidden"><h1>TERMINÉ !</h1><p>Résultats bientôt affichés...</p></div>
-        <div id="result-screen" class="hidden"><h1>VOTRE SCORE</h1><div id="score-val" style="font-size: 5rem;">0</div></div>
+        <div id="result-screen" class="hidden"><h1>SCORE FINAL</h1><div id="score-val" style="font-size: 5rem;">0</div></div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -50,30 +51,55 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref('competition');
 
-        // توليد معرف فريد للمتصفح لمنع تداخل الجلسات
         let userId = localStorage.getItem('userId') || ('user_' + Math.random().toString(36).substr(2, 9));
         localStorage.setItem('userId', userId);
 
         let myColor = '', myName = '', current = 0, score = 0, selected = null, timerInterval = null;
 
         const questions = [
-            { q: "Quel gène est surnومّم 'Le gardien du génome' ?", opts: ["p53", "BRCA1", "KRAS", "MYC"], a: "p53" },
+            { q: "Quel gène est surnommé 'Le gardien du génome' ?", opts: ["p53", "BRCA1", "KRAS", "MYC"], a: "p53" },
             { q: "Marqueur spécifique au cancer de l'ovaire ?", opts: ["CA-125", "PSA", "CEA", "AFP"], a: "CA-125" }
         ];
 
-        // فحص الجلسة تلقائياً عند الدخول
-        async function checkSession() {
-            const snap = await db.once('value');
-            const data = snap.val();
-            if (!data) return;
+        // المراقبة اللحظية للحالة (Real-time Observer)
+        db.on('value', snap => {
+            const data = snap.val(); if(!data) return;
 
-            if (data.userPink === userId) { 
-                rejoin('pink', data.teamPink); 
-            } else if (data.userPurple === userId) { 
-                rejoin('purple', data.teamPurple); 
+            // 1. تصفير البيانات عند طلب الـ Reset
+            if(data.status === 'waiting' && myName !== '') {
+                localStorage.removeItem('myName');
+                localStorage.removeItem('myColor');
+                location.reload();
             }
-        }
-        checkSession();
+
+            // 2. التحقق إذا كان هذا المستخدم مسجل مسبقاً (Session Recovery)
+            if (!myName) {
+                if (data.userPink === userId) rejoin('pink', data.teamPink);
+                else if (data.userPurple === userId) rejoin('purple', data.teamPurple);
+            }
+
+            // 3. تحديث واجهة التسجيل إذا تم حجز الفرق من أجهزة أخرى
+            if (!myName && document.getElementById('reg-screen').style.display !== 'none') {
+                if (data.teamPink && data.teamPurple) {
+                    document.getElementById('reg-status').innerText = "Session pleine (Equipes déjà prêtes)";
+                    document.getElementById('reg-btn').disabled = true;
+                }
+            }
+
+            // 4. بدء الكويز
+            if(data.status === 'start' && myName && current === 0 && !timerInterval) {
+                document.getElementById('waiting-screen').classList.add('hidden');
+                document.getElementById('quiz-screen').classList.remove('hidden');
+                startQuizTimer(data.startTime);
+            }
+
+            // 5. عرض النتائج
+            if(data.showResults && myName) {
+                document.getElementById('quiz-screen').classList.add('hidden');
+                document.getElementById('result-screen').classList.remove('hidden');
+                document.getElementById('score-val').innerText = `${score}/${questions.length}`;
+            }
+        });
 
         function rejoin(color, name) {
             myColor = color; myName = name;
@@ -93,36 +119,12 @@
 
             if(!data.teamPink) { 
                 await db.update({ teamPink: name, userPink: userId }); 
-                rejoin('pink', name);
             } else if(!data.teamPurple) { 
                 await db.update({ teamPurple: name, userPurple: userId }); 
-                rejoin('purple', name);
             } else {
-                alert("Session pleine! Les deux équipes sont déjà inscrites.");
+                alert("Désolé, les deux équipes sont déjà inscrites.");
             }
         }
-
-        db.on('value', snap => {
-            const data = snap.val(); if(!data) return;
-
-            // عند عمل Reset: مسح كل شيء والعودة للبداية
-            if(data.status === 'waiting' && myName !== '') {
-                localStorage.removeItem('userId'); // مسح المعرف عند الريسيت فقط
-                location.reload();
-            }
-
-            if(data.status === 'start' && myName && current === 0 && !timerInterval) {
-                document.getElementById('waiting-screen').classList.add('hidden');
-                document.getElementById('quiz-screen').classList.remove('hidden');
-                startQuizTimer(data.startTime);
-            }
-
-            if(data.showResults && myName) {
-                document.getElementById('quiz-screen').classList.add('hidden');
-                document.getElementById('result-screen').classList.remove('hidden');
-                document.getElementById('score-val').innerText = `${score}/${questions.length}`;
-            }
-        });
 
         function startQuizTimer(st) {
             render();
@@ -168,4 +170,3 @@
     </script>
 </body>
 </html>
-
