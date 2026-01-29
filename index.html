@@ -1,39 +1,71 @@
 
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oncology Masterclass | Live Student</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* إضافة شاشة الانتظار */
-        #waiting-screen { text-align: center; padding: 50px; }
-        .loader { border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--purple); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        :root { --purple: #9d50bb; --glass: rgba(255, 255, 255, 0.03); --correct: #10b981; --wrong: #ef4444; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            margin: 0; font-family: 'Cairo', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            background-color: #050505; color: #fff; overflow-x: hidden;
+            background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
+            background-size: cover; background-position: center; background-attachment: fixed;
+        }
+        .glass-ui { position: relative; z-index: 10; width: 92%; max-width: 750px; background: var(--glass); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 40px; padding: 40px; text-align: center; max-height: 85vh; overflow-y: auto; }
         .hidden { display: none !important; }
+        
+        /* شاشة الانتظار */
+        #waiting-screen { text-align: center; padding: 30px; }
+        .loader { border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--purple); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 25px auto; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .action-btn { margin-top: 30px; width: 220px; padding: 16px; border-radius: 50px; border: none; background: #fff; color: #000; font-weight: 900; cursor: pointer; font-size: 1rem; box-shadow: 0 10px 20px rgba(255,255,255,0.2); transition: 0.3s; }
+        .action-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        
+        .opt-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 18px; color: #fff; cursor: pointer; font-family: 'Cairo'; transition: 0.3s; font-size: 1rem; }
+        .opt-card:hover { background: rgba(157, 80, 187, 0.12); border-color: var(--purple); }
+        .opt-card.active { background: var(--purple); border-color: var(--purple); font-weight: 900; }
+
+        .correction-item { text-align: right; background: rgba(255,255,255,0.03); border-radius: 15px; padding: 15px; margin-top: 15px; border-right: 4px solid var(--purple); }
+        .purple-gradient { background: linear-gradient(to left, #fff, var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900; }
     </style>
 </head>
 <body>
-    <div class="ambient-glow"></div>
+
     <div class="glass-ui">
-        <div id="status-tag" style="font-size: 0.7rem; color: var(--purple); margin-bottom: 10px;">متصل بالخادم..</div>
+        <div id="status-tag" style="font-size: 0.7rem; color: var(--purple); margin-bottom: 10px; opacity: 0.6;">نظام المزامنة المباشر متصل..</div>
 
         <div id="waiting-screen">
             <h1 class="purple-gradient">في انتظار إشارة البدء...</h1>
             <div class="loader"></div>
-            <p>سيبدأ التحدي لجميع الفرق في وقت واحد فور إذن الإدارة.</p>
+            <p style="opacity: 0.8;">سيبدأ التحدي لجميع الفرق في وقت واحد فور إذن الإدارة.</p>
         </div>
 
         <div id="quiz-screen" class="hidden">
-            </div>
+            <div id="q-text" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 25px;"></div>
+            <div id="options-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"></div>
+            <button class="action-btn" id="next-btn" disabled onclick="handleNext()">السؤال التالي</button>
+        </div>
 
         <div id="wait-results" class="hidden">
-            <h1 class="purple-gradient">أحسنت!</h1>
-            <p>تم إرسال إجاباتك. انتظر إعلان النتائج من قبل الأدمن.</p>
+            <h1 class="purple-gradient">تم إنهاء الاختبار!</h1>
+            <p style="margin-top: 15px;">أحسنت دكتور، تم حفظ إجاباتك.<br>يرجى انتظار الأدمن لإظهار النتائج للجميع.</p>
         </div>
 
         <div id="result-screen" class="hidden">
             <h1 class="purple-gradient">النتيجة النهائية</h1>
-            <div id="score-val" style="font-size: 5rem; font-weight: 900;">0</div>
-            <button class="action-btn" onclick="showCorrection()">عرض التصحيح</button>
+            <div id="score-val" style="font-size: 5rem; font-weight: 900; margin: 10px 0;">0</div>
+            <button class="action-btn" onclick="showCorrection()">عرض التصحيح والشرح 🔍</button>
+        </div>
+
+        <div id="correction-screen" class="hidden">
+            <h2 class="purple-gradient">مراجعة الإجابات</h2>
+            <div id="correction-list" style="margin-top: 20px;"></div>
+            <button class="action-btn" onclick="location.reload()">العودة</button>
         </div>
     </div>
 
@@ -41,27 +73,99 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
     <script>
-        // هنا تضع إعدادات Firebase الخاصة بك (سأشرحها لك في الأسفل)
+        // إعدادات Firebase الخاصة بك
         const firebaseConfig = { databaseURL: "https://quiz-8016b-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref('competition');
 
-        // مراقبة الأوامر من الأدمن
-        dbRef.on('value', (snapshot) => {
+        // مصفوفة الأسئلة
+        const questions = [
+            { q: "ما هو الجين الملقب بـ 'حارس الجينوم' دكتور؟", opts: ["p53", "BRCA1", "KRAS", "MYC"], a: "p53", exp: "يعمل p53 ككابت للأورام من خلال تنظيم دورة الخلية وإصلاح الحمض النووي." },
+            { q: "أي من الواسمات التالية هو الأنسب لسرطان المبيض؟", opts: ["CA-125", "PSA", "CEA", "AFP"], a: "CA-125", exp: "يعتبر CA-125 الواسم الذهبي لمتابعة سرطان المبيض سريرياً." }
+        ];
+
+        let current = 0, score = 0, selected = null, userHistory = [];
+
+        // مراقبة الأوامر من الأدمن بشكل لحظي
+        db.on('value', (snapshot) => {
             const data = snapshot.val();
-            if (data.status === 'start') {
+            if (!data) return;
+
+            // أمر البدء
+            if (data.status === 'start' && current === 0) {
                 document.getElementById('waiting-screen').classList.add('hidden');
                 document.getElementById('quiz-screen').classList.remove('hidden');
-            } else if (data.showResults && current >= questions.length) {
+                render();
+            } 
+            
+            // أمر إظهار النتائج
+            if (data.showResults && current >= questions.length) {
                 document.getElementById('wait-results').classList.add('hidden');
                 document.getElementById('result-screen').classList.remove('hidden');
+                document.getElementById('score-val').innerText = `${score} / ${questions.length}`;
+            }
+
+            // أمر إعادة التعيين
+            if (data.status === 'waiting') {
+                location.reload();
             }
         });
 
-        // (باقي دوال المسابقة السابقة مع تعديل دوال الانتقال)
+        function render() {
+            const q = questions[current];
+            document.getElementById('q-text').innerText = q.q;
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            document.getElementById('next-btn').disabled = true;
+
+            q.opts.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-card';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    document.querySelectorAll('.opt-card').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    selected = opt;
+                    document.getElementById('next-btn').disabled = false;
+                };
+                grid.appendChild(btn);
+            });
+        }
+
+        function handleNext() {
+            userHistory.push(selected);
+            if (selected === questions[current].a) score++;
+            current++;
+            if (current < questions.length) {
+                render();
+            } else {
+                document.getElementById('quiz-screen').classList.add('hidden');
+                document.getElementById('wait-results').classList.remove('hidden');
+            }
+        }
+
+        function showCorrection() {
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('correction-screen').classList.remove('hidden');
+            const list = document.getElementById('correction-list');
+            list.innerHTML = '';
+
+            questions.forEach((item, i) => {
+                const isCorrect = userHistory[i] === item.a;
+                list.innerHTML += `
+                    <div class="correction-item">
+                        <div style="font-weight: 700; color: var(--purple);">${i+1}. ${item.q}</div>
+                        <div style="color: ${isCorrect ? 'var(--correct)' : 'var(--wrong)'}; margin-top: 5px;">
+                            إجابتك: ${userHistory[i]} ${isCorrect ? '✓' : '✗'}
+                        </div>
+                        ${!isCorrect ? `<div style="color: var(--correct)">الجواب الصحيح: ${item.a}</div>` : ''}
+                        <div style="font-size: 0.85rem; color: #aaa; margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 5px;">
+                            💡 الشرح: ${item.exp}
+                        </div>
+                    </div>
+                `;
+            });
+        }
     </script>
 </body>
 </html>
-
-
-
