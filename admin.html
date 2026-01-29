@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -34,23 +33,24 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     
     <script>
-        // إعدادات Firebase الخاصة بك
         const firebaseConfig = { databaseURL: "https://quiz-8016b-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
-        
-        // المرجع يجب أن يكون 'competition' ليطابق كود الطالب
         const db = firebase.database().ref('competition');
 
         function sendAction(action) {
             if (action === 'start') {
-                db.update({ status: 'start', showResults: false });
+                // نرسل وقت السيرفر الحالي لضمان تزامن العداد عند الجميع
+                db.update({ 
+                    status: 'start', 
+                    showResults: false,
+                    startTime: firebase.database.ServerValue.TIMESTAMP 
+                });
             } else if (action === 'showResults') {
                 db.update({ showResults: true });
             } else if (action === 'reset') {
                 db.set({ status: 'waiting', showResults: false });
             }
             
-            // إظهار رسالة تأكيد بسيطة بدلاً من الـ alert المزعج
             const msg = document.getElementById('msg');
             msg.style.display = 'block';
             setTimeout(() => { msg.style.display = 'none'; }, 2000);
