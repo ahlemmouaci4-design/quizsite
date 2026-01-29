@@ -2,114 +2,95 @@
 <html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <title>Oncology Dashboard | Premium Theme</title>
+    <title>Oncology Dashboard | Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --purple-main: #9d50bb; 
-            --purple-light: rgba(157, 80, 187, 0.4);
-            --pink-main: #ec4899; 
-            --glass-bg: rgba(255, 255, 255, 0.08); /* شفافية أقل لإظهار الخلفية */
-            --glass-border: rgba(255, 255, 255, 0.15);
+            --purple-main: #9d50bb; --purple-light: rgba(157, 80, 187, 0.4);
+            --pink-main: #ec4899; --glass-bg: rgba(255, 255, 255, 0.08); 
         }
-
         body {
-            margin: 0; font-family: 'Poppins', sans-serif; min-height: 100vh;
-            background: #050505; color: #fff; display: flex; align-items: center; justify-content: center;
-            /* خلفية مع تظليل خفيف جداً لإبراز الصورة خلف الزجاج */
+            margin: 0; font-family: 'Poppins', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            background: #050505; color: #fff;
             background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
-            background-size: cover; background-position: center; background-attachment: fixed;
+            background-size: cover; background-attachment: fixed;
         }
-
         .admin-ui { 
-            width: 90%; max-width: 950px; 
-            background: var(--glass-bg); 
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); 
-            border: 1px solid var(--glass-border); 
-            border-radius: 40px; padding: 50px; text-align: center;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            width: 90%; max-width: 950px; background: var(--glass-bg); backdrop-filter: blur(15px); 
+            border: 1px solid rgba(255,255,255,0.15); border-radius: 40px; padding: 50px; text-align: center;
         }
-
-        h1 { font-weight: 800; letter-spacing: 3px; margin-bottom: 10px; opacity: 0.9; }
-
-        #timer-display { 
-            font-size: 7rem; font-weight: 800; margin: 10px 0; 
-            background: linear-gradient(to bottom, #fff, #ddd);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-
+        #timer-display { font-size: 7rem; font-weight: 800; margin: 10px 0; background: linear-gradient(#fff, #bbb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .teams-container { display: flex; justify-content: space-around; margin-top: 30px; gap: 25px; }
-        
-        .team-slot { 
-            padding: 25px; border-radius: 25px; 
-            background: rgba(255, 255, 255, 0.03); 
-            width: 45%; border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: 0.4s;
-        }
-        
-        /* تأثير السطر العلوي الملون */
+        .team-slot { padding: 25px; border-radius: 25px; background: rgba(255, 255, 255, 0.03); width: 45%; border: 1px solid rgba(255,255,255,0.1); }
         .team-pink { border-top: 6px solid var(--pink-main); }
         .team-purple { border-top: 6px solid var(--purple-main); }
-
-        .controls { 
-            margin-top: 50px; display: grid; 
-            grid-template-columns: repeat(3, 1fr); gap: 20px; 
-        }
-
-        /* تنسيق الأزرار المتناسق مع الثيم البنفسجي */
-        button { 
-            padding: 18px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1); 
-            font-weight: 700; cursor: pointer; transition: 0.3s; 
-            font-family: 'Poppins'; font-size: 0.9rem;
-            color: white; background: var(--purple-light);
-        }
-
-        button:hover { background: var(--purple-main); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(157, 80, 187, 0.3); }
-
-        .btn-go { background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.4); }
-        .btn-go:hover { background: #10b981; border-color: #10b981; }
-
-        .btn-reset { background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); }
-        .btn-reset:hover { background: #ef4444; border-color: #ef4444; }
-
-        #finish-alert { 
-            margin-top: 25px; padding: 10px; border-radius: 15px;
-            background: rgba(16, 185, 129, 0.1); color: #10b981; 
-            font-weight: 600; display: none; animation: fadeIn 0.5s;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .controls { margin-top: 50px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        button { padding: 18px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1); font-weight: 700; cursor: pointer; transition: 0.3s; color: white; background: var(--purple-light); }
+        button:hover { background: var(--purple-main); transform: translateY(-3px); }
+        .btn-go { background: rgba(16, 185, 129, 0.2); } .btn-go:hover { background: #10b981; }
+        .btn-reset { background: rgba(239, 68, 68, 0.1); } .btn-reset:hover { background: #ef4444; }
     </style>
 </head>
 <body>
-
     <div class="admin-ui">
         <h1>ONCOLOGY SHOW</h1>
-        <p style="opacity: 0.6; font-size: 0.9rem;">Live Masterclass Session 2026</p>
-        
         <div id="timer-display">01:00</div>
-
         <div class="teams-container">
             <div class="team-slot team-pink">
-                <h3 style="color: var(--pink-main); margin-bottom: 5px;">Team Rose</h3>
-                <div id="name-pink" style="font-size: 1.4rem; font-weight: 600;">En attente...</div>
-                <div id="status-pink" style="margin-top: 10px; font-weight: bold; color: #10b981;"></div>
+                <h3 style="color: var(--pink-main);">Team Rose</h3>
+                <div id="name-pink" style="font-size: 1.4rem;">En attente...</div>
+                <div id="status-pink" style="color: #10b981; font-weight: bold; margin-top:10px;"></div>
             </div>
             <div class="team-slot team-purple">
-                <h3 style="color: var(--purple-main); margin-bottom: 5px;">Team Violette</h3>
-                <div id="name-purple" style="font-size: 1.4rem; font-weight: 600;">En attente...</div>
-                <div id="status-purple" style="margin-top: 10px; font-weight: bold; color: #10b981;"></div>
+                <h3 style="color: var(--purple-main);">Team Violette</h3>
+                <div id="name-purple" style="font-size: 1.4rem;">En attente...</div>
+                <div id="status-purple" style="color: #10b981; font-weight: bold; margin-top:10px;"></div>
             </div>
         </div>
-
-        <div id="finish-alert">✓ Tout le monde a terminé !</div>
-
         <div class="controls">
-            <button class="btn-go" onclick="triggerAction('start')">LANCER LE QUIZ</button>
-            <button onclick="triggerAction('showResults')">AFFICHER RÉSULTATS</button>
-            <button class="btn-reset" onclick="triggerAction('reset')">RESET SESSION</button>
+            <button class="btn-go" onclick="triggerAction('start')">START</button>
+            <button onclick="triggerAction('showResults')">RESULTS</button>
+            <button class="btn-reset" onclick="triggerAction('reset')">RESET</button>
         </div>
     </div>
 
-    </body>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script>
+        const firebaseConfig = { databaseURL: "https://quiz-8016b-default-rtdb.firebaseio.com/" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database().ref('competition');
+        let interval;
+
+        db.on('value', snap => {
+            const data = snap.val(); if(!data) return;
+            if(data.teamPink) document.getElementById('name-pink').innerText = data.teamPink;
+            if(data.teamPurple) document.getElementById('name-purple').innerText = data.teamPurple;
+            if(data.finishedPink) document.getElementById('status-pink').innerText = "TERMINE ✓";
+            if(data.finishedPurple) document.getElementById('status-purple').innerText = "TERMINE ✓";
+            if(data.status === 'start' && data.startTime) startTimer(data.startTime);
+            if(data.status === 'waiting') { 
+                clearInterval(interval); document.getElementById('timer-display').innerText = "01:00"; 
+                document.querySelectorAll('[id^="status-"]').forEach(el => el.innerText = "");
+                document.getElementById('name-pink').innerText = "En attente...";
+                document.getElementById('name-purple').innerText = "En attente...";
+            }
+        });
+
+        function startTimer(st) {
+            clearInterval(interval);
+            interval = setInterval(() => {
+                const rem = 60 - Math.floor((Date.now() - st) / 1000);
+                document.getElementById('timer-display').innerText = `00:${rem > 0 ? rem.toString().padStart(2,'0') : '00'}`;
+                if(rem <= 0) clearInterval(interval);
+            }, 1000);
+        }
+
+        function triggerAction(act) {
+            if(act === 'start') db.update({ status: 'start', startTime: firebase.database.ServerValue.TIMESTAMP });
+            else if(act === 'showResults') db.update({ showResults: true });
+            else if(act === 'reset') db.set({ status: 'waiting' });
+        }
+    </script>
+</body>
 </html>
