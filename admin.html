@@ -1,76 +1,100 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Oncology Quiz | ADMIN PRO</title>
+    <title>Oncology Quiz | ADMIN ULTIMATE</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;900&display=swap" rel="stylesheet">
     <style>
-        :root { --pink: #ec4899; --purple: #9d50bb; --glass: rgba(255, 255, 255, 0.05); }
+        :root {
+            --purple-grad: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            --purple-glow: rgba(106, 17, 203, 0.4);
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
         body { 
             font-family: 'Poppins', sans-serif; margin: 0; background: #050505; color: white;
             min-height: 100vh; display: flex; flex-direction: column; align-items: center;
-            background-image: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
+            background-image: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
             background-size: cover; background-attachment: fixed;
         }
+
         .top-status { display: flex; justify-content: center; gap: 20px; width: 90%; margin-top: 40px; }
-        .team-card { flex: 1; max-width: 400px; background: var(--glass); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 25px; padding: 25px; text-align: center; transition: 0.5s; }
         
-        /* تأثير النقاط المتحركة */
+        .team-card { 
+            flex: 1; max-width: 400px; background: var(--glass); backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 30px; padding: 25px; 
+            text-align: center; transition: 0.5s; position: relative;
+        }
+
+        .status-tag { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; padding: 4px 12px; border-radius: 50px; background: rgba(255,255,255,0.1); margin-bottom: 10px; display: inline-block; }
         .dots::after { content: ''; animation: dots 1.5s infinite; }
         @keyframes dots { 0% { content: '.'; } 33% { content: '..'; } 66% { content: '...'; } }
-        
-        .status-badge { font-size: 0.8rem; padding: 5px 15px; border-radius: 50px; background: rgba(255,255,255,0.1); margin-bottom: 10px; display: inline-block; }
-        .score-val { font-size: 3.5rem; font-weight: 900; }
-        
-        .admin-panel { background: var(--glass); backdrop-filter: blur(30px); border-radius: 35px; padding: 30px; margin-top: 30px; width: 85%; max-width: 800px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
-        .controls { display: flex; justify-content: center; gap: 15px; }
-        .btn { padding: 15px 25px; border-radius: 15px; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; text-transform: uppercase; }
-        .btn-reset { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
-        .btn-start { background: #10b981; color: white; }
-        .btn-results { background: #3b82f6; color: white; }
-        
-        /* شاشة الفائز الفضية */
-        #winner-overlay {
-            position: fixed; top:0; left:0; width:100%; height:100%; 
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(20px);
-            display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000;
+
+        .score-val { font-size: 4rem; font-weight: 900; background: linear-gradient(#fff, #999); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .admin-panel { 
+            background: var(--glass); backdrop-filter: blur(30px); border-radius: 40px; 
+            padding: 35px; margin-top: 30px; width: 85%; max-width: 800px; 
+            border: 1px solid rgba(255,255,255,0.1); text-align: center;
         }
-        .silver-card {
-            background: linear-gradient(145deg, #bdc3c7, #ffffff, #8e9eab);
-            color: #2c3e50; padding: 50px; border-radius: 30px;
-            box-shadow: 0 0 50px rgba(255,255,255,0.3), inset 0 0 20px rgba(0,0,0,0.2);
-            text-align: center; border: 4px solid #ecf0f1;
-            transform: scale(0.8); animation: celebrate 1s forwards;
+
+        .btn-group { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+
+        .btn-purple {
+            background: var(--purple-grad); color: white; border: none;
+            padding: 16px 35px; border-radius: 18px; font-weight: 700;
+            text-transform: uppercase; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 10px 20px var(--purple-glow);
         }
-        @keyframes celebrate { to { transform: scale(1.1); } }
+
+        .btn-purple:hover { transform: translateY(-3px); box-shadow: 0 15px 25px var(--purple-glow); }
+        .btn-purple:active { transform: scale(0.92); }
+
+        /* شاشة إعلان الفائز الفضية */
+        #winner-screen {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(25px);
+            display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000;
+        }
+
+        .silver-medal {
+            background: linear-gradient(135deg, #e0e0e0 0%, #ffffff 50%, #b0b0b0 100%);
+            color: #1a1a1a; padding: 60px; border-radius: 40px; text-align: center;
+            box-shadow: 0 0 50px rgba(255,255,255,0.2); border: 8px solid #d1d1d1;
+            transform: scale(0.5); animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popIn { to { transform: scale(1); } }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
     <div class="top-status">
-        <div class="team-card" id="card-pink">
-            <div id="stat-p" class="status-badge">En attente</div>
-            <h3 id="n-p">---</h3>
-            <div class="score-val" id="s-p" style="color: var(--pink);">0</div>
+        <div class="team-card" id="card-p">
+            <div id="status-p" class="status-tag">En attente</div>
+            <h2 id="name-p" style="margin:10px 0; color:#ec4899;">---</h2>
+            <div class="score-val" id="score-p">0</div>
         </div>
-        <div class="team-card" id="card-purple">
-            <div id="stat-v" class="status-badge">En attente</div>
-            <h3 id="n-v">---</h3>
-            <div class="score-val" id="s-v" style="color: var(--purple);">0</div>
+        <div class="team-card" id="card-v">
+            <div id="status-v" class="status-tag">En attente</div>
+            <h2 id="name-v" style="margin:10px 0; color:#9d50bb;">---</h2>
+            <div class="score-val" id="score-v">0</div>
         </div>
     </div>
 
     <div class="admin-panel">
-        <div class="controls">
-            <button class="btn btn-reset" onclick="resetComp()">Reset</button>
-            <button class="btn btn-start" onclick="startQuiz()">Lancer le Quiz</button>
-            <button class="btn btn-results" onclick="showFinal()">Afficher Résultats</button>
+        <div class="btn-group">
+            <button class="btn-purple" style="background: #ef4444;" onclick="resetComp()">Reset</button>
+            <button class="btn-purple" onclick="startQuiz()">Lancer Quiz</button>
+            <button class="btn-purple" onclick="showFinal()">Afficher Résultats</button>
         </div>
     </div>
 
-    <div id="winner-overlay">
-        <h1 id="countdown" style="font-size: 8rem; color: #bdc3c7;">10</h1>
-        <div id="final-box" class="hidden"></div>
+    <div id="winner-screen">
+        <div id="countdown" style="font-size: 10rem; font-weight: 900; color: #fff;">10</div>
+        <div id="result-box" class="hidden"></div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -80,58 +104,58 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref('competition');
 
-        function resetComp() { db.set({ status: 'waiting', teamPink: "", teamPurple: "", scorePink: 0, scorePurple: 0, showResults: false }); }
+        function resetComp() { 
+            db.set({ status: 'waiting', teamPink: "", teamPurple: "", scorePink: 0, scorePurple: 0, showResults: false, finishedPink: false, finishedPurple: false }); 
+        }
         function startQuiz() { db.update({ status: 'start', startTime: Date.now() }); }
         function showFinal() { db.update({ showResults: true }); }
 
         db.on('value', snap => {
             const d = snap.val(); if(!d) return;
-            // تحديث البطاقات
-            document.getElementById('n-p').innerText = d.teamPink || "---";
-            document.getElementById('s-p').innerText = d.scorePink || 0;
-            document.getElementById('n-v').innerText = d.teamPurple || "---";
-            document.getElementById('s-v').innerText = d.scorePurple || 0;
+            document.getElementById('name-p').innerText = d.teamPink || "---";
+            document.getElementById('score-p').innerText = d.scorePink || 0;
+            document.getElementById('name-v').innerText = d.teamPurple || "---";
+            document.getElementById('score-v').innerText = d.scorePurple || 0;
 
-            // تحديث الحالة (يجيب/أنهى)
-            updateStatus('stat-p', d.teamPink, d.status, d.finishedPink);
-            updateStatus('stat-v', d.teamPurple, d.status, d.finishedPurple);
+            updateUIStatus('status-p', d.teamPink, d.status, d.finishedPink);
+            updateUIStatus('status-v', d.teamPurple, d.status, d.finishedPurple);
 
-            if(d.showResults) triggerWinnerFlow(d);
+            if(d.showResults) triggerCelebration(d);
         });
 
-        function updateStatus(id, name, status, finished) {
+        function updateUIStatus(id, name, status, finished) {
             const el = document.getElementById(id);
-            if(!name) el.innerText = "Vide";
-            else if(finished) { el.innerText = "Terminé ✅"; el.className = "status-badge"; el.style.color = "#10b981"; }
+            if(!name) el.innerText = "Emplacement Vide";
+            else if(finished) { el.innerText = "Terminé ✅"; el.style.color = "#10b981"; el.classList.remove('dots'); }
             else if(status === 'start') { el.innerText = "Répond"; el.classList.add('dots'); el.style.color = "#3b82f6"; }
-            else el.innerText = "Prêt";
+            else el.innerText = "Prêt à commencer";
         }
 
-        function triggerWinnerFlow(d) {
-            const overlay = document.getElementById('winner-overlay');
-            overlay.style.display = 'flex';
-            let count = 10;
+        function triggerCelebration(d) {
+            const screen = document.getElementById('winner-screen');
+            screen.style.display = 'flex';
+            let sec = 10;
             const timer = setInterval(() => {
-                count--;
-                document.getElementById('countdown').innerText = count;
-                if(count <= 0) {
+                sec--;
+                document.getElementById('countdown').innerText = sec;
+                if(sec <= 0) {
                     clearInterval(timer);
-                    showWinner(d);
+                    displayWinner(d);
                 }
             }, 1000);
         }
 
-        function showWinner(d) {
+        function displayWinner(d) {
             document.getElementById('countdown').classList.add('hidden');
             const winner = d.scorePink >= d.scorePurple ? 
-                {name: d.teamPink, score: d.scorePink} : {name: d.teamPurple, score: d.scorePurple};
+                {n: d.teamPink, s: d.scorePink} : {n: d.teamPurple, s: d.scorePurple};
             
-            const box = document.getElementById('final-box');
+            const box = document.getElementById('result-box');
             box.classList.remove('hidden');
-            box.innerHTML = `<div class="silver-card">
-                <h2 style="margin:0; letter-spacing:3px;">VAINQUEUR</h2>
-                <h1 style="font-size:4rem; margin:10px 0;">${winner.name}</h1>
-                <div style="font-size:3rem; font-weight:900;">SCORE: ${winner.score}</div>
+            box.innerHTML = `<div class="silver-medal">
+                <h3 style="margin:0; opacity:0.7;">CHAMPION</h3>
+                <h1 style="font-size:4.5rem; margin:10px 0; text-transform:uppercase;">${winner.n}</h1>
+                <div style="font-size:2.5rem; font-weight:900;">SCORE FINAL: ${winner.s}</div>
             </div>`;
         }
     </script>
