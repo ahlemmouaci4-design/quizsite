@@ -1,44 +1,65 @@
+
+
 <!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oncology Quiz | Final Sync</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>Oncology Quiz | Participant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --purple: #9d50bb; --pink: #ec4899; --glass-bg: rgba(255, 255, 255, 0.1); }
-        body { margin: 0; font-family: 'Poppins', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #000; color: #fff; background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'); background-size: cover; overflow: hidden; }
-        .glass-ui { width: 85%; max-width: 500px; background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 30px; padding: 40px; text-align: center; }
+        /* الديزاين الأصلي الخاص بك تماماً */
+        :root { --purple: #9d50bb; --pink: #ec4899; --glass-bg: rgba(255, 255, 255, 0.08); --glass-border: rgba(255, 255, 255, 0.12); --correct: #10b981; --wrong: #ef4444; }
+        body { margin: 0; font-family: 'Poppins', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #050505; color: #fff; background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'); background-size: cover; background-position: center; overflow-x: hidden; }
+        .glass-ui { width: 90%; max-width: 650px; background: var(--glass-bg); backdrop-filter: blur(25px); border: 1px solid var(--glass-border); border-radius: 40px; padding: 45px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
         .hidden { display: none !important; }
-        input { width: 90%; padding: 15px; border-radius: 12px; border: none; margin: 20px 0; text-align: center; font-size: 1.1rem; }
-        .action-btn { width: 100%; padding: 15px; border-radius: 50px; border: none; background: #fff; color: #000; font-weight: 800; cursor: pointer; }
-        #timer-box { font-size: 3rem; font-weight: 800; margin-bottom: 20px; }
-        .opt-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 15px; margin: 10px 0; cursor: pointer; }
-        .active-pink { background: var(--pink) !important; }
-        .active-purple { background: var(--purple) !important; }
+        input { width: 85%; padding: 18px; border-radius: 15px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.4); color: #fff; text-align: center; font-size: 1.2rem; margin: 25px 0; outline: none; }
+        .action-btn { width: 240px; padding: 16px; border-radius: 50px; border: none; background: #fff; color: #000; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        #timer-box { font-size: 2.2rem; font-weight: 800; margin-bottom: 20px; }
+        #options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .opt-card { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); padding: 20px; border-radius: 18px; color: #fff; cursor: pointer; transition: 0.2s; }
+        .active-pink { background: var(--pink) !important; border-color: #fff; box-shadow: 0 0 15px var(--pink); }
+        .active-purple { background: var(--purple) !important; border-color: #fff; box-shadow: 0 0 15px var(--purple); }
+        .correction-item { text-align: left; background: rgba(255,255,255,0.05); border-radius: 15px; padding: 15px; margin-top: 15px; }
     </style>
 </head>
 <body>
     <div class="glass-ui">
         <div id="reg-screen">
-            <h2>NOM DE L'ÉQUIPE</h2>
-            <input type="text" id="team-name-input" placeholder="Entrez votre nom...">
-            <button class="action-btn" onclick="claimSeat()">REJOINDRE</button>
+            <h1>INSCRIPTION</h1>
+            <input type="text" id="team-name-input" placeholder="Nom de l'équipe...">
+            <br><button class="action-btn" onclick="registerTeam()">REJOINDRE</button>
         </div>
 
         <div id="waiting-screen" class="hidden">
             <h1 id="assigned-team-name"></h1>
-            <p>Attente du lancement par l'admin...</p>
+            <p>Attente du signal de l'admin...</p>
         </div>
 
         <div id="quiz-screen" class="hidden">
             <div id="timer-box">01:00</div>
-            <div id="q-text" style="margin-bottom:20px;"></div>
+            <div id="q-text" style="font-size: 1.2rem; font-weight: 600; margin-bottom: 20px;"></div>
             <div id="options-grid"></div>
-            <button class="action-btn" id="next-btn" disabled onclick="handleNext()" style="margin-top:20px;">CONFIRMER</button>
+            <button class="action-btn" id="next-btn" disabled onclick="handleNext()" style="margin-top: 30px;">CONFIRMER</button>
         </div>
 
-        <div id="wait-results" class="hidden"><h1>TERMINÉ !</h1><p>Résultats en cours...</p></div>
+        <div id="wait-results" class="hidden">
+            <h1 id="end-status-title"></h1>
+            <p>Résultats bientôt affichés...</p>
+        </div>
+
+        <div id="result-screen" class="hidden">
+            <h1>RÉSULTAT FINAL</h1>
+            <div id="score-val" style="font-size: 5rem; font-weight: 800;">0</div>
+            <button class="action-btn" onclick="showCorrection()">VOIR LA CORRECTION 🔍</button>
+        </div>
+
+        <div id="correction-screen" class="hidden">
+            <h2>CORRECTION</h2>
+            <div id="correction-list" style="max-height: 400px; overflow-y: auto;"></div>
+            <button class="action-btn" onclick="location.reload()" style="margin-top:20px;">RETOUR</button>
+        </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -48,77 +69,65 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref('competition');
 
-        // هوية فريدة للمتصفح (بصمة المتصفح)
         let myBrowserId = localStorage.getItem('myBrowserId') || 'ID_' + Math.random().toString(36).substr(2, 9);
         localStorage.setItem('myBrowserId', myBrowserId);
 
-        let myColor = '', myName = '', current = 0, score = 0, selected = null, timerInterval = null;
+        let myColor = '', myName = '', current = 0, score = 0, selected = null, userHistory = [], timerInterval = null;
+
         const questions = [
-            { q: "Quel gène est surnommé 'Le gardien du génome' ?", opts: ["p53", "BRCA1", "KRAS", "MYC"], a: "p53" },
-            { q: "Marqueur spécifique au cancer de l'ovaire ?", opts: ["CA-125", "PSA", "CEA", "AFP"], a: "CA-125" }
+            { q: "Quel gène est surnommé 'Le gardien du génome' ?", opts: ["p53", "BRCA1", "KRAS", "MYC"], a: "p53", exp: "p53 est un suppresseur de tumeur clé." },
+            { q: "Marqueur spécifique au cancer de l'ovaire ?", opts: ["CA-125", "PSA", "CEA", "AFP"], a: "CA-125", exp: "Le CA-125 est utilisé en oncologie gynécologique." }
         ];
 
-        // الاستماع المستمر لكل تغيير
+        // المراقبة اللحظية
         db.on('value', snap => {
-            const data = snap.val();
-            if (!data) return;
+            const data = snap.val(); if(!data) return;
 
-            // 1. إعادة ضبط كاملة عند Reset
-            if (data.status === 'waiting' && myName !== '') {
-                localStorage.removeItem('myName');
-                location.reload();
-                return;
+            if(data.status === 'waiting' && myName !== '') {
+                localStorage.clear(); location.reload(); return;
             }
 
-            // 2. فحص هل المتصفح مسجل مسبقاً؟ (Session Recovery)
-            if (!myName) {
-                if (data.userPink === myBrowserId) { setupUser('pink', data.teamPink); }
-                else if (data.userPurple === myBrowserId) { setupUser('purple', data.teamPurple); }
+            if(!myName) {
+                if(data.userPink === myBrowserId) setupUser('pink', data.teamPink);
+                else if(data.userPurple === myBrowserId) setupUser('purple', data.teamPurple);
             }
 
-            // 3. بدء الكويز بتوقيت موحد
-            if (data.status === 'start' && myName && !timerInterval) {
+            if(data.status === 'start' && myName && current === 0 && !timerInterval) {
                 document.getElementById('waiting-screen').classList.add('hidden');
                 document.getElementById('quiz-screen').classList.remove('hidden');
-                syncTimer(data.startTime);
+                startQuizTimer(data.startTime);
             }
 
-            // 4. الانتقال لشاشة الانتظار النهائية
-            if (data.showResults && myName) {
+            if(data.showResults && myName) {
                 clearInterval(timerInterval);
-                location.reload(); // أو نقله لصفحة النتائج
+                document.getElementById('quiz-screen').classList.add('hidden');
+                document.getElementById('wait-results').classList.add('hidden');
+                document.getElementById('result-screen').classList.remove('hidden');
+                document.getElementById('score-val').innerText = `${score}/${questions.length}`;
             }
         });
 
-        async function claimSeat() {
+        async function registerTeam() {
             const name = document.getElementById('team-name-input').value.trim();
-            if (!name) return alert("Nom requis!");
+            if(!name) return alert("Nom requis!");
 
-            // محاولة حجز مكان (Transaction) لضمان عدم التداخل
-            db.transaction((currentData) => {
-                if (!currentData) return { teamPink: name, userPink: myBrowserId };
-                
-                if (!currentData.userPink) {
-                    currentData.userPink = myBrowserId;
-                    currentData.teamPink = name;
-                } else if (!currentData.userPurple && currentData.userPink !== myBrowserId) {
-                    currentData.userPurple = myBrowserId;
-                    currentData.teamPurple = name;
-                }
-                return currentData;
-            }, (error, committed, snapshot) => {
-                if (committed) {
-                    const data = snapshot.val();
-                    if (data.userPink === myBrowserId) setupUser('pink', name);
-                    else if (data.userPurple === myBrowserId) setupUser('purple', name);
-                    else alert("Désolé, la session est pleine!");
+            db.transaction((curr) => {
+                if(!curr) return { teamPink: name, userPink: myBrowserId };
+                if(!curr.userPink) { curr.userPink = myBrowserId; curr.teamPink = name; }
+                else if(!curr.userPurple && curr.userPink !== myBrowserId) { curr.userPurple = myBrowserId; curr.teamPurple = name; }
+                return curr;
+            }, (err, commit, snap) => {
+                if(commit) {
+                    const d = snap.val();
+                    if(d.userPink === myBrowserId) setupUser('pink', name);
+                    else if(d.userPurple === myBrowserId) setupUser('purple', name);
+                    else alert("Désolé, Session pleine!");
                 }
             });
         }
 
         function setupUser(color, name) {
             myColor = color; myName = name;
-            localStorage.setItem('myName', name);
             document.getElementById('reg-screen').classList.add('hidden');
             document.getElementById('waiting-screen').classList.remove('hidden');
             const title = document.getElementById('assigned-team-name');
@@ -126,12 +135,12 @@
             title.style.color = `var(--${color})`;
         }
 
-        function syncTimer(startTime) {
+        function startQuizTimer(st) {
             render();
             timerInterval = setInterval(() => {
-                const rem = 60 - Math.floor((Date.now() - startTime) / 1000);
+                const rem = 60 - Math.floor((Date.now() - st) / 1000);
                 document.getElementById('timer-box').innerText = `00:${rem > 0 ? rem.toString().padStart(2,'0') : '00'}`;
-                if (rem <= 0) forceFinish();
+                if(rem <= 0) forceFinish(true);
             }, 1000);
         }
 
@@ -140,6 +149,7 @@
             document.getElementById('q-text').innerText = q.q;
             const grid = document.getElementById('options-grid');
             grid.innerHTML = '';
+            document.getElementById('next-btn').disabled = true;
             q.opts.forEach(opt => {
                 const b = document.createElement('div');
                 b.className = 'opt-card'; b.innerText = opt;
@@ -153,12 +163,13 @@
         }
 
         function handleNext() {
-            if (selected === questions[current].a) score++;
+            userHistory.push(selected);
+            if(selected === questions[current].a) score++;
             current++; selected = null;
-            if (current < questions.length) render(); else forceFinish();
+            if(current < questions.length) render(); else forceFinish(false);
         }
 
-        function forceFinish() {
+        function forceFinish(isT) {
             clearInterval(timerInterval);
             const upd = {};
             upd[myColor === 'pink' ? 'scorePink' : 'scorePurple'] = score;
@@ -166,8 +177,23 @@
             db.update(upd);
             document.getElementById('quiz-screen').classList.add('hidden');
             document.getElementById('wait-results').classList.remove('hidden');
+            document.getElementById('end-status-title').innerText = isT ? "TEMPS ÉCOULÉ !" : "TERMINÉ !";
+        }
+
+        function showCorrection() {
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('correction-screen').classList.remove('hidden');
+            const list = document.getElementById('correction-list'); list.innerHTML = '';
+            questions.forEach((item, i) => {
+                const isC = userHistory[i] === item.a;
+                list.innerHTML += `<div class="correction-item" style="border-left:4px solid ${isC?'var(--correct)':'var(--wrong)'}">
+                    <div style="font-weight:600;">${i+1}. ${item.q}</div>
+                    <div style="color:${isC?'var(--correct)':'var(--wrong)'}">Réponse: ${userHistory[i] || '---'}</div>
+                    ${!isC?`<div style="color:var(--correct)">Bonne: ${item.a}</div>`:''}
+                    <div style="font-size:0.8rem; opacity:0.6; margin-top:5px;">💡 ${item.exp}</div>
+                </div>`;
+            });
         }
     </script>
 </body>
 </html>
-
