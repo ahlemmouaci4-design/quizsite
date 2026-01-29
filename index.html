@@ -5,10 +5,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oncology Quiz | Participant</title>
+    <title>Oncology Quiz | Final Stable</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        /* الديزاين الأصلي الخاص بك تماماً */
         :root { --purple: #9d50bb; --pink: #ec4899; --glass-bg: rgba(255, 255, 255, 0.08); --glass-border: rgba(255, 255, 255, 0.12); --correct: #10b981; --wrong: #ef4444; }
         body { margin: 0; font-family: 'Poppins', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #050505; color: #fff; background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'); background-size: cover; background-position: center; overflow-x: hidden; }
         .glass-ui { width: 90%; max-width: 650px; background: var(--glass-bg); backdrop-filter: blur(25px); border: 1px solid var(--glass-border); border-radius: 40px; padding: 45px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
@@ -45,8 +44,8 @@
         </div>
 
         <div id="wait-results" class="hidden">
-            <h1 id="end-status-title"></h1>
-            <p>Résultats bientôt affichés...</p>
+            <h1 id="end-status-title">TERMINÉ</h1>
+            <p>Veuillez patienter pour les résultats...</p>
         </div>
 
         <div id="result-screen" class="hidden">
@@ -69,6 +68,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref('competition');
 
+        // هوية فريدة للمتصفح لمنع التداخل
         let myBrowserId = localStorage.getItem('myBrowserId') || 'ID_' + Math.random().toString(36).substr(2, 9);
         localStorage.setItem('myBrowserId', myBrowserId);
 
@@ -79,25 +79,25 @@
             { q: "Marqueur spécifique au cancer de l'ovaire ?", opts: ["CA-125", "PSA", "CEA", "AFP"], a: "CA-125", exp: "Le CA-125 est utilisé en oncologie gynécologique." }
         ];
 
-        // المراقبة اللحظية
+        // الاستماع للتغييرات بدون "تصفير" الجلسة الحالية
         db.on('value', snap => {
             const data = snap.val(); if(!data) return;
 
+            // إذا ضغط الأدمن Reset
             if(data.status === 'waiting' && myName !== '') {
-                localStorage.clear(); location.reload(); return;
+                localStorage.removeItem('myName'); 
+                location.reload(); 
+                return;
             }
 
-            if(!myName) {
-                if(data.userPink === myBrowserId) setupUser('pink', data.teamPink);
-                else if(data.userPurple === myBrowserId) setupUser('purple', data.teamPurple);
-            }
-
+            // إذا بدأ الأدمن المسابقة وكان المتسابق مسجلاً
             if(data.status === 'start' && myName && current === 0 && !timerInterval) {
                 document.getElementById('waiting-screen').classList.add('hidden');
                 document.getElementById('quiz-screen').classList.remove('hidden');
                 startQuizTimer(data.startTime);
             }
 
+            // إذا عرض الأدمن النتائج
             if(data.showResults && myName) {
                 clearInterval(timerInterval);
                 document.getElementById('quiz-screen').classList.add('hidden');
@@ -108,20 +108,20 @@
         });
 
         async function registerTeam() {
-            const name = document.getElementById('team-name-input').value.trim();
-            if(!name) return alert("Nom requis!");
+            const nameInput = document.getElementById('team-name-input').value.trim();
+            if(!nameInput) return alert("Veuillez entrer un nom !");
 
             db.transaction((curr) => {
-                if(!curr) return { teamPink: name, userPink: myBrowserId };
-                if(!curr.userPink) { curr.userPink = myBrowserId; curr.teamPink = name; }
-                else if(!curr.userPurple && curr.userPink !== myBrowserId) { curr.userPurple = myBrowserId; curr.teamPurple = name; }
+                if(!curr) return { teamPink: nameInput, userPink: myBrowserId, status: 'waiting' };
+                if(!curr.userPink) { curr.userPink = myBrowserId; curr.teamPink = nameInput; }
+                else if(!curr.userPurple && curr.userPink !== myBrowserId) { curr.userPurple = myBrowserId; curr.teamPurple = nameInput; }
                 return curr;
             }, (err, commit, snap) => {
                 if(commit) {
                     const d = snap.val();
-                    if(d.userPink === myBrowserId) setupUser('pink', name);
-                    else if(d.userPurple === myBrowserId) setupUser('purple', name);
-                    else alert("Désolé, Session pleine!");
+                    if(d.userPink === myBrowserId) setupUser('pink', nameInput);
+                    else if(d.userPurple === myBrowserId) setupUser('purple', nameInput);
+                    else alert("Désolé, les deux places sont déjà prises !");
                 }
             });
         }
@@ -177,7 +177,6 @@
             db.update(upd);
             document.getElementById('quiz-screen').classList.add('hidden');
             document.getElementById('wait-results').classList.remove('hidden');
-            document.getElementById('end-status-title').innerText = isT ? "TEMPS ÉCOULÉ !" : "TERMINÉ !";
         }
 
         function showCorrection() {
@@ -185,11 +184,12 @@
             document.getElementById('correction-screen').classList.remove('hidden');
             const list = document.getElementById('correction-list'); list.innerHTML = '';
             questions.forEach((item, i) => {
-                const isC = userHistory[i] === item.a;
+                const userAns = userHistory[i] || '---';
+                const isC = userAns === item.a;
                 list.innerHTML += `<div class="correction-item" style="border-left:4px solid ${isC?'var(--correct)':'var(--wrong)'}">
                     <div style="font-weight:600;">${i+1}. ${item.q}</div>
-                    <div style="color:${isC?'var(--correct)':'var(--wrong)'}">Réponse: ${userHistory[i] || '---'}</div>
-                    ${!isC?`<div style="color:var(--correct)">Bonne: ${item.a}</div>`:''}
+                    <div style="color:${isC?'var(--correct)':'var(--wrong)'}">Votre réponse: ${userAns}</div>
+                    ${!isC?`<div style="color:var(--correct)">La bonne réponse: ${item.a}</div>`:''}
                     <div style="font-size:0.8rem; opacity:0.6; margin-top:5px;">💡 ${item.exp}</div>
                 </div>`;
             });
