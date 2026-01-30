@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oncology Quiz | Team View</title>
+    <title>Oncology Quiz | Team</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         :root { --p-pink: #ec4899; --p-purple: #9d50bb; }
@@ -18,28 +18,15 @@
             background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(50px) saturate(180%);
             border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 40px;
             padding: 40px; width: 85%; max-width: 450px; text-align: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
         input { 
             width: 100%; padding: 18px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(0,0,0,0.6); color: #fff; text-align: center; margin-bottom: 25px; font-size: 1.1rem;
-            outline: none; box-sizing: border-box;
+            background: rgba(0,0,0,0.6); color: #fff; text-align: center; margin-bottom: 25px; font-size: 1.1rem; outline: none;
         }
-        .main-btn { 
-            width: 100%; padding: 18px; border-radius: 50px; border: none;
-            background: linear-gradient(45deg, var(--p-purple), var(--p-pink));
-            color: white; font-weight: 700; cursor: pointer; text-transform: uppercase;
-        }
-        .opt-btn { 
-            width: 100%; padding: 15px; margin: 8px 0; border-radius: 15px;
-            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1);
-            color: #fff; text-align: left; cursor: pointer; transition: 0.2s;
-        }
+        .main-btn { width: 100%; padding: 18px; border-radius: 50px; border: none; background: linear-gradient(45deg, var(--p-purple), var(--p-pink)); color: white; font-weight: 700; cursor: pointer; text-transform: uppercase; }
+        .opt-btn { width: 100%; padding: 15px; margin: 8px 0; border-radius: 15px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: #fff; text-align: left; cursor: pointer; transition: 0.2s; }
         .opt-btn.active { background: var(--p-pink); border-color: #fff; }
-        .send-btn { 
-            width: 100%; padding: 15px; margin-top: 20px; border-radius: 50px; border: none;
-            background: #10b981; color: white; font-weight: 800; cursor: pointer;
-        }
+        .send-btn { width: 100%; padding: 15px; margin-top: 20px; border-radius: 50px; border: none; background: #10b981; color: white; font-weight: 800; cursor: pointer; }
         #timer { font-size: 3.5rem; font-weight: 700; color: #fff; margin-bottom: 15px; }
         .hidden { display: none !important; }
     </style>
@@ -55,14 +42,14 @@
 
         <div id="wait-zone" class="hidden">
             <div style="font-size: 4rem;">🩺</div>
-            <p style="font-weight: 300; margin-top: 20px;">En attente de la question...</p>
+            <p id="wait-msg">En attente de la question...</p>
         </div>
 
         <div id="quiz-zone" class="hidden">
             <div id="timer">01:00</div>
             <p id="q-text" style="font-size: 1.1rem; margin-bottom: 20px;"></p>
             <div id="options-container"></div>
-            <button class="send-btn" id="send-btn" onclick="confirmChoice()">ENVOYER LA RÉPONSE</button>
+            <button class="send-btn" onclick="confirmChoice()">ENVOYER LA RÉPONSE</button>
             <div id="status-msg" style="margin-top:10px; font-size:0.8rem; color:#10b981; opacity:0;">Réponse enregistrée ✓</div>
         </div>
     </div>
@@ -73,36 +60,34 @@
         const firebaseConfig = { databaseURL: "https://quiz-8016b-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref('competition');
-
         let myType = localStorage.getItem('myType');
-        let currentQ = 0;
-        let localChoice = "";
+        let currentQ = 0, localChoice = "";
 
-        // إذا كان مسجلاً مسبقاً، اذهب للانتظار فوراً
+        const quizData = [
+            { q: "Question 1: ...?", options: ["A","B","C","D"] },
+            { q: "Question 2: ...?", options: ["A","B","C","D"] },
+            { q: "Question 3: ...?", options: ["A","B","C","D"] },
+            { q: "Question 4: ...?", options: ["A","B","C","D"] },
+            { q: "Question 5: ...?", options: ["A","B","C","D"] },
+            { q: "Question 6: ...?", options: ["A","B","C","D"] },
+            { q: "Question 7: ...?", options: ["A","B","C","D"] },
+            { q: "Question 8: ...?", options: ["A","B","C","D"] },
+            { q: "Question 9: ...?", options: ["A","B","C","D"] },
+            { q: "Question 10: ...?", options: ["A","B","C","D"] }
+        ];
+
         if(myType) { showWait(); }
 
         function registerTeam() {
             const name = document.getElementById('t-name').value.trim();
             if(!name) return alert("Entrez un nom !");
-            
-            document.getElementById('reg-btn').disabled = true;
-            document.getElementById('reg-btn').innerText = "Vérification...";
-
             db.transaction(function(data) {
                 if (data === null) return { teamPink: name };
                 if (!data.teamPink) { data.teamPink = name; myType = "pink"; }
                 else if (!data.teamPurple) { data.teamPurple = name; myType = "purple"; }
-                else { return; } // الفريقين مسجلين بالفعل
                 return data;
-            }, function(error, committed, snapshot) {
-                if (committed && myType) {
-                    localStorage.setItem('myType', myType);
-                    showWait();
-                } else {
-                    alert("Désolé, la session هو كامل أو حدث خطأ.");
-                    document.getElementById('reg-btn').disabled = false;
-                    document.getElementById('reg-btn').innerText = "REJOINDRE";
-                }
+            }, function(err, committed) {
+                if (committed && myType) { localStorage.setItem('myType', myType); showWait(); }
             });
         }
 
@@ -114,12 +99,7 @@
 
         db.on('value', snap => {
             const d = snap.val(); if(!d) return;
-            // إذا قام الأدمن بعمل Reset
-            if(d.status === 'waiting' && currentQ !== 0) {
-                localStorage.clear();
-                location.reload();
-            }
-            // إذا انطلق السؤال
+            if(d.status === 'waiting' && currentQ !== 0) { localStorage.clear(); location.reload(); }
             if(d.status === 'start' && d.currentQuestion !== currentQ) {
                 currentQ = d.currentQuestion;
                 startQuiz(d.startTime, currentQ - 1);
@@ -127,16 +107,10 @@
         });
 
         function startQuiz(start, idx) {
-            const quizData = [
-                { q: "Quel est le principal marqueur du cancer de la prostate ?", options: ["PSA", "CEA", "CA-125", "AFP"] },
-                { q: "Quelle mutation est recherchée في سرطان الرئة ؟", options: ["EGFR", "BRCA1", "HER2", "APC"] }
-            ];
-            
             document.getElementById('wait-zone').classList.add('hidden');
             document.getElementById('quiz-zone').classList.remove('hidden');
             document.getElementById('status-msg').style.opacity = "0";
             localChoice = "";
-
             const data = quizData[idx];
             document.getElementById('q-text').innerText = data.q;
             const container = document.getElementById('options-container');
@@ -145,7 +119,6 @@
                 const L = String.fromCharCode(65 + i);
                 container.innerHTML += `<button class="opt-btn" id="btn-${L}" onclick="localSelect('${L}')">${L}: ${opt}</button>`;
             });
-
             const intv = setInterval(() => {
                 const rem = 60 - Math.floor((Date.now() - start)/1000);
                 if(rem <= 0) { clearInterval(intv); showWait(); }
