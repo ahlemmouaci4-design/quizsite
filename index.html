@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Player | Synced White</title>
+    <title>Quiz Player | Pro Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --pink: #ec4899; --purple: #9d50bb; }
@@ -16,9 +15,12 @@
         .ultra-glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(40px); border-radius: 30px; padding: 30px; width: 85%; max-width: 350px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
         input { width: 100%; padding: 15px; border-radius: 15px; border: 2px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.8); color: #fff; text-align: center; margin-bottom: 20px; font-size: 1.1rem; }
         .main-btn { width: 100%; padding: 15px; border-radius: 50px; border: none; background: linear-gradient(45deg, var(--purple), var(--pink)); color: white; font-weight: 700; text-transform: uppercase; cursor: pointer; }
-        .opt-btn { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: #fff; cursor: pointer; text-align: left; }
+        .opt-btn { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: #fff; cursor: pointer; text-align: left; font-weight: bold; }
         .opt-btn.active { background: var(--pink); border-color: #fff; box-shadow: 0 0 15px var(--pink); }
-        #timer { font-size: 4rem; font-weight: 900; color: #ffffff; margin-bottom: 15px; text-shadow: 0 0 15px rgba(255,255,255,0.3); }
+        
+        /* عداد أبيض ناصع */
+        #timer { font-size: 4rem; font-weight: 900; color: #ffffff; margin-bottom: 15px; text-shadow: 0 0 20px rgba(255,255,255,0.4); }
+        
         .hidden { display: none !important; }
         .pulse { animation: pulse 2s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
@@ -33,9 +35,9 @@
         </div>
 
         <div id="wait-zone" class="hidden">
-            <div style="font-size: 4rem;" class="pulse">🧬</div>
-            <h2 id="display-name" style="color:var(--pink);">---</h2>
-            <p>Attente du question التالي...</p>
+            <div style="font-size: 4rem;" id="wait-icon" class="pulse">🧬</div>
+            <h2 id="display-name" style="color:var(--pink); margin: 10px 0;">---</h2>
+            <p id="wait-msg">Attente du lancement...</p>
         </div>
 
         <div id="quiz-zone" class="hidden">
@@ -61,27 +63,29 @@
             const d = snap.val() || {};
             if(!d.teamPink) { await db.update({ teamPink: name }); myRole = "pink"; }
             else if(!d.teamPurple) { await db.update({ teamPurple: name }); myRole = "purple"; }
-            else { return alert("Plein!"); }
+            else { return alert("Désolé, Quiz Plein!"); }
+            
             document.getElementById('display-name').innerText = name;
-            document.getElementById('reg-zone').classList.add('hidden');
-            document.getElementById('wait-zone').classList.remove('hidden');
+            goWait("Préparez-vous...");
             startSync();
         }
 
         function startSync() {
             db.on('value', snap => {
                 const d = snap.val() || {};
-                if(!d.teamPink && !d.teamPurple) location.reload();
+                
+                // إعادة الضبط إذا قام الأدمن بمسح البيانات
+                if(!d.teamPink && !d.teamPurple) { location.reload(); return; }
                 
                 if(d.status === 'start') {
+                    // إذا كان سؤالاً جديداً ولم نجب عليه بعد في هذا الدور
                     if(currentQ !== d.currentQuestion) {
                         currentQ = d.currentQuestion;
                         launch(d.startTime);
                     }
-                } else {
-                    document.getElementById('quiz-zone').classList.add('hidden');
-                    document.getElementById('wait-zone').classList.remove('hidden');
-                    clearInterval(timerInterval);
+                } else if (d.status === 'correction') {
+                    // العودة للانتظار تلقائياً عند ضغط الأدمن على التصحيح
+                    goWait(currentQ >= 10 ? "Quiz terminé ! Regardez l'écran principal" : "Bravo ! En attente du prochain question...");
                 }
             });
         }
@@ -92,6 +96,7 @@
             document.getElementById('valider-btn').disabled = false;
             document.getElementById('valider-btn').style.opacity = "1";
             choice = "";
+            
             const optDiv = document.getElementById('options');
             optDiv.innerHTML = '';
             ["A","B","C","D"].forEach(L => {
@@ -105,6 +110,8 @@
                     document.getElementById('timer').innerText = "00:00";
                     document.getElementById('valider-btn').disabled = true;
                     clearInterval(timerInterval);
+                    // الذهاب للانتظار عند انتهاء الوقت
+                    setTimeout(() => goWait("Temps écoulé !"), 1500);
                 } else {
                     document.getElementById('timer').innerText = `00:${rem.toString().padStart(2,'0')}`;
                 }
@@ -119,10 +126,25 @@
 
         function send() {
             if(!choice || !myRole) return;
+            // إرسال الإجابة لـ Firebase
             db.child('answers').child(myRole).child(currentQ).set(choice);
-            document.getElementById('valider-btn').disabled = true;
-            document.getElementById('valider-btn').style.opacity = "0.5";
+            
+            // الانتقال الفوري للانتظار
+            if(currentQ >= 10) {
+                goWait("Félicitations ! Attendez l'annonce du vainqueur sur l'écran d'accueil 🏆");
+                document.getElementById('wait-icon').innerText = "🏆";
+            } else {
+                goWait("Réponse envoyée ! En attente du Master...");
+            }
+        }
+
+        function goWait(msg) {
+            document.getElementById('quiz-zone').classList.add('hidden');
+            document.getElementById('wait-zone').classList.remove('hidden');
+            document.getElementById('wait-msg').innerText = msg;
+            clearInterval(timerInterval);
         }
     </script>
 </body>
 </html>
+
