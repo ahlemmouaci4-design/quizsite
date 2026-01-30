@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Joueur | Quiz Oncologie</title>
+    <title>Player | Quiz</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --pink: #ec4899; --purple: #9d50bb; }
@@ -56,13 +56,14 @@
             if(!d.teamPink) { await db.update({ teamPink: name }); myRole = "pink"; }
             else if(!d.teamPurple) { await db.update({ teamPurple: name }); myRole = "purple"; }
             else return alert("Plein!");
+            
             document.getElementById('display-name').innerText = name;
             goWait("Préparez-vous...");
             db.on('value', snap => {
                 const d = snap.val() || {};
                 if(!d.teamPink && !d.teamPurple) location.reload();
                 if(d.status === 'start' && curQ !== d.curQ) { curQ = d.curQ; launch(d.startTime); }
-                else if(d.status === 'correction') goWait(curQ >= 10 ? "Quiz terminé ! Regardez l'écran" : "En attente du suivant...");
+                else if(d.status === 'correction' || d.status === 'waiting') goWait(curQ >= 10 ? "Quiz terminé ! 🏆" : "Attente du suivant...");
             });
         }
 
@@ -73,9 +74,8 @@
             choice = "";
             const div = document.getElementById('opts');
             div.innerHTML = '';
-            ["A","B","C","D"].forEach(L => {
-                div.innerHTML += `<button class="opt-btn" id="b-${L}" onclick="select('${L}')">OPTION ${L}</button>`;
-            });
+            ["A","B","C","D"].forEach(L => div.innerHTML += `<button class="opt-btn" id="b-${L}" onclick="select('${L}')">OPTION ${L}</button>`);
+            
             clearInterval(timer);
             timer = setInterval(() => {
                 const rem = 60 - Math.floor((Date.now() - start)/1000);
@@ -93,7 +93,7 @@
         function send() {
             if(!choice) return;
             db.child('answers').child(myRole).child(curQ).set(choice);
-            goWait(curQ >= 10 ? "Merci ! Résultats sur l'écran principal 🏆" : "Réponse envoyée !");
+            goWait(curQ >= 10 ? "Fini ! Regardez l'écran 🏆" : "Réponse envoyée !");
         }
 
         function goWait(m) {
