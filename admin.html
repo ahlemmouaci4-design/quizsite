@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
@@ -15,7 +14,6 @@
             background-size: cover;
         }
 
-        /* تأثير الزجاج الفائق العام */
         .ultra-glass { 
             background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(50px) saturate(180%);
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 50px;
@@ -31,6 +29,7 @@
 
         .welcome-content {
             width: 80%; max-width: 900px; padding: 60px; text-align: center;
+            margin-bottom: 50px; /* رفع المحتوى قليلاً */
         }
 
         .welcome-content h1 { font-weight: 900; font-size: 4rem; margin-bottom: 20px; letter-spacing: 5px; }
@@ -39,37 +38,53 @@
         .rules-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; text-align: left; }
         .rule-card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px; border-left: 4px solid #fff; }
 
-        /* سهم الانتقال */
         .next-arrow {
             position: absolute; right: 50px; top: 50%; transform: translateY(-50%);
             cursor: pointer; z-index: 20; transition: 0.3s; animation: pulseArrow 2s infinite;
         }
         .next-arrow svg { width: 60px; fill: none; stroke: white; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 
-        /* --- لوحة التحكم (مخفية في البداية) --- */
+        /* --- لوحة التحكم --- */
         #control-screen {
             position: absolute; width: 100%; height: 100%; left: 100%;
             display: flex; align-items: center; justify-content: center;
             transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);
         }
 
-        /* تنسيقات لوحة التحكم (السابقة) */
-        .admin-panel { width: 90%; max-width: 1100px; padding: 40px; text-align: center; }
-        #timer { font-size: 6rem; font-weight: 900; color: #ffffff; margin: 0; }
-        .score-badge { background: rgba(255,255,255,0.1); padding: 5px 20px; border-radius: 50px; font-size: 1.2rem; margin-top: 10px; display: inline-block; border: 1px solid rgba(255,255,255,0.2); }
-        .q-display { background: rgba(0,0,0,0.3); padding: 25px; border-radius: 30px; margin-bottom: 25px; margin-top: 20px; }
+        .admin-panel { 
+            width: 90%; max-width: 1100px; padding: 30px 40px; text-align: center; 
+            margin-top: -40px; /* رفع اللوحة كاملة للأعلى قليلاً */
+        }
+
+        #timer { font-size: 5.5rem; font-weight: 900; color: #ffffff; margin: 0; }
+        
+        .score-badge { background: rgba(255,255,255,0.1); padding: 5px 20px; border-radius: 50px; font-size: 1.1rem; margin-top: 5px; display: inline-block; border: 1px solid rgba(255,255,255,0.2); }
+        
+        .q-display { background: rgba(0,0,0,0.3); padding: 20px; border-radius: 30px; margin-bottom: 20px; margin-top: 15px; }
+        
         .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .opt-item { padding: 15px; background: rgba(255,255,255,0.05); border-radius: 15px; border: 2px solid transparent; text-align: left; transition: 0.5s; }
+        .opt-item { padding: 12px 18px; background: rgba(255,255,255,0.05); border-radius: 15px; border: 2px solid transparent; text-align: left; transition: 0.5s; font-size: 1.1rem; }
+        
         .is-correct { border-color: var(--success) !important; background: rgba(16, 185, 129, 0.2) !important; box-shadow: 0 0 30px var(--success); }
         .is-wrong { border-color: var(--danger) !important; background: rgba(239, 68, 68, 0.2) !important; box-shadow: 0 0 30px var(--danger); }
+        
         .team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-        .team-box { padding: 25px; border-radius: 35px; background: rgba(0,0,0,0.4); border: 2px solid rgba(255,255,255,0.1); transition: 0.6s; }
-        .big-letter { font-size: 5rem; font-weight: 900; display: block; margin: 10px 0; }
-        .controls { margin-top: 30px; display: flex; gap: 15px; justify-content: center; }
-        .btn { padding: 15px 35px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+        .team-box { padding: 20px; border-radius: 35px; background: rgba(0,0,0,0.4); border: 2px solid rgba(255,255,255,0.1); transition: 0.6s; }
+        
+        .big-letter { font-size: 4.5rem; font-weight: 900; display: block; margin: 5px 0; }
+
+        /* منطقة الأزرار المرفوعة */
+        .controls { 
+            margin-top: 25px; 
+            margin-bottom: 10px; /* ضمان مسافة أمان من حافة الشاشة */
+            display: flex; gap: 15px; justify-content: center; 
+        }
+
+        .btn { padding: 14px 35px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.3s; font-size: 0.9rem; }
         .btn-launch { background: #fff; color: #000; }
         .btn-reveal { background: var(--success); color: #fff; }
         .btn-reset { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+        
         .hidden { display: none !important; }
 
         @keyframes pulseArrow {
@@ -88,39 +103,37 @@
         <div class="ultra-glass welcome-content">
             <h1>BIENVENUE</h1>
             <p>Préparez-vous pour une compétition d'excellence en Oncologie</p>
-            
             <div class="rules-grid">
                 <div class="rule-card">
                     <h3 style="margin-top:0">Phase 1 (Publique)</h3>
-                    <small>Questions 1 à 5. Les réponses et corrections sont affichées en direct pour tout le public.</small>
+                    <small>Questions 1 à 5. Les réponses et corrections sont affichées en direct.</small>
                 </div>
                 <div class="rule-card">
                     <h3 style="margin-top:0">Phase 2 (Secrète)</h3>
-                    <small>Questions 6 à 10. Les choix des équipes restent cachés. Le gagnant sera révélé à la fin.</small>
+                    <small>Questions 6 à 10. Les choix restent cachés jusqu'au résultat final.</small>
                 </div>
             </div>
-            <p style="margin-top: 40px; font-size: 0.9rem; opacity: 0.7;">Appuyez sur la flèche pour accéder au panneau de contrôle →</p>
         </div>
     </section>
 
     <section id="control-screen">
         <div class="ultra-glass admin-panel">
-            <div id="secret-tag" style="color:#f1c40f; font-size: 0.8rem; letter-spacing: 3px;" class="hidden">🔒 MODE SECRET ACTIVÉ</div>
+            <div id="secret-tag" style="color:#f1c40f; font-size: 0.7rem; letter-spacing: 3px; margin-bottom: 5px;" class="hidden">🔒 MODE SECRET ACTIVÉ</div>
             <div id="timer">01:00</div>
             
             <div id="q-area" class="hidden q-display">
-                <h2 id="q-text-main"></h2>
+                <h2 id="q-text-main" style="font-size: 1.4rem; margin: 0 0 15px 0;"></h2>
                 <div class="opt-grid" id="q-opts-main"></div>
             </div>
 
             <div class="team-grid">
                 <div class="team-box" id="card-p">
-                    <div style="color:var(--pink); font-weight:800;">TEAM PINK</div>
+                    <div style="color:var(--pink); font-size: 0.9rem; font-weight:800;">TEAM PINK</div>
                     <div class="score-badge">SCORE: <span id="score-p">0</span></div>
                     <span class="big-letter" id="ans-p">?</span>
                 </div>
                 <div class="team-box" id="card-v">
-                    <div style="color:var(--purple); font-weight:800;">TEAM PURPLE</div>
+                    <div style="color:var(--purple); font-size: 0.9rem; font-weight:800;">TEAM PURPLE</div>
                     <div class="score-badge">SCORE: <span id="score-v">0</span></div>
                     <span class="big-letter" id="ans-v">?</span>
                 </div>
@@ -137,14 +150,12 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script>
-        // التنقل بين الصفحات
         function goToAdmin() {
             document.getElementById('welcome-screen').style.transform = 'translateX(-100%)';
             document.getElementById('control-screen').style.transform = 'translateX(-100%)';
             document.getElementById('arrow-trigger').classList.add('hidden');
         }
 
-        // إعدادات الفايربيس (نفس السابقة)
         const firebaseConfig = { databaseURL: "https://quiz-8016b-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref('competition');
@@ -177,18 +188,15 @@
         function showCorrection() {
             const correct = quizData[curQ-1].correct;
             document.getElementById('m-opt-'+correct).classList.add('is-correct');
-            
             if(pAns === correct) { pScore++; db.child('scores/pink').set(pScore); }
             if(vAns === correct) { vScore++; db.child('scores/purple').set(vScore); }
-
             if(curQ <= 5) {
                 document.getElementById('card-p').classList.add(pAns === correct ? 'is-correct' : 'is-wrong');
                 document.getElementById('card-v').classList.add(vAns === correct ? 'is-correct' : 'is-wrong');
             }
-
             document.getElementById('reveal-btn').classList.add('hidden');
             document.getElementById('action-btn').classList.remove('hidden');
-            document.getElementById('action-btn').innerText = (curQ === 10) ? "RÉSULTAT FINAL" : "Question Suivante";
+            document.getElementById('action-btn').innerText = (curQ === 10) ? "RÉSULTAT FINAL" : "Suivant";
         }
 
         db.on('value', snap => {
