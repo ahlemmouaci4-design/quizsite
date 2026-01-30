@@ -1,71 +1,46 @@
+
+
+
 <!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oncology Quiz | Team</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>Quiz Oncology | Team</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;800&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --purple: #9d50bb; --pink: #ec4899; 
-            --glass-bg: rgba(255, 255, 255, 0.08); --glass-border: rgba(255, 255, 255, 0.12); 
-        }
-
+        :root { --purple: #9d50bb; --pink: #ec4899; }
         body { 
             margin: 0; font-family: 'Poppins', sans-serif; min-height: 100vh; 
-            display: flex; align-items: center; justify-content: center; 
-            background: #000; color: #fff; overflow: hidden;
+            display: flex; align-items: center; justify-content: center; background: #000; color: #fff;
             background-image: url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
             background-size: cover; background-position: center;
         }
-
-        .glass-ui { 
-            width: 90%; max-width: 450px; z-index: 10;
-            background: var(--glass-bg); backdrop-filter: blur(20px); 
-            border: 1px solid var(--glass-border); border-radius: 40px; 
-            padding: 40px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
-        }
-
-        h2 { font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 30px; }
-
-        input, textarea { 
-            width: 100%; padding: 15px; border-radius: 20px; border: 1px solid var(--glass-border); 
-            background: rgba(0,0,0,0.2); color: #fff; font-size: 1rem; margin-bottom: 20px;
-            box-sizing: border-box; text-align: center; font-family: 'Poppins';
-        }
-
-        .glass-btn { 
-            width: 100%; padding: 15px; border-radius: 50px; border: none; 
-            background: linear-gradient(45deg, var(--purple), var(--pink)); 
-            color: #fff; font-weight: 700; cursor: pointer; transition: 0.3s; 
-            text-transform: uppercase; letter-spacing: 2px;
-        }
-
-        .glass-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(236, 72, 153, 0.3); }
-        .glass-btn:disabled { background: #444; cursor: not-allowed; transform: none; }
-
-        #timer-display { font-size: 3.5rem; font-weight: 800; color: #f1c40f; margin: 15px 0; }
-        
-        .waiting-status { font-style: italic; opacity: 0.7; font-size: 0.9rem; margin-top: 20px; }
+        .glass-ui { background: rgba(255,255,255,0.08); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 40px; padding: 40px; text-align: center; width: 85%; max-width: 400px; }
+        input, textarea { width: 100%; padding: 15px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: #fff; text-align: center; margin-bottom: 20px; box-sizing: border-box; }
+        .glass-btn { width: 100%; padding: 15px; border-radius: 50px; border: none; background: linear-gradient(45deg, var(--purple), var(--pink)); color: #fff; font-weight: 700; cursor: pointer; text-transform: uppercase; }
+        #timer { font-size: 3.5rem; font-weight: 800; color: #f1c40f; margin: 10px 0; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
-
     <div class="glass-ui">
-        <div id="registration-zone">
+        <div id="reg-zone">
             <h2>Inscription</h2>
-            <input type="text" id="team-name" placeholder="Nom de l'équipe...">
-            <button class="glass-btn" onclick="registerTeam()">Rejoindre</button>
+            <input type="text" id="t-name" placeholder="Nom de l'équipe...">
+            <button class="glass-btn" onclick="reg()">Rejoindre</button>
+        </div>
+
+        <div id="wait-zone" class="hidden">
+            <div style="font-size: 3rem; margin-bottom: 10px;">⏳</div>
+            <p>Bienvenue! Veuillez attendre que l'administrateur lance le quiz...</p>
         </div>
 
         <div id="quiz-zone" class="hidden">
-            <h3 id="q-header" style="opacity:0.6; font-size:0.8rem;">QUESTION 1</h3>
-            <div id="timer-display">01:00</div>
-            <textarea id="answer-input" placeholder="Votre réponse..."></textarea>
-            <button id="send-btn" class="glass-btn" onclick="sendAnswer()">Envoyer</button>
-            <p id="msg-sent" class="hidden" style="color:#10b981; margin-top:10px;">✓ Envoyé</p>
-            <p id="wait-msg" class="waiting-status hidden">Attendez la question suivante...</p>
+            <h3 id="q-num" style="opacity:0.6">QUESTION</h3>
+            <div id="timer">01:00</div>
+            <textarea id="ans-input" placeholder="Votre réponse..."></textarea>
+            <button id="send-btn" class="glass-btn" onclick="send()">Envoyer la réponse</button>
         </div>
     </div>
 
@@ -75,90 +50,64 @@
         const firebaseConfig = { databaseURL: "https://quiz-8016b-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref('competition');
+        let myType = localStorage.getItem('myType');
+        let curQ = 0;
 
-        let myTeam = localStorage.getItem('teamType');
-        let currentQ = 0;
-        let timerInterval = null;
-
-        // استعادة الجلسة إذا كان مسجلاً مسبقاً
-        if(myTeam) {
-            document.getElementById('registration-zone').classList.add('hidden');
-            document.getElementById('quiz-zone').classList.remove('hidden');
+        function reg() {
+            const n = document.getElementById('t-name').value;
+            if(!n) return;
+            db.once('value', s => {
+                const d = s.val();
+                let type = !d.teamPink ? "pink" : (!d.teamPurple ? "purple" : null);
+                if(!type) return alert("Full!");
+                db.update({ [type === "pink" ? 'teamPink' : 'teamPurple']: n });
+                myType = type; localStorage.setItem('myType', type);
+                showWait();
+            });
         }
 
-        function registerTeam() {
-            const name = document.getElementById('team-name').value;
-            if(!name) return;
-            
-            db.once('value', snap => {
-                const d = snap.val();
-                let type = !d.teamPink ? "pink" : (!d.teamPurple ? "purple" : null);
-                
-                if(!type) return alert("Complet !");
-
-                let updates = {};
-                updates[type === "pink" ? 'teamPink' : 'teamPurple'] = name;
-                db.update(updates);
-                
-                myTeam = type;
-                localStorage.setItem('teamType', type);
-                document.getElementById('registration-zone').classList.add('hidden');
-                document.getElementById('quiz-zone').classList.remove('hidden');
-            });
+        function showWait() {
+            document.getElementById('reg-zone').classList.add('hidden');
+            document.getElementById('quiz-zone').classList.add('hidden');
+            document.getElementById('wait-zone').classList.remove('hidden');
         }
 
         db.on('value', snap => {
             const d = snap.val(); if(!d) return;
-
-            // تحديث واجهة السؤال الجديد
-            if(d.status === 'start' && d.currentQuestion !== currentQ) {
-                currentQ = d.currentQuestion;
-                newQuestionActive(d.startTime, currentQ);
+            if(d.status === 'start' && d.currentQuestion !== curQ) {
+                curQ = d.currentQuestion;
+                startQ(d.startTime, curQ);
             }
-
-            if(d.showResults) {
-                document.getElementById('quiz-zone').innerHTML = "<h2>Terminé !</h2><p>Vérifiez l'écran principal</p>";
-            }
-
-            if(d.status === 'waiting' && currentQ !== 0) {
-                localStorage.clear();
-                location.reload();
-            }
+            if(d.status === 'waiting' && curQ !== 0) { localStorage.clear(); location.reload(); }
         });
 
-        function newQuestionActive(startTime, qNum) {
-            document.getElementById('q-header').innerText = `QUESTION ${qNum}`;
-            document.getElementById('answer-input').value = "";
-            document.getElementById('answer-input').classList.remove('hidden');
-            document.getElementById('send-btn').classList.remove('hidden');
+        function startQ(start, num) {
+            document.getElementById('wait-zone').classList.add('hidden');
+            document.getElementById('quiz-zone').classList.remove('hidden');
+            document.getElementById('q-num').innerText = "QUESTION " + num;
+            document.getElementById('ans-input').value = "";
             document.getElementById('send-btn').disabled = false;
-            document.getElementById('msg-sent').classList.add('hidden');
-            document.getElementById('wait-msg').classList.add('hidden');
-
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                const rem = 60 - Math.floor((Date.now() - startTime) / 1000);
+            
+            const intv = setInterval(() => {
+                const rem = 60 - Math.floor((Date.now() - start)/1000);
                 if(rem <= 0) {
-                    document.getElementById('timer-display').innerText = "00:00";
+                    clearInterval(intv);
+                    document.getElementById('timer').innerText = "00:00";
                     document.getElementById('send-btn').disabled = true;
-                    clearInterval(timerInterval);
+                    setTimeout(showWait, 2000); // العودة لشاشة الانتظار بعد انتهاء الوقت
                 } else {
-                    document.getElementById('timer-display').innerText = `00:${rem.toString().padStart(2,'0')}`;
+                    document.getElementById('timer').innerText = "00:" + rem.toString().padStart(2,'0');
                 }
             }, 1000);
         }
 
-        function sendAnswer() {
-            const ans = document.getElementById('answer-input').value;
-            if(!ans || !myTeam) return;
-
-            db.child(`answers/${myTeam}/${currentQ}`).set(ans).then(() => {
+        function send() {
+            const a = document.getElementById('ans-input').value;
+            if(!a || !myType) return;
+            db.child(`answers/${myType}/${curQ}`).set(a).then(() => {
                 document.getElementById('send-btn').disabled = true;
-                document.getElementById('msg-sent').classList.remove('hidden');
-                document.getElementById('wait-msg').classList.remove('hidden');
             });
         }
     </script>
 </body>
 </html>
-
