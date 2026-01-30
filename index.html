@@ -1,12 +1,15 @@
+
+
+
 <!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oncology Quiz | Team View</title>
+    <title>Oncology Quiz | Team</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --p-pink: #ec4899; --p-purple: #9d50bb; }
+        :root { --p-pink: #ec4899; --p-purple: #9d50bb; --p-green: #10b981; }
         body { 
             margin: 0; font-family: 'Poppins', sans-serif; min-height: 100vh;
             display: flex; align-items: center; justify-content: center;
@@ -15,34 +18,45 @@
         }
         /* تأثير الزجاج الفائق */
         .ultra-glass { 
-            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(40px) saturate(150%);
+            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(45px) saturate(160%);
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 40px;
             padding: 40px; width: 85%; max-width: 450px; text-align: center;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
         }
         h2 { font-weight: 300; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 30px; }
         input { 
             width: 100%; padding: 18px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.4); color: #fff; text-align: center; margin-bottom: 25px; font-size: 1.1rem;
+            background: rgba(0,0,0,0.5); color: #fff; text-align: center; margin-bottom: 25px; font-size: 1.1rem;
         }
         .main-btn { 
-            width: 100%; padding: 18px; border-radius: 20px; border: none;
+            width: 100%; padding: 18px; border-radius: 50px; border: none;
             background: linear-gradient(45deg, var(--p-purple), var(--p-pink));
-            color: white; font-weight: 700; cursor: pointer; transition: 0.3s;
+            color: white; font-weight: 700; cursor: pointer; transition: 0.3s; text-transform: uppercase;
         }
         .opt-btn { 
-            width: 100%; padding: 15px; margin: 10px 0; border-radius: 15px;
+            width: 100%; padding: 15px; margin: 8px 0; border-radius: 15px;
             background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            color: #fff; text-align: left; cursor: pointer; transition: 0.3s;
+            color: #fff; text-align: left; cursor: pointer; transition: 0.2s; font-size: 1rem;
         }
-        .opt-btn.active { background: var(--p-pink); border-color: #fff; box-shadow: 0 0 15px var(--p-pink); }
-        #timer { font-size: 3.5rem; font-weight: 700; color: #ffffff; margin-bottom: 20px; }
+        .opt-btn.active { background: rgba(255,255,255,0.2); border-color: #fff; transform: scale(1.02); }
+        
+        /* زر الإرسال المتطور */
+        .send-btn {
+            width: 100%; padding: 15px; margin-top: 20px; border-radius: 50px; border: none;
+            background: var(--p-green); color: white; font-weight: 800; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3); transition: 0.3s;
+        }
+        .send-btn:active { transform: scale(0.95); }
+        .send-btn.sent { background: #3b82f6; } /* يتغير لونه عند التأكيد */
+
+        #timer { font-size: 3.5rem; font-weight: 700; color: #ffffff; margin-bottom: 15px; }
         .hidden { display: none !important; }
+        #status-msg { font-size: 0.8rem; margin-top: 10px; color: var(--p-green); opacity: 0; transition: 0.3s; }
     </style>
 </head>
 <body>
 
-    <div class="ultra-glass" id="app-container">
+    <div class="ultra-glass">
         <div id="reg-zone">
             <h2>INSCRIPTION</h2>
             <input type="text" id="t-name" placeholder="Nom de l'équipe...">
@@ -50,14 +64,17 @@
         </div>
 
         <div id="wait-zone" class="hidden">
-            <div style="font-size: 4rem;">🩺</div>
-            <p style="font-weight: 300; margin-top: 20px;">En attente de la question...</p>
+            <div style="font-size: 4rem; animation: pulse 2s infinite;">🩺</div>
+            <p style="font-weight: 300; margin-top: 20px; letter-spacing: 1px;">Attente du signal...</p>
         </div>
 
         <div id="quiz-zone" class="hidden">
             <div id="timer">01:00</div>
-            <p id="q-text-view" style="font-size: 1.1rem; margin-bottom: 25px;"></p>
+            <p id="q-text-view" style="font-size: 1.1rem; margin-bottom: 20px; font-weight: 400;"></p>
             <div id="options-view"></div>
+            
+            <button class="send-btn" id="send-action" onclick="confirmChoice()">ENVOYER LA RÉPONSE</button>
+            <div id="status-msg">Réponse enregistrée ✓</div>
         </div>
     </div>
 
@@ -69,6 +86,7 @@
         const db = firebase.database().ref('competition');
         let myType = localStorage.getItem('myType');
         let currentQ = 0;
+        let localChoice = "";
 
         const quizData = [
             { q: "Quel est le principal marqueur du cancer de la prostate ?", options: ["PSA", "CEA", "CA-125", "AFP"] },
@@ -102,37 +120,62 @@
             }
             if(d.status === 'waiting') {
                 localStorage.clear();
-                document.getElementById('wait-zone').classList.add('hidden');
-                document.getElementById('quiz-zone').classList.add('hidden');
-                document.getElementById('reg-zone').classList.remove('hidden');
+                location.reload();
             }
         });
 
         function startQuestion(start, idx) {
             document.getElementById('wait-zone').classList.add('hidden');
             document.getElementById('quiz-zone').classList.remove('hidden');
+            document.getElementById('status-msg').style.opacity = "0";
+            localChoice = ""; 
+
             const data = quizData[idx];
             document.getElementById('q-text-view').innerText = data.q;
             const container = document.getElementById('options-view');
             container.innerHTML = '';
             data.options.forEach((opt, i) => {
                 const L = String.fromCharCode(65 + i);
-                container.innerHTML += `<button class="opt-btn" id="btn-${L}" onclick="submit('${L}')">${L}: ${opt}</button>`;
+                container.innerHTML += `<button class="opt-btn" id="btn-${L}" onclick="select('${L}')">${L}: ${opt}</button>`;
             });
 
             const intv = setInterval(() => {
                 const rem = 60 - Math.floor((Date.now() - start)/1000);
-                if(rem <= 0) { clearInterval(intv); showWait(); }
-                else { document.getElementById('timer').innerText = `00:${rem.toString().padStart(2,'0')}`; }
+                if(rem <= 0) { 
+                    clearInterval(intv); 
+                    showWait(); 
+                }
+                else { 
+                    document.getElementById('timer').innerText = `00:${rem.toString().padStart(2,'0')}`; 
+                }
             }, 1000);
         }
 
-        function submit(L) {
+        // اختيار أولي (يمكن تغييره)
+        function select(L) {
             document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('btn-'+L).classList.add('active');
-            db.child(`answers/${myType}/${currentQ}`).set(L);
+            localChoice = L;
+            // إخفاء رسالة النجاح إذا قرر تغيير الاختيار قبل الإرسال الجديد
+            document.getElementById('status-msg').style.opacity = "0";
+        }
+
+        // إرسال رسمي لقاعدة البيانات (يمكن إعادة الضغط عليه طوال الوقت)
+        function confirmChoice() {
+            if(!localChoice) return alert("Veuillez choisir une option !");
+            db.child(`answers/${myType}/${currentQ}`).set(localChoice).then(() => {
+                const msg = document.getElementById('status-msg');
+                msg.style.opacity = "1";
+                msg.innerText = "Réponse " + localChoice + " envoyée ✓";
+                // تأثير بسيط لزر الإرسال
+                const btn = document.getElementById('send-action');
+                btn.innerText = "MISE À JOUR RÉUSSIE";
+                setTimeout(() => { btn.innerText = "MODIFIER MA RÉPONSE"; }, 1500);
+            });
         }
     </script>
+    <style>
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+    </style>
 </body>
 </html>
-
