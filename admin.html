@@ -9,7 +9,7 @@
         :root { --pink: #ec4899; --purple: #9d50bb; --success: #10b981; --danger: #ef4444; }
         body { margin: 0; font-family: 'Poppins', sans-serif; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000 url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center fixed; background-size: cover; color: #fff; overflow: hidden; }
         .glass { background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(15px); border-radius: 30px; padding: 40px; border: 1px solid rgba(255,255,255,0.1); width: 90%; max-width: 850px; text-align: center; }
-        #timer { font-size: 5rem; font-weight: 900; color: #fff; margin: 0; text-shadow: 0 0 30px rgba(255,255,255,0.2); }
+        #timer { font-size: 4rem; font-weight: 900; color: #fff; margin: 0; text-shadow: 0 0 30px rgba(255,255,255,0.2); }
         .q-card { background: rgba(255,255,255,0.05); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); margin: 25px 0; }
         .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .opt-box { padding: 18px; background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); font-size: 1.2rem; }
@@ -25,7 +25,7 @@
 
     <div id="winner-screen">
         <h2 style="font-size: 3rem; margin-bottom: 0;">FÉLICITATIONS !</h2>
-        <div id="winner-name" style="font-size: 9rem; font-weight: 900;">NOM</div>
+        <div id="winner-name" style="font-size: 10rem; font-weight: 900;">NOM</div>
         <button class="btn" style="background:#fff; margin-top:40px;" onclick="resetCompetition()">NOUVELLE SESSION</button>
     </div>
 
@@ -34,11 +34,11 @@
         
         <div id="q-area" class="hidden q-card">
             <h2 id="q-num" style="color:var(--pink); margin:0 0 15px 0;">QUESTION 1/10</h2>
-            <p id="q-text" style="font-size:1.8rem; font-weight:700; margin-bottom:20px;"></p>
+            <p id="q-text" style="font-size:1.6rem; font-weight:700; margin-bottom:20px;"></p>
             <div class="opt-grid" id="q-opts"></div>
         </div>
 
-        <div style="display: flex; justify-content: space-around; margin-top: 30px; font-weight: 900; font-size: 1.2rem;">
+        <div style="display: flex; justify-content: space-around; margin-top: 30px; font-weight: 900; font-size: 1.6rem;">
             <div id="name-p" style="color:var(--pink);">ROSE</div>
             <div id="name-v" style="color:var(--purple);">VIOLETTE</div>
         </div>
@@ -46,9 +46,9 @@
         <div style="margin-top:30px;">
             <button id="btn-next" class="btn" style="background:#fff; color:#000" onclick="launchNext()">Lancer Question</button>
             <button id="btn-corr" class="btn hidden" style="background:var(--success); color:#fff" onclick="showCorrection()">Correction</button>
-            <button id="btn-win" class="btn hidden" style="background:gold; color:#000" onclick="revealWinner()">🏆 VOIR LE GAGNANT</button>
+            <button id="btn-win" class="btn hidden" style="background:gold; color:#000" onclick="revealWinner()"> VOIR LE GAGNANT</button>
             <br>
-            <button class="btn btn-danger" onclick="resetCompetition()">⚠️ RÉINITIALISER TOUT LE QUIZ</button>
+            <button class="btn btn-danger" onclick="resetCompetition()"> RÉINITIALISER TOUT LE QUIZ</button>
         </div>
     </div>
 
