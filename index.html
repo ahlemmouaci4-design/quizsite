@@ -1,80 +1,58 @@
-
-
 <!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Player | High-End Glass</title>
+    <title>Inscription Quiz</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --p-pink: #ec4899; --p-purple: #9d50bb; --glass: rgba(255, 255, 255, 0.05); }
+        :root { --p-pink: #ec4899; --p-purple: #9d50bb; }
         body { 
             margin: 0; font-family: 'Poppins', sans-serif; min-height: 100vh; 
             display: flex; align-items: center; justify-content: center; 
             background: #000 url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed;
-            background-size: cover; color: #fff; overflow: hidden;
+            background-size: cover; color: #fff;
         }
-
-        /* تصميم زجاجي فائق الشفافية */
         .ultra-glass { 
             background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(40px) saturate(150%); 
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 35px; 
-            padding: 30px; width: 90%; max-width: 400px; text-align: center; 
-            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+            padding: 30px; width: 85%; max-width: 400px; text-align: center; 
         }
-
         input { 
-            width: 100%; padding: 15px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); 
-            background: rgba(0,0,0,0.5); color: #fff; text-align: center; margin-bottom: 20px; font-size: 1rem;
+            width: 100%; padding: 15px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.2); 
+            background: rgba(0,0,0,0.6); color: #fff; text-align: center; margin-bottom: 20px; font-size: 1.1rem; box-sizing: border-box;
         }
-
         .main-btn { 
             width: 100%; padding: 15px; border-radius: 50px; border: none; 
             background: linear-gradient(45deg, var(--p-purple), var(--p-pink)); 
             color: white; font-weight: 700; cursor: pointer; text-transform: uppercase;
         }
-
-        .opt-btn { 
-            width: 100%; padding: 14px; margin: 10px 0; border-radius: 15px; 
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
-            color: #fff; text-align: left; cursor: pointer; transition: 0.3s; font-size: 1rem;
-        }
+        .opt-btn { width: 100%; padding: 14px; margin: 8px 0; border-radius: 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; text-align: left; cursor: pointer; }
         .opt-btn.active { background: var(--p-pink); border-color: #fff; box-shadow: 0 0 15px var(--p-pink); }
-
-        .send-btn { 
-            width: 100%; padding: 15px; margin-top: 15px; border-radius: 50px; border: none; 
-            background: #10b981; color: white; font-weight: 800; cursor: pointer;
-        }
-
-        #timer { font-size: 3rem; font-weight: 700; color: #f1c40f; margin-bottom: 10px; line-height: 1; }
+        #timer { font-size: 3rem; font-weight: 700; color: #f1c40f; }
         .hidden { display: none !important; }
-        
-        /* انيميشن بسيط للانتظار */
-        .pulse { animation: pulse-bg 2s infinite; }
-        @keyframes pulse-bg { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
     </style>
 </head>
 <body>
-
     <div class="ultra-glass">
         <div id="reg-zone">
-            <h2 style="letter-spacing: 2px;">INSCRIPTION</h2>
+            <h2 style="margin-top:0">INSCRIPTION</h2>
+            <p style="font-size:0.8rem; opacity:0.7">Entrez le nom de votre équipe pour commencer</p>
             <input type="text" id="t-name" placeholder="Nom de l'équipe...">
-            <button class="main-btn" onclick="registerTeam()">REJOINDRE</button>
+            <button class="main-btn" onclick="registerTeam()">COMMENCER</button>
         </div>
 
         <div id="wait-zone" class="hidden">
-            <div class="pulse" style="font-size: 5rem;">🧬</div>
+            <div style="font-size: 4rem; margin-bottom: 10px;">🧬</div>
             <h3 id="display-team-name">...</h3>
-            <p style="opacity: 0.6;">En attente de la question...</p>
+            <p style="opacity: 0.6;">Préparez-vous, le quiz va commencer...</p>
         </div>
 
         <div id="quiz-zone" class="hidden">
             <div id="timer">01:00</div>
-            <p id="q-title" style="color: var(--p-pink); font-weight: bold; margin: 0;">QUESTION</p>
+            <p id="q-status" style="color:var(--p-pink); font-weight:bold;"></p>
             <div id="options-container"></div>
-            <button id="valider-btn" class="send-btn" onclick="confirmChoice()">VALIDER</button>
+            <button id="valider-btn" class="main-btn" style="background:#10b981; margin-top:20px" onclick="confirmChoice()">VALIDER</button>
             <div id="status-msg" style="margin-top:10px; font-size:0.9rem; color:#10b981; opacity:0;">Réponse envoyée ✓</div>
         </div>
     </div>
@@ -86,92 +64,74 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref('competition');
 
-        let myType = localStorage.getItem('myType');
+        let myType = localStorage.getItem('myType'); 
         let currentQ = 0;
-        let localChoice = "";
         let timerInterval;
 
-        if(myType) {
-            document.getElementById('reg-zone').classList.add('hidden');
-            document.getElementById('wait-zone').classList.remove('hidden');
-        }
+        // التحقق من وجود تسجيل مسبق
+        if(myType) showWait();
 
         function registerTeam() {
             const name = document.getElementById('t-name').value.trim();
-            if(!name) return;
+            if(!name) return alert("Veuillez entrer un nom !");
+
             db.transaction(data => {
-                if (!data) return { teamPink: name };
+                if (!data) data = {};
                 if (!data.teamPink) { data.teamPink = name; myType = "pink"; }
                 else if (!data.teamPurple) { data.teamPurple = name; myType = "purple"; }
+                else { return; } // الفرق مكتملة
                 return data;
             }, (err, commit, snap) => {
                 if(commit && myType) {
                     localStorage.setItem('myType', myType);
-                    location.reload();
+                    showWait();
                 } else {
                     alert("Désolé, les deux équipes sont déjà inscrites.");
                 }
             });
         }
 
+        function showWait() {
+            document.getElementById('reg-zone').classList.add('hidden');
+            document.getElementById('quiz-zone').classList.add('hidden');
+            document.getElementById('wait-zone').classList.remove('hidden');
+            db.once('value', s => {
+                const d = s.val();
+                document.getElementById('display-team-name').innerText = (myType === 'pink' ? d.teamPink : d.teamPurple);
+            });
+        }
+
         db.on('value', snap => {
             const d = snap.val(); if(!d) return;
-            
-            // تحديث اسم الفريق في واجهة الانتظار
-            if(myType) {
-                document.getElementById('display-team-name').innerText = (myType === 'pink' ? d.teamPink : d.teamPurple) || "Équipe";
-            }
-
-            // منطق التبديل بين الشاشات
-            if(d.status === 'start') {
-                if(currentQ !== d.currentQuestion) {
-                    currentQ = d.currentQuestion;
-                    startQuizSession(d.startTime);
-                }
-            } else {
-                // إذا كانت الحالة correction أو waiting، نعود لشاشة الانتظار
-                showWaitScreen();
+            if(d.status === 'start' && currentQ !== d.currentQuestion) {
+                currentQ = d.currentQuestion;
+                startQuiz(d.startTime);
+            } else if (d.status !== 'start') {
+                showWait();
             }
         });
 
-        function showWaitScreen() {
-            clearInterval(timerInterval);
-            document.getElementById('quiz-zone').classList.add('hidden');
-            document.getElementById('wait-zone').classList.remove('hidden');
-            document.getElementById('reg-zone').classList.add('hidden');
-        }
-
-        function startQuizSession(startTime) {
+        function startQuiz(startTime) {
             document.getElementById('wait-zone').classList.add('hidden');
             document.getElementById('quiz-zone').classList.remove('hidden');
             document.getElementById('status-msg').style.opacity = "0";
-            document.getElementById('valider-btn').disabled = false;
-            document.getElementById('valider-btn').style.opacity = "1";
+            document.getElementById('q-status').innerText = "QUESTION " + currentQ;
             
-            localChoice = "";
             const container = document.getElementById('options-container');
             container.innerHTML = '';
             ["A","B","C","D"].forEach(L => {
                 container.innerHTML += `<button class="opt-btn" id="btn-${L}" onclick="selectOpt('${L}')">OPTION ${L}</button>`;
             });
 
-            // مزامنة العداد مع الأدمن
             clearInterval(timerInterval);
             timerInterval = setInterval(() => {
-                const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                const rem = 60 - elapsed;
-                
-                if(rem <= 0) {
-                    clearInterval(timerInterval);
-                    document.getElementById('timer').innerText = "00:00";
-                    // اختياري: إغلاق إمكانية الإجابة بعد انتهاء الوقت
-                    document.getElementById('valider-btn').disabled = true;
-                } else {
-                    document.getElementById('timer').innerText = `00:${rem.toString().padStart(2,'0')}`;
-                }
+                const rem = 60 - Math.floor((Date.now() - startTime)/1000);
+                document.getElementById('timer').innerText = `00:${rem > 0 ? rem.toString().padStart(2,'0') : '00'}`;
+                if(rem <= 0) clearInterval(timerInterval);
             }, 1000);
         }
 
+        let localChoice = "";
         function selectOpt(L) {
             document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('btn-'+L).classList.add('active');
@@ -179,11 +139,10 @@
         }
 
         function confirmChoice() {
-            if(!localChoice || !myType) return;
+            if(!localChoice) return;
             db.child(`answers/${myType}/${currentQ}`).set(localChoice).then(() => {
                 document.getElementById('status-msg').style.opacity = "1";
                 document.getElementById('valider-btn').disabled = true;
-                document.getElementById('valider-btn').style.opacity = "0.5";
             });
         }
     </script>
