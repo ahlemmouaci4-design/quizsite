@@ -1,73 +1,52 @@
-
 <!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Control | Live Correction</title>
+    <title>Master Control | Oncology Quiz</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --purple: #9d50bb; --pink: #ec4899; --success: #10b981; --danger: #ef4444; }
-        body { 
-            margin: 0; font-family: 'Poppins', sans-serif; min-height: 100vh; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: #000; color: #fff;
-            background-image: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
-            background-size: cover;
-        }
-        .container { width: 95%; max-width: 1000px; text-align: center; }
-        .glass-panel { background: rgba(255,255,255,0.05); backdrop-filter: blur(30px); border-radius: 40px; padding: 40px; border: 1px solid rgba(255,255,255,0.1); }
-        
+        body { margin: 0; font-family: 'Poppins', sans-serif; min-height: 100vh; background: #000; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; background-image: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'); background-size: cover; }
+        .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border-radius: 40px; padding: 40px; border: 1px solid rgba(255,255,255,0.1); width: 90%; max-width: 1000px; text-align: center; }
         #timer { font-size: 6rem; font-weight: 900; color: #f1c40f; margin-bottom: 20px; }
-        
-        /* خيارات السؤال */
         .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
-        .opt-box { padding: 15px; background: rgba(255,255,255,0.05); border-radius: 15px; text-align: left; border: 2px solid transparent; transition: 0.4s; }
-        
-        /* التصحيح */
+        .opt-box { padding: 15px; background: rgba(255,255,255,0.05); border-radius: 15px; text-align: left; border: 3px solid transparent; transition: 0.4s; font-size: 1.2rem; }
         .is-correct { border-color: var(--success) !important; background: rgba(16, 185, 129, 0.2) !important; box-shadow: 0 0 20px var(--success); }
         .is-wrong { border-color: var(--danger) !important; background: rgba(239, 68, 68, 0.2) !important; box-shadow: 0 0 20px var(--danger); }
-
-        /* بطاقات الفرق */
         .team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px; }
         .ans-card { padding: 25px; border-radius: 30px; border: 4px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); transition: 0.5s; }
         .pink-side { border-color: var(--pink); }
         .purple-side { border-color: var(--purple); }
         .big-letter { font-size: 6rem; font-weight: 900; display: block; }
-
         .controls { margin-top: 40px; display: flex; gap: 15px; justify-content: center; }
         .btn { padding: 15px 35px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
         .btn-next { background: var(--success); color: #fff; }
         .btn-show { background: #f1c40f; color: #000; }
+        .btn-reset { background: var(--danger); color: #fff; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <div class="glass-panel">
-            <div id="timer">01:00</div>
-            
-            <div id="q-area" class="hidden">
-                <h2 id="q-text" style="font-size: 1.8rem; margin-bottom: 20px;"></h2>
-                <div class="opt-grid" id="q-opts"></div>
+    <div class="glass">
+        <div id="timer">01:00</div>
+        <div id="q-area" class="hidden">
+            <h2 id="q-text" style="font-size: 1.8rem; margin-bottom: 20px;"></h2>
+            <div class="opt-grid" id="q-opts"></div>
+        </div>
+        <div class="team-grid">
+            <div class="ans-card pink-side" id="card-pink">
+                <small id="name-p" style="color:var(--pink); font-weight:800;">EQUIPE ROSE</small>
+                <span class="big-letter" id="view-p">?</span>
             </div>
-
-            <div class="team-grid">
-                <div class="ans-card pink-side" id="card-pink">
-                    <small id="name-p" style="color:var(--pink); font-weight:800;">EQUIPE ROSE</small>
-                    <span class="big-letter" id="view-p">?</span>
-                </div>
-                <div class="ans-card purple-side" id="card-purple">
-                    <small id="name-v" style="color:var(--purple); font-weight:800;">EQUIPE VIOLETTE</small>
-                    <span class="big-letter" id="view-v">?</span>
-                </div>
+            <div class="ans-card purple-side" id="card-purple">
+                <small id="name-v" style="color:var(--purple); font-weight:800;">EQUIPE VIOLETTE</small>
+                <span class="big-letter" id="view-v">?</span>
             </div>
-
-            <div class="controls">
-                <button class="btn btn-show hidden" id="btn-reveal" onclick="applyCorrection()">Afficher la Correction</button>
-                <button class="btn btn-next" id="btn-action" onclick="startNext()">Lancer Question 1</button>
-            </div>
+        </div>
+        <div class="controls">
+            <button class="btn btn-reset" onclick="resetGame()">Réinitialiser le Quiz</button>
+            <button class="btn btn-show hidden" id="btn-reveal" onclick="applyCorrection()">Correction</button>
+            <button class="btn btn-next" id="btn-action" onclick="startNext()">Lancer Question</button>
         </div>
     </div>
 
@@ -80,15 +59,22 @@
 
         const quizData = [
             { q: "Quel est le principal marqueur du cancer de la prostate ?", options: ["PSA", "CEA", "CA-125", "AFP"], correct: "A" },
-            { q: "Quelle mutation est recherchée في سرطان الرئة ؟", options: ["EGFR", "BRCA1", "HER2", "APC"], correct: "A" }
+            { q: "Quelle mutation est recherchée dans le cancer du poumon ?", options: ["EGFR", "BRCA1", "HER2", "APC"], correct: "A" }
         ];
 
         let curQ = 0;
-        let lastPinkAns = " ", lastPurpleAns = " ";
+        let lastPinkAns = "?", lastPurpleAns = "?";
+
+        function resetGame() {
+            if(confirm("Voulez-vous vraiment recommencer la compétition à zéro ?")) {
+                db.set({ status: 'waiting', currentQuestion: 0, teamPink: "", teamPurple: "", answers: {} }).then(() => location.reload());
+            }
+        }
 
         function startNext() {
             curQ++;
-            db.update({ status: 'start', currentQuestion: curQ, startTime: Date.now(), answers: {pink:{[curQ]:"?"}, purple:{[curQ]:"?"}} });
+            if(curQ > quizData.length) return alert("Fin du quiz");
+            db.update({ status: 'start', currentQuestion: curQ, startTime: Date.now() });
             document.getElementById('btn-action').classList.add('hidden');
             resetVisuals();
         }
@@ -100,45 +86,38 @@
         }
 
         function applyCorrection() {
-            const correctLetter = quizData[curQ-1].correct;
+            const correct = quizData[curQ-1].correct;
+            document.getElementById('opt-' + correct).classList.add('is-correct');
             
-            // 1. تلوين الخيار الصحيح في قائمة الأسئلة بالأخضر
-            document.getElementById('opt-' + correctLetter).classList.add('is-correct');
-
-            // 2. تصحيح إجابة الفريق الوردي
             const cardP = document.getElementById('card-pink');
-            if(lastPinkAns === correctLetter) cardP.classList.add('is-correct');
-            else cardP.classList.add('is-wrong');
+            cardP.classList.add(lastPinkAns === correct ? 'is-correct' : 'is-wrong');
 
-            // 3. تصحيح إجابة الفريق البنفسجي
             const cardV = document.getElementById('card-purple');
-            if(lastPurpleAns === correctLetter) cardV.classList.add('is-correct');
-            else cardV.classList.add('is-wrong');
+            cardV.classList.add(lastPurpleAns === correct ? 'is-correct' : 'is-wrong');
 
-            // 4. إظهار زر السؤال التالي
             document.getElementById('btn-reveal').classList.add('hidden');
             document.getElementById('btn-action').classList.remove('hidden');
-            document.getElementById('btn-action').innerText = "Question Suivante";
+            document.getElementById('btn-action').innerText = "Suivant";
         }
 
         db.on('value', snap => {
             const d = snap.val(); if(!d) return;
             document.getElementById('name-p').innerText = d.teamPink || "ROSE (Attente)";
             document.getElementById('name-v').innerText = d.teamPurple || "VIOLETTE (Attente)";
-
             if(d.status === 'start') {
                 curQ = d.currentQuestion;
-                renderQuestion(curQ - 1);
-                handleTimer(d.startTime);
-                
-                lastPinkAns = (d.answers && d.answers.pink) ? d.answers.pink[curQ] || ' ' : ' ';
-                lastPurpleAns = (d.answers && d.answers.purple) ? d.answers.purple[curQ] || ' ' : ' ';
+                renderQ(curQ-1);
+                lastPinkAns = (d.answers && d.answers.pink) ? d.answers.pink[curQ] || '?' : '?';
+                lastPurpleAns = (d.answers && d.answers.purple) ? d.answers.purple[curQ] || '?' : '?';
                 document.getElementById('view-p').innerText = lastPinkAns;
                 document.getElementById('view-v').innerText = lastPurpleAns;
+                
+                const elapsed = Math.floor((Date.now() - d.startTime)/1000);
+                updateTimer(d.startTime);
             }
         });
 
-        function renderQuestion(idx) {
+        function renderQ(idx) {
             const data = quizData[idx];
             document.getElementById('q-area').classList.remove('hidden');
             document.getElementById('q-text').innerText = data.q;
@@ -150,16 +129,16 @@
             });
         }
 
-        function handleTimer(start) {
-            const timerDiv = document.getElementById('timer');
+        function updateTimer(start) {
             const intv = setInterval(() => {
-                const rem = 60 - Math.floor((Date.now() - start)/1000);
+                const elapsed = Math.floor((Date.now() - start)/1000);
+                const rem = 60 - elapsed;
+                if(elapsed >= 30) document.getElementById('btn-reveal').classList.remove('hidden');
                 if(rem <= 0) {
                     clearInterval(intv);
-                    timerDiv.innerText = "00:00";
-                    document.getElementById('btn-reveal').classList.remove('hidden');
+                    document.getElementById('timer').innerText = "00:00";
                 } else {
-                    timerDiv.innerText = `00:${rem.toString().padStart(2,'0')}`;
+                    document.getElementById('timer').innerText = `00:${rem.toString().padStart(2,'0')}`;
                 }
             }, 1000);
         }
