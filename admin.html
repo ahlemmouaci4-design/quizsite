@@ -3,56 +3,50 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Master Admin | Quiz Live</title>
+    <title>Master Admin | Live Show</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --pink: #ec4899; --purple: #9d50bb; --success: #10b981; }
         body { margin: 0; font-family: 'Poppins', sans-serif; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000 url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center fixed; background-size: cover; color: #fff; overflow: hidden; }
-        .glass { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(15px); border-radius: 30px; padding: 30px; border: 1px solid rgba(255,255,255,0.1); width: 90%; max-width: 850px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        #timer { font-size: 6rem; font-weight: 900; color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.4); margin: 0; }
-        .q-card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); margin: 20px 0; }
+        .glass { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(15px); border-radius: 30px; padding: 40px; border: 1px solid rgba(255,255,255,0.1); width: 90%; max-width: 850px; text-align: center; }
+        #timer { font-size: 7rem; font-weight: 900; color: #fff; margin: 0; text-shadow: 0 0 30px rgba(255,255,255,0.2); }
+        .q-card { background: rgba(255,255,255,0.05); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); margin: 25px 0; }
         .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .opt-box { padding: 15px; background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); font-size: 1.1rem; }
-        .correct { border-color: var(--success) !important; background: rgba(16, 185, 129, 0.3) !important; animation: blink 1s infinite; }
-        .team-box { display: flex; justify-content: space-around; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
-        .ans-preview { font-size: 4rem; font-weight: 900; opacity: 0; transition: 0.5s; }
-        .show { opacity: 1; }
-        .btn { padding: 15px 40px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; margin: 10px; transition: 0.3s; }
-        #winner-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 999; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .opt-box { padding: 18px; background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); font-size: 1.2rem; transition: 0.5s; }
+        .correct { border-color: var(--success) !important; background: rgba(16, 185, 129, 0.4) !important; box-shadow: 0 0 20px var(--success); transform: scale(1.05); }
+        .btn { padding: 18px 45px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; margin: 10px; font-size: 1rem; }
+        .team-names { display: flex; justify-content: space-around; margin-top: 30px; font-size: 1.5rem; font-weight: 900; }
+        .hidden { display: none !important; }
+        #winner-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; animation: fadeIn 1s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
     <div id="winner-screen">
-        <h1 id="winner-name" style="font-size: 8rem; margin: 0;">NOM</h1>
-        <button class="btn" style="background:#fff" onclick="location.reload()">RECOMMENCER</button>
+        <h2 style="font-size: 3rem; margin-bottom: 0;">FÉLICITATIONS !</h2>
+        <div id="winner-name" style="font-size: 9rem; font-weight: 900; text-transform: uppercase;">NOM</div>
+        <button class="btn" style="background:#fff; margin-top:40px;" onclick="location.reload()">REJOUER</button>
     </div>
 
-    <div class="glass" id="main-ui">
+    <div class="glass" id="ui-main">
         <div id="timer">01:00</div>
         
         <div id="q-area" class="hidden q-card">
-            <h2 id="q-num" style="color:var(--pink); margin-bottom:10px;">QUESTION 1/10</h2>
-            <p id="q-text" style="font-size:1.6rem; font-weight:700;"></p>
+            <h2 id="q-num" style="color:var(--pink); margin:0 0 15px 0;">QUESTION 1/10</h2>
+            <p id="q-text" style="font-size:1.8rem; font-weight:700; margin-bottom:20px;"></p>
             <div class="opt-grid" id="q-opts"></div>
         </div>
 
-        <div class="team-box">
-            <div>
-                <div id="name-p" style="color:var(--pink); font-weight:900;">EQUIPE ROSE</div>
-                <div id="ans-p" class="ans-preview">?</div>
-            </div>
-            <div>
-                <div id="name-v" style="color:var(--purple); font-weight:900;">EQUIPE VIOLETTE</div>
-                <div id="ans-v" class="ans-preview">?</div>
-            </div>
+        <div class="team-names">
+            <div id="name-p" style="color:var(--pink);">ROSE</div>
+            <div id="name-v" style="color:var(--purple);">VIOLETTE</div>
         </div>
 
-        <div style="margin-top:20px;">
-            <button id="btn-next" class="btn" style="background:#fff; color:#000" onclick="launchQ()">Lancer Question</button>
-            <button id="btn-corr" class="btn hidden" style="background:var(--success); color:#fff" onclick="showCorr()">Correction</button>
-            <button id="btn-win" class="btn hidden" style="background:gold; color:#000" onclick="showWinner()">🏆 Gagnant</button>
+        <div style="margin-top:30px;">
+            <button id="btn-next" class="btn" style="background:#fff; color:#000" onclick="launchNext()">Lancer Question</button>
+            <button id="btn-corr" class="btn hidden" style="background:var(--success); color:#fff" onclick="showCorrection()">Correction</button>
+            <button id="btn-win" class="btn hidden" style="background:gold; color:#000" onclick="revealWinner()">🏆 PROCLAMER LE VAINQUEUR</button>
         </div>
     </div>
 
@@ -76,69 +70,74 @@
             { q: "Nom d'une tumeur non cancéreuse ?", opts: ["Maligne", "Métastatique", "Bénigne", "Invasive"], c: "C" }
         ];
 
-        let cur = 0, scP = 0, scV = 0, timer;
-        let pName, vName;
+        let cur = 0, scP = 0, scV = 0, timerObj;
+        let tPink = "", tPurple = "";
 
-        function launchQ() {
+        function launchNext() {
             if(cur >= 10) return;
             cur++;
             db.update({ status: 'start', curQ: cur, startTime: firebase.database.ServerValue.TIMESTAMP });
             document.getElementById('btn-next').classList.add('hidden');
         }
 
-        function showCorr() {
-            const letter = questions[cur-1].c;
-            document.getElementById('opt-'+letter).classList.add('correct');
+        function showCorrection() {
+            const correct = questions[cur-1].c;
+            document.getElementById('opt-'+correct).classList.add('correct');
+            
             db.once('value', s => {
                 const d = s.val();
-                if(d.answers?.pink?.[cur] === letter) scP++;
-                if(d.answers?.purple?.[cur] === letter) scV++;
-                document.getElementById('ans-p').classList.add('show');
-                document.getElementById('ans-v').classList.add('show');
-                if(cur === 10) document.getElementById('btn-win').classList.remove('hidden');
-                else document.getElementById('btn-next').classList.remove('hidden');
+                if(d.answers?.pink?.[cur] === correct) scP++;
+                if(d.answers?.purple?.[cur] === correct) scV++;
+                
+                if(cur === 10) {
+                    document.getElementById('btn-win').classList.remove('hidden');
+                } else {
+                    document.getElementById('btn-next').classList.remove('hidden');
+                    document.getElementById('btn-next').innerText = "Question Suivante";
+                }
             });
             db.update({ status: 'correction' });
             document.getElementById('btn-corr').classList.add('hidden');
-            clearInterval(timer);
+            clearInterval(timerObj);
         }
 
-        function showWinner() {
-            const s = document.getElementById('winner-screen');
-            document.getElementById('main-ui').style.display = 'none';
-            s.style.display = 'flex';
-            if(scP > scV) { s.style.backgroundColor = '#ec4899'; document.getElementById('winner-name').innerText = pName; }
-            else { s.style.backgroundColor = '#9d50bb'; document.getElementById('winner-name').innerText = vName; }
+        function revealWinner() {
+            const screen = document.getElementById('winner-screen');
+            document.getElementById('ui-main').style.display = 'none';
+            screen.style.display = 'flex';
+            if(scP > scV) { screen.style.backgroundColor = '#ec4899'; document.getElementById('winner-name').innerText = tPink; }
+            else if(scV > scP) { screen.style.backgroundColor = '#9d50bb'; document.getElementById('winner-name').innerText = tPurple; }
+            else { screen.style.backgroundColor = '#333'; document.getElementById('winner-name').innerText = "ÉGALITÉ !"; }
         }
 
         db.on('value', snap => {
             const d = snap.val() || {};
-            pName = d.teamPink || "ROSE"; vName = d.teamPurple || "VIOLETTE";
-            document.getElementById('name-p').innerText = pName;
-            document.getElementById('name-v').innerText = vName;
+            tPink = d.teamPink || "ROSE"; tPurple = d.teamPurple || "VIOLETTE";
+            document.getElementById('name-p').innerText = tPink;
+            document.getElementById('name-v').innerText = tPurple;
 
             if(d.status === 'start' && d.curQ === cur) {
                 document.getElementById('q-area').classList.remove('hidden');
-                document.getElementById('ans-p').innerText = d.answers?.pink?.[cur] || '?';
-                document.getElementById('ans-v').innerText = d.answers?.purple?.[cur] || '?';
-                document.getElementById('ans-p').classList.remove('show');
-                document.getElementById('ans-v').classList.remove('show');
-                
                 const q = questions[cur-1];
                 document.getElementById('q-num').innerText = `QUESTION ${cur}/10`;
                 document.getElementById('q-text').innerText = q.q;
-                const oDiv = document.getElementById('q-opts'); oDiv.innerHTML = '';
+                const div = document.getElementById('q-opts'); div.innerHTML = '';
                 q.opts.forEach((o, i) => {
                     const L = String.fromCharCode(65+i);
-                    oDiv.innerHTML += `<div class="opt-box" id="opt-${L}"><b>${L}:</b> ${o}</div>`;
+                    div.innerHTML += `<div class="opt-box" id="opt-${L}">${L}: ${o}</div>`;
                 });
 
-                clearInterval(timer);
-                timer = setInterval(() => {
-                    const rem = 60 - Math.floor((Date.now() - d.startTime)/1000);
+                clearInterval(timerObj);
+                timerObj = setInterval(() => {
+                    const elapsed = Math.floor((Date.now() - d.startTime)/1000);
+                    const rem = 60 - elapsed;
                     document.getElementById('timer').innerText = `00:${rem > 0 ? rem.toString().padStart(2,'0') : '00'}`;
-                    if(rem <= 30) document.getElementById('btn-corr').classList.remove('hidden');
-                    if(rem <= 0) clearInterval(timer);
+                    
+                    // ظهور زر التصحيح بعد 15 ثانية فقط
+                    if(elapsed >= 15) {
+                        document.getElementById('btn-corr').classList.remove('hidden');
+                    }
+                    if(rem <= 0) clearInterval(timerObj);
                 }, 1000);
             }
         });
