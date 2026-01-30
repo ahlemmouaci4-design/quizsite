@@ -1,59 +1,62 @@
 <!DOCTYPE html>
-<html lang="fr" dir="ltr">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscription Quiz</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --p-pink: #ec4899; --p-purple: #9d50bb; }
+        :root { --pink: #ec4899; --purple: #9d50bb; }
         body { 
-            margin: 0; font-family: 'Poppins', sans-serif; min-height: 100vh; 
-            display: flex; align-items: center; justify-content: center; 
+            margin: 0; font-family: 'Poppins', sans-serif; height: 100vh; 
+            display: flex; align-items: center; justify-content: center;
             background: #000 url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed;
             background-size: cover; color: #fff;
         }
         .ultra-glass { 
-            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(40px) saturate(150%); 
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 35px; 
-            padding: 30px; width: 85%; max-width: 400px; text-align: center; 
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(30px); 
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px; 
+            padding: 40px 20px; width: 85%; max-width: 350px; text-align: center;
         }
         input { 
-            width: 100%; padding: 15px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.2); 
+            width: 100%; padding: 15px; border-radius: 15px; border: 2px solid rgba(255,255,255,0.2); 
             background: rgba(0,0,0,0.6); color: #fff; text-align: center; margin-bottom: 20px; font-size: 1.1rem; box-sizing: border-box;
         }
+        input:focus { border-color: var(--pink); outline: none; }
         .main-btn { 
             width: 100%; padding: 15px; border-radius: 50px; border: none; 
-            background: linear-gradient(45deg, var(--p-purple), var(--p-pink)); 
-            color: white; font-weight: 700; cursor: pointer; text-transform: uppercase;
+            background: linear-gradient(45deg, var(--purple), var(--pink)); 
+            color: white; font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 1rem;
         }
-        .opt-btn { width: 100%; padding: 14px; margin: 8px 0; border-radius: 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; text-align: left; cursor: pointer; }
-        .opt-btn.active { background: var(--p-pink); border-color: #fff; box-shadow: 0 0 15px var(--p-pink); }
-        #timer { font-size: 3rem; font-weight: 700; color: #f1c40f; }
+        #timer { font-size: 3.5rem; font-weight: 900; color: #f1c40f; margin: 10px 0; }
+        .opt-btn { width: 100%; padding: 15px; margin: 10px 0; border-radius: 15px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; cursor: pointer; font-weight: bold; }
+        .opt-btn.active { background: var(--pink); border-color: #fff; box-shadow: 0 0 15px var(--pink); }
         .hidden { display: none !important; }
+        .pulse { animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
     </style>
 </head>
 <body>
+
     <div class="ultra-glass">
         <div id="reg-zone">
-            <h2 style="margin-top:0">INSCRIPTION</h2>
-            <p style="font-size:0.8rem; opacity:0.7">Entrez le nom de votre équipe pour commencer</p>
-            <input type="text" id="t-name" placeholder="Nom de l'équipe...">
-            <button class="main-btn" onclick="registerTeam()">COMMENCER</button>
+            <h2 style="margin-top:0">BIENVENUE</h2>
+            <p style="font-size:0.9rem; opacity:0.8; margin-bottom:20px">Entrez le nom de votre équipe</p>
+            <input type="text" id="t-name" placeholder="Nom de l'équipe..." autocomplete="off">
+            <button class="main-btn" onclick="registerTeam()">Rejoindre le Quiz</button>
         </div>
 
         <div id="wait-zone" class="hidden">
-            <div style="font-size: 4rem; margin-bottom: 10px;">🧬</div>
-            <h3 id="display-team-name">...</h3>
-            <p style="opacity: 0.6;">Préparez-vous, le quiz va commencer...</p>
+            <div style="font-size: 4rem; margin-bottom: 15px;" class="pulse">🧬</div>
+            <h2 id="display-team-name" style="margin:0; color:var(--pink)">---</h2>
+            <p style="opacity: 0.7;">En attente de l'administrateur...</p>
         </div>
 
         <div id="quiz-zone" class="hidden">
             <div id="timer">01:00</div>
-            <p id="q-status" style="color:var(--p-pink); font-weight:bold;"></p>
             <div id="options-container"></div>
-            <button id="valider-btn" class="main-btn" style="background:#10b981; margin-top:20px" onclick="confirmChoice()">VALIDER</button>
-            <div id="status-msg" style="margin-top:10px; font-size:0.9rem; color:#10b981; opacity:0;">Réponse envoyée ✓</div>
+            <button id="valider-btn" class="main-btn" style="background:#10b981; margin-top:15px" onclick="confirmChoice()">VALIDER</button>
+            <p id="status-msg" style="margin-top:15px; color:#10b981; font-weight:bold; opacity:0;">Réponse enregistrée ✓</p>
         </div>
     </div>
 
@@ -64,62 +67,73 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref('competition');
 
-        let myType = localStorage.getItem('myType'); 
+        let myType = localStorage.getItem('quiz_team_type'); 
         let currentQ = 0;
         let timerInterval;
 
-        // التحقق من وجود تسجيل مسبق
-        if(myType) showWait();
+        // إذا كان مسجلاً مسبقاً، اذهب للانتظار
+        if(myType) { 
+            checkStatus(); 
+        }
 
         function registerTeam() {
             const name = document.getElementById('t-name').value.trim();
-            if(!name) return alert("Veuillez entrer un nom !");
+            if(!name) { alert("Veuillez saisir un nom !"); return; }
 
-            db.transaction(data => {
-                if (!data) data = {};
-                if (!data.teamPink) { data.teamPink = name; myType = "pink"; }
-                else if (!data.teamPurple) { data.teamPurple = name; myType = "purple"; }
-                else { return; } // الفرق مكتملة
-                return data;
-            }, (err, commit, snap) => {
-                if(commit && myType) {
-                    localStorage.setItem('myType', myType);
-                    showWait();
+            db.once('value').then(snap => {
+                const data = snap.val() || {};
+                let updates = {};
+                
+                if (!data.teamPink) {
+                    updates['teamPink'] = name;
+                    myType = 'pink';
+                } else if (!data.teamPurple) {
+                    updates['teamPurple'] = name;
+                    myType = 'purple';
                 } else {
-                    alert("Désolé, les deux équipes sont déjà inscrites.");
+                    alert("Le quiz est complet (2 équipes max)");
+                    return;
+                }
+
+                db.update(updates).then(() => {
+                    localStorage.setItem('quiz_team_type', myType);
+                    checkStatus();
+                });
+            });
+        }
+
+        function checkStatus() {
+            document.getElementById('reg-zone').classList.add('hidden');
+            document.getElementById('wait-zone').classList.remove('hidden');
+            document.getElementById('quiz-zone').classList.add('hidden');
+
+            db.on('value', snap => {
+                const d = snap.val() || {};
+                const myName = (myType === 'pink' ? d.teamPink : d.teamPurple);
+                document.getElementById('display-team-name').innerText = myName || "Équipe";
+
+                if(d.status === 'start') {
+                    if(currentQ !== d.currentQuestion) {
+                        currentQ = d.currentQuestion;
+                        startQuiz(d.startTime);
+                    }
+                } else {
+                    document.getElementById('quiz-zone').classList.add('hidden');
+                    document.getElementById('wait-zone').classList.remove('hidden');
+                    clearInterval(timerInterval);
                 }
             });
         }
-
-        function showWait() {
-            document.getElementById('reg-zone').classList.add('hidden');
-            document.getElementById('quiz-zone').classList.add('hidden');
-            document.getElementById('wait-zone').classList.remove('hidden');
-            db.once('value', s => {
-                const d = s.val();
-                document.getElementById('display-team-name').innerText = (myType === 'pink' ? d.teamPink : d.teamPurple);
-            });
-        }
-
-        db.on('value', snap => {
-            const d = snap.val(); if(!d) return;
-            if(d.status === 'start' && currentQ !== d.currentQuestion) {
-                currentQ = d.currentQuestion;
-                startQuiz(d.startTime);
-            } else if (d.status !== 'start') {
-                showWait();
-            }
-        });
 
         function startQuiz(startTime) {
             document.getElementById('wait-zone').classList.add('hidden');
             document.getElementById('quiz-zone').classList.remove('hidden');
             document.getElementById('status-msg').style.opacity = "0";
-            document.getElementById('q-status').innerText = "QUESTION " + currentQ;
+            document.getElementById('valider-btn').disabled = false;
             
             const container = document.getElementById('options-container');
             container.innerHTML = '';
-            ["A","B","C","D"].forEach(L => {
+            ["A", "B", "C", "D"].forEach(L => {
                 container.innerHTML += `<button class="opt-btn" id="btn-${L}" onclick="selectOpt('${L}')">OPTION ${L}</button>`;
             });
 
@@ -127,7 +141,10 @@
             timerInterval = setInterval(() => {
                 const rem = 60 - Math.floor((Date.now() - startTime)/1000);
                 document.getElementById('timer').innerText = `00:${rem > 0 ? rem.toString().padStart(2,'0') : '00'}`;
-                if(rem <= 0) clearInterval(timerInterval);
+                if(rem <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('valider-btn').disabled = true;
+                }
             }, 1000);
         }
 
@@ -148,3 +165,4 @@
     </script>
 </body>
 </html>
+
