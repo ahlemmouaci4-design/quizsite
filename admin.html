@@ -2,51 +2,67 @@
 <html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <title>Master Control | Oncology Quiz</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>Control Center | White Timer Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --purple: #9d50bb; --pink: #ec4899; --success: #10b981; --danger: #ef4444; }
-        body { margin: 0; font-family: 'Poppins', sans-serif; min-height: 100vh; background: #000; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; background-image: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'); background-size: cover; }
-        .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border-radius: 40px; padding: 40px; border: 1px solid rgba(255,255,255,0.1); width: 90%; max-width: 1000px; text-align: center; }
-        #timer { font-size: 6rem; font-weight: 900; color: #f1c40f; margin-bottom: 20px; }
-        .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
-        .opt-box { padding: 15px; background: rgba(255,255,255,0.05); border-radius: 15px; text-align: left; border: 3px solid transparent; transition: 0.4s; font-size: 1.2rem; }
-        .is-correct { border-color: var(--success) !important; background: rgba(16, 185, 129, 0.2) !important; box-shadow: 0 0 20px var(--success); }
-        .is-wrong { border-color: var(--danger) !important; background: rgba(239, 68, 68, 0.2) !important; box-shadow: 0 0 20px var(--danger); }
-        .team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px; }
-        .ans-card { padding: 25px; border-radius: 30px; border: 4px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); transition: 0.5s; }
-        .pink-side { border-color: var(--pink); }
-        .purple-side { border-color: var(--purple); }
-        .big-letter { font-size: 6rem; font-weight: 900; display: block; }
-        .controls { margin-top: 40px; display: flex; gap: 15px; justify-content: center; }
-        .btn { padding: 15px 35px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
-        .btn-next { background: var(--success); color: #fff; }
-        .btn-show { background: #f1c40f; color: #000; }
-        .btn-reset { background: var(--danger); color: #fff; }
+        :root { --success: #10b981; --danger: #ef4444; }
+        body { 
+            margin: 0; font-family: 'Poppins', sans-serif; min-height: 100vh;
+            background: url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed;
+            background-size: cover; color: #fff; display: flex; align-items: center; justify-content: center;
+        }
+        .ultra-glass { 
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(45px);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 50px;
+            padding: 50px; width: 95%; max-width: 1100px; text-align: center;
+        }
+        /* العداد الأبيض */
+        #timer { font-size: 7rem; font-weight: 900; color: #ffffff; margin-bottom: 20px; letter-spacing: -2px; }
+        
+        .q-display { background: rgba(0,0,0,0.3); padding: 30px; border-radius: 30px; margin-bottom: 30px; }
+        .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .opt-item { padding: 20px; background: rgba(255,255,255,0.05); border-radius: 20px; border: 2px solid transparent; text-align: left; }
+        
+        .is-correct { border-color: var(--success) !important; background: rgba(16, 185, 129, 0.2) !important; box-shadow: 0 0 30px var(--success); }
+        .is-wrong { border-color: var(--danger) !important; background: rgba(239, 68, 68, 0.2) !important; box-shadow: 0 0 30px var(--danger); }
+
+        .team-box { padding: 30px; border-radius: 35px; background: rgba(0,0,0,0.4); border: 2px solid rgba(255,255,255,0.1); transition: 0.6s; }
+        .team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        .big-letter { font-size: 6.5rem; font-weight: 900; display: block; margin-top: 10px; }
+
+        .controls { margin-top: 40px; display: flex; gap: 20px; justify-content: center; }
+        .btn { padding: 18px 40px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+        .btn-launch { background: #fff; color: #000; }
+        .btn-reveal { background: var(--success); color: #fff; }
+        .btn-reset { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.3); }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
-    <div class="glass">
+
+    <div class="ultra-glass">
         <div id="timer">01:00</div>
-        <div id="q-area" class="hidden">
-            <h2 id="q-text" style="font-size: 1.8rem; margin-bottom: 20px;"></h2>
-            <div class="opt-grid" id="q-opts"></div>
+        
+        <div id="q-area" class="hidden q-display">
+            <h2 id="q-text-main" style="font-size: 2rem;"></h2>
+            <div class="opt-grid" id="q-opts-main"></div>
         </div>
+
         <div class="team-grid">
-            <div class="ans-card pink-side" id="card-pink">
-                <small id="name-p" style="color:var(--pink); font-weight:800;">EQUIPE ROSE</small>
-                <span class="big-letter" id="view-p">?</span>
+            <div class="team-box" id="card-p">
+                <div id="name-p" style="color:#ec4899; font-weight:800;">TEAM PINK</div>
+                <span class="big-letter" id="ans-p">?</span>
             </div>
-            <div class="ans-card purple-side" id="card-purple">
-                <small id="name-v" style="color:var(--purple); font-weight:800;">EQUIPE VIOLETTE</small>
-                <span class="big-letter" id="view-v">?</span>
+            <div class="team-box" id="card-v">
+                <div id="name-v" style="color:#9d50bb; font-weight:800;">TEAM PURPLE</div>
+                <span class="big-letter" id="ans-v">?</span>
             </div>
         </div>
+
         <div class="controls">
-            <button class="btn btn-reset" onclick="resetGame()">Réinitialiser le Quiz</button>
-            <button class="btn btn-show hidden" id="btn-reveal" onclick="applyCorrection()">Correction</button>
-            <button class="btn btn-next" id="btn-action" onclick="startNext()">Lancer Question</button>
+            <button class="btn btn-reset" onclick="resetAll()">RESET</button>
+            <button class="btn btn-reveal hidden" id="reveal-btn" onclick="showCorrection()">Correction</button>
+            <button class="btn btn-launch" id="action-btn" onclick="launch()">Lancer Question</button>
         </div>
     </div>
 
@@ -63,83 +79,61 @@
         ];
 
         let curQ = 0;
-        let lastPinkAns = "?", lastPurpleAns = "?";
+        let pAns = "?", vAns = "?";
 
-        function resetGame() {
-            if(confirm("Voulez-vous vraiment recommencer la compétition à zéro ?")) {
-                db.set({ status: 'waiting', currentQuestion: 0, teamPink: "", teamPurple: "", answers: {} }).then(() => location.reload());
-            }
-        }
+        function resetAll() { if(confirm("Reset total?")) db.set({status:'waiting', currentQuestion:0, teamPink:"", teamPurple:""}).then(()=>location.reload()); }
 
-        function startNext() {
+        function launch() {
             curQ++;
-            if(curQ > quizData.length) return alert("Fin du quiz");
-            db.update({ status: 'start', currentQuestion: curQ, startTime: Date.now() });
-            document.getElementById('btn-action').classList.add('hidden');
-            resetVisuals();
+            db.update({ status:'start', currentQuestion: curQ, startTime: Date.now() });
+            document.getElementById('action-btn').classList.add('hidden');
         }
 
-        function resetVisuals() {
-            document.getElementById('card-pink').className = "ans-card pink-side";
-            document.getElementById('card-purple').className = "ans-card purple-side";
-            document.getElementById('btn-reveal').classList.add('hidden');
-        }
-
-        function applyCorrection() {
+        function showCorrection() {
             const correct = quizData[curQ-1].correct;
-            document.getElementById('opt-' + correct).classList.add('is-correct');
-            
-            const cardP = document.getElementById('card-pink');
-            cardP.classList.add(lastPinkAns === correct ? 'is-correct' : 'is-wrong');
-
-            const cardV = document.getElementById('card-purple');
-            cardV.classList.add(lastPurpleAns === correct ? 'is-correct' : 'is-wrong');
-
-            document.getElementById('btn-reveal').classList.add('hidden');
-            document.getElementById('btn-action').classList.remove('hidden');
-            document.getElementById('btn-action').innerText = "Suivant";
+            document.getElementById('m-opt-'+correct).classList.add('is-correct');
+            document.getElementById('card-p').classList.add(pAns === correct ? 'is-correct' : 'is-wrong');
+            document.getElementById('card-v').classList.add(vAns === correct ? 'is-correct' : 'is-wrong');
+            document.getElementById('reveal-btn').classList.add('hidden');
+            document.getElementById('action-btn').classList.remove('hidden');
+            document.getElementById('action-btn').innerText = "Suivant";
         }
 
         db.on('value', snap => {
             const d = snap.val(); if(!d) return;
-            document.getElementById('name-p').innerText = d.teamPink || "ROSE (Attente)";
-            document.getElementById('name-v').innerText = d.teamPurple || "VIOLETTE (Attente)";
+            document.getElementById('name-p').innerText = d.teamPink || "Attente...";
+            document.getElementById('name-v').innerText = d.teamPurple || "Attente...";
+            
             if(d.status === 'start') {
                 curQ = d.currentQuestion;
-                renderQ(curQ-1);
-                lastPinkAns = (d.answers && d.answers.pink) ? d.answers.pink[curQ] || '?' : '?';
-                lastPurpleAns = (d.answers && d.answers.purple) ? d.answers.purple[curQ] || '?' : '?';
-                document.getElementById('view-p').innerText = lastPinkAns;
-                document.getElementById('view-v').innerText = lastPurpleAns;
-                
-                const elapsed = Math.floor((Date.now() - d.startTime)/1000);
-                updateTimer(d.startTime);
+                renderMain(curQ - 1);
+                pAns = (d.answers && d.answers.pink) ? d.answers.pink[curQ] || '?' : '?';
+                vAns = (d.answers && d.answers.purple) ? d.answers.purple[curQ] || '?' : '?';
+                document.getElementById('ans-p').innerText = pAns;
+                document.getElementById('ans-v').innerText = vAns;
+                startTimer(d.startTime);
             }
         });
 
-        function renderQ(idx) {
+        function renderMain(idx) {
             const data = quizData[idx];
             document.getElementById('q-area').classList.remove('hidden');
-            document.getElementById('q-text').innerText = data.q;
-            const container = document.getElementById('q-opts');
+            document.getElementById('q-text-main').innerText = data.q;
+            const container = document.getElementById('q-opts-main');
             container.innerHTML = '';
             data.options.forEach((opt, i) => {
                 const L = String.fromCharCode(65 + i);
-                container.innerHTML += `<div class="opt-box" id="opt-${L}"><b>${L}:</b> ${opt}</div>`;
+                container.innerHTML += `<div class="opt-item" id="m-opt-${L}"><b>${L}:</b> ${opt}</div>`;
             });
         }
 
-        function updateTimer(start) {
+        function startTimer(start) {
             const intv = setInterval(() => {
                 const elapsed = Math.floor((Date.now() - start)/1000);
                 const rem = 60 - elapsed;
-                if(elapsed >= 30) document.getElementById('btn-reveal').classList.remove('hidden');
-                if(rem <= 0) {
-                    clearInterval(intv);
-                    document.getElementById('timer').innerText = "00:00";
-                } else {
-                    document.getElementById('timer').innerText = `00:${rem.toString().padStart(2,'0')}`;
-                }
+                if(elapsed >= 30) document.getElementById('reveal-btn').classList.remove('hidden');
+                if(rem <= 0) { clearInterval(intv); document.getElementById('timer').innerText = "00:00"; }
+                else { document.getElementById('timer').innerText = `00:${rem.toString().padStart(2,'0')}`; }
             }, 1000);
         }
     </script>
