@@ -1,71 +1,50 @@
+
 <!DOCTYPE html>
-<html lang="fr" dir="ltr">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Maestro | Synced White</title>
+    <title>Quiz Player | Pro Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --purple: #9d50bb; --pink: #ec4899; --glass: rgba(255, 255, 255, 0.05); --success: #10b981; }
+        :root { --pink: #ec4899; --purple: #9d50bb; }
         body { 
-            margin: 0; font-family: 'Poppins', sans-serif; height: 100vh; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: #000 url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed;
+            margin: 0; font-family: 'Poppins', sans-serif; height: 100vh; display: flex; align-items: center; justify-content: center;
+            background: #000 url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') center center fixed;
             background-size: cover; color: #fff; overflow: hidden;
         }
-        .container { width: 98%; height: 98vh; display: flex; flex-direction: column; gap: 10px; padding: 5px; box-sizing: border-box; }
-        .glass-panel { background: var(--glass); backdrop-filter: blur(25px); border-radius: 30px; padding: 15px; border: 1px solid rgba(255,255,255,0.1); flex-grow: 1; display: flex; flex-direction: column; position: relative; }
+        .ultra-glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(40px); border-radius: 30px; padding: 30px; width: 85%; max-width: 350px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+        input { width: 100%; padding: 15px; border-radius: 15px; border: 2px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.8); color: #fff; text-align: center; margin-bottom: 20px; font-size: 1.1rem; }
+        .main-btn { width: 100%; padding: 15px; border-radius: 50px; border: none; background: linear-gradient(45deg, var(--purple), var(--pink)); color: white; font-weight: 700; text-transform: uppercase; cursor: pointer; }
+        .opt-btn { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: #fff; cursor: pointer; text-align: left; font-weight: bold; }
+        .opt-btn.active { background: var(--pink); border-color: #fff; box-shadow: 0 0 15px var(--pink); }
         
-        /* عداد أبيض أنيق */
-        #timer { font-size: 4rem; font-weight: 900; color: #ffffff; text-align: center; margin: 5px 0; text-shadow: 0 0 15px rgba(255,255,255,0.3); }
+        /* عداد أبيض ناصع */
+        #timer { font-size: 4rem; font-weight: 900; color: #ffffff; margin-bottom: 15px; text-shadow: 0 0 20px rgba(255,255,255,0.4); }
         
-        .q-card { background: rgba(0,0,0,0.6); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); margin: 5px 0; }
-        #q-text { font-size: 1.6rem; font-weight: 700; margin: 10px 0; }
-        .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .opt-box { padding: 10px; background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); }
-        .correct-blink { border-color: var(--success) !important; background: rgba(16, 185, 129, 0.4) !important; animation: blink 1s infinite; }
-        
-        .team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 5px; }
-        .team-ans-card { padding: 10px; border-radius: 20px; background: rgba(0,0,0,0.4); text-align: center; border: 1px solid rgba(255,255,255,0.1); }
-        .big-letter { font-size: 2.5rem; font-weight: 900; opacity: 0; color: #fff; }
-        .show-ans { opacity: 1 !important; }
-
-        .admin-controls { display: flex; gap: 10px; justify-content: center; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 50px; }
-        .ctrl-btn { padding: 12px 30px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
-        .btn-launch { background: #fff; color: #000; }
-        .btn-correct { background: var(--success); color: #fff; }
         .hidden { display: none !important; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .pulse { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="glass-panel">
-            <div id="timer">01:00</div>
-            
-            <div id="question-area" class="hidden q-card">
-                <p id="q-text">Chargement...</p>
-                <div class="opt-grid" id="q-opts"></div>
-            </div>
-
-            <div class="team-grid">
-                <div class="team-ans-card" style="border-top: 4px solid var(--pink);">
-                    <span id="name-p" style="color:var(--pink); font-weight:800;">ROSE</span>
-                    <div class="big-letter" id="ans-p-view">?</div>
-                    <div style="font-size:0.9rem">Score: <span id="val-p">0</span></div>
-                </div>
-                <div class="team-ans-card" style="border-top: 4px solid var(--purple);">
-                    <span id="name-v" style="color:var(--purple); font-weight:800;">VIOLETTE</span>
-                    <div class="big-letter" id="ans-v-view">?</div>
-                    <div style="font-size:0.9rem">Score: <span id="val-v">0</span></div>
-                </div>
-            </div>
+    <div class="ultra-glass">
+        <div id="reg-zone">
+            <h2>INSCRIPTION</h2>
+            <input type="text" id="t-name" placeholder="Nom de l'équipe...">
+            <button class="main-btn" onclick="join()">REJOINDRE</button>
         </div>
 
-        <div class="admin-controls">
-            <button class="ctrl-btn btn-launch" id="next-btn" onclick="nextQuestion()">Lancer Question التالي</button>
-            <button id="correct-btn" class="ctrl-btn btn-correct hidden" onclick="showCorrection()">Correction</button>
-            <button class="ctrl-btn" style="background:#ef4444; color:#fff; font-size:0.7rem;" onclick="resetGame()">Reset</button>
+        <div id="wait-zone" class="hidden">
+            <div style="font-size: 4rem;" id="wait-icon" class="pulse">🧬</div>
+            <h2 id="display-name" style="color:var(--pink); margin: 10px 0;">---</h2>
+            <p id="wait-msg">Attente du lancement...</p>
+        </div>
+
+        <div id="quiz-zone" class="hidden">
+            <div id="timer">01:00</div>
+            <div id="options"></div>
+            <button id="valider-btn" class="main-btn" style="background:#10b981; margin-top:15px" onclick="send()">VALIDER</button>
         </div>
     </div>
 
@@ -76,87 +55,95 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref('competition');
 
-        const quizData = [
-            { q: "Quel est le principal marqueur du cancer de la prostate ?", options: ["PSA", "CEA", "CA-125", "AFP"], correct: "A" },
-            { q: "Quelle mutation est recherchée dans le cancer du poumon ?", options: ["EGFR", "BRCA1", "HER2", "APC"], correct: "A" },
-            { q: "Question 3: Exemple de question ?", options: ["Opt1", "Opt2", "Opt3", "Opt4"], correct: "B" }
-        ];
+        let myRole = "", currentQ = 0, timerInterval, choice = "";
 
-        let currentQ = 0, pScore = 0, vScore = 0, timerInterval;
-
-        function resetGame() { if(confirm("Reset?")) db.set({status:'waiting', currentQuestion:0}).then(()=>location.reload()); }
-
-        function nextQuestion() {
-            if (currentQ >= quizData.length) return alert("Fin du quiz");
-            currentQ++;
-            db.update({ 
-                status: 'start', 
-                currentQuestion: currentQ, 
-                startTime: firebase.database.ServerValue.TIMESTAMP 
-            });
-            document.getElementById('next-btn').classList.add('hidden');
-            document.getElementById('correct-btn').classList.add('hidden');
-        }
-
-        function showCorrection() {
-            const correct = quizData[currentQ-1].correct;
-            document.getElementById('opt-'+correct).classList.add('correct-blink');
-            db.once('value', snap => {
-                const d = snap.val();
-                const ansP = d.answers?.pink?.[currentQ];
-                const ansV = d.answers?.purple?.[currentQ];
-                if(ansP === correct) pScore++;
-                if(ansV === correct) vScore++;
-                document.getElementById('val-p').innerText = pScore;
-                document.getElementById('val-v').innerText = vScore;
-                document.getElementById('ans-p-view').classList.add('show-ans');
-                document.getElementById('ans-v-view').classList.add('show-ans');
-            });
-            db.update({ status: 'correction' });
-            document.getElementById('correct-btn').classList.add('hidden');
-            document.getElementById('next-btn').classList.remove('hidden');
-            clearInterval(timerInterval);
-        }
-
-        db.on('value', snap => {
+        async function join() {
+            const name = document.getElementById('t-name').value.trim();
+            if(!name) return;
+            const snap = await db.once('value');
             const d = snap.val() || {};
-            document.getElementById('name-p').innerText = d.teamPink || "ROSE";
-            document.getElementById('name-v').innerText = d.teamPurple || "VIOLETTE";
+            if(!d.teamPink) { await db.update({ teamPink: name }); myRole = "pink"; }
+            else if(!d.teamPurple) { await db.update({ teamPurple: name }); myRole = "purple"; }
+            else { return alert("Désolé, Quiz Plein!"); }
             
-            if(d.status === 'start' && d.currentQuestion === currentQ) {
-                updateUI(d.startTime);
-            }
-            if(d.status === 'start') {
-                document.getElementById('ans-p-view').innerText = d.answers?.pink?.[currentQ] || '?';
-                document.getElementById('ans-v-view').innerText = d.answers?.purple?.[currentQ] || '?';
-            }
-        });
+            document.getElementById('display-name').innerText = name;
+            goWait("Préparez-vous...");
+            startSync();
+        }
 
-        function updateUI(startTime) {
-            document.getElementById('question-area').classList.remove('hidden');
-            document.getElementById('ans-p-view').classList.remove('show-ans');
-            document.getElementById('ans-v-view').classList.remove('show-ans');
-            const data = quizData[currentQ-1];
-            document.getElementById('q-text').innerText = data.q;
-            const container = document.getElementById('q-opts');
-            container.innerHTML = '';
-            data.options.forEach((opt, i) => {
-                const L = String.fromCharCode(65 + i);
-                container.innerHTML += `<div class="opt-box" id="opt-${L}"><b>${L}:</b> ${opt}</div>`;
+        function startSync() {
+            db.on('value', snap => {
+                const d = snap.val() || {};
+                
+                // إعادة الضبط إذا قام الأدمن بمسح البيانات
+                if(!d.teamPink && !d.teamPurple) { location.reload(); return; }
+                
+                if(d.status === 'start') {
+                    // إذا كان سؤالاً جديداً ولم نجب عليه بعد في هذا الدور
+                    if(currentQ !== d.currentQuestion) {
+                        currentQ = d.currentQuestion;
+                        launch(d.startTime);
+                    }
+                } else if (d.status === 'correction') {
+                    // العودة للانتظار تلقائياً عند ضغط الأدمن على التصحيح
+                    goWait(currentQ >= 10 ? "Quiz terminé ! Regardez l'écran principal" : "Bravo ! En attente du prochain question...");
+                }
+            });
+        }
+
+        function launch(start) {
+            document.getElementById('wait-zone').classList.add('hidden');
+            document.getElementById('quiz-zone').classList.remove('hidden');
+            document.getElementById('valider-btn').disabled = false;
+            document.getElementById('valider-btn').style.opacity = "1";
+            choice = "";
+            
+            const optDiv = document.getElementById('options');
+            optDiv.innerHTML = '';
+            ["A","B","C","D"].forEach(L => {
+                optDiv.innerHTML += `<button class="opt-btn" id="b-${L}" onclick="select('${L}')">OPTION ${L}</button>`;
             });
 
             clearInterval(timerInterval);
             timerInterval = setInterval(() => {
-                const diff = Math.floor((Date.now() - startTime) / 1000);
-                const rem = 60 - diff;
-                if(rem <= 30) document.getElementById('correct-btn').classList.remove('hidden');
+                const rem = 60 - Math.floor((Date.now() - start) / 1000);
                 if(rem <= 0) {
                     document.getElementById('timer').innerText = "00:00";
+                    document.getElementById('valider-btn').disabled = true;
                     clearInterval(timerInterval);
+                    // الذهاب للانتظار عند انتهاء الوقت
+                    setTimeout(() => goWait("Temps écoulé !"), 1500);
                 } else {
                     document.getElementById('timer').innerText = `00:${rem.toString().padStart(2,'0')}`;
                 }
             }, 1000);
+        }
+
+        function select(L) {
+            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('b-'+L).classList.add('active');
+            choice = L;
+        }
+
+        function send() {
+            if(!choice || !myRole) return;
+            // إرسال الإجابة لـ Firebase
+            db.child('answers').child(myRole).child(currentQ).set(choice);
+            
+            // الانتقال الفوري للانتظار
+            if(currentQ >= 10) {
+                goWait("Félicitations ! Attendez l'annonce du vainqueur sur l'écran d'accueil 🏆");
+                document.getElementById('wait-icon').innerText = "🏆";
+            } else {
+                goWait("Réponse envoyée ! En attente du Master...");
+            }
+        }
+
+        function goWait(msg) {
+            document.getElementById('quiz-zone').classList.add('hidden');
+            document.getElementById('wait-zone').classList.remove('hidden');
+            document.getElementById('wait-msg').innerText = msg;
+            clearInterval(timerInterval);
         }
     </script>
 </body>
