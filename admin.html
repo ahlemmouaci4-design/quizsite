@@ -3,29 +3,67 @@
 <html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Maestro | 10 Questions Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;700;900&display=swap" rel="stylesheet">
+    <title>Oncology Quiz | Master Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --success: #10b981; --danger: #ef4444; --pink: #ec4899; --purple: #9d50bb; }
-        body { 
-            margin: 0; font-family: 'Poppins', sans-serif; min-height: 100vh;
+        
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            font-family: 'Poppins', sans-serif; color: #fff; overflow: hidden;
             background: url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed;
-            background-size: cover; color: #fff; display: flex; align-items: center; justify-content: center;
+            background-size: cover;
         }
+
+        /* تأثير الزجاج الفائق العام */
         .ultra-glass { 
-            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(50px) saturate(180%);
+            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(50px) saturate(180%);
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 50px;
-            padding: 40px; width: 95%; max-width: 1100px; text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
         }
+
+        /* --- صفحة الترحيب --- */
+        #welcome-screen {
+            position: absolute; width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 10; transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        .welcome-content {
+            width: 80%; max-width: 900px; padding: 60px; text-align: center;
+        }
+
+        .welcome-content h1 { font-weight: 900; font-size: 4rem; margin-bottom: 20px; letter-spacing: 5px; }
+        .welcome-content p { font-weight: 200; font-size: 1.5rem; line-height: 1.8; margin-bottom: 40px; }
+        
+        .rules-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; text-align: left; }
+        .rule-card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px; border-left: 4px solid #fff; }
+
+        /* سهم الانتقال */
+        .next-arrow {
+            position: absolute; right: 50px; top: 50%; transform: translateY(-50%);
+            cursor: pointer; z-index: 20; transition: 0.3s; animation: pulseArrow 2s infinite;
+        }
+        .next-arrow svg { width: 60px; fill: none; stroke: white; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+        /* --- لوحة التحكم (مخفية في البداية) --- */
+        #control-screen {
+            position: absolute; width: 100%; height: 100%; left: 100%;
+            display: flex; align-items: center; justify-content: center;
+            transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        /* تنسيقات لوحة التحكم (السابقة) */
+        .admin-panel { width: 90%; max-width: 1100px; padding: 40px; text-align: center; }
         #timer { font-size: 6rem; font-weight: 900; color: #ffffff; margin: 0; }
         .score-badge { background: rgba(255,255,255,0.1); padding: 5px 20px; border-radius: 50px; font-size: 1.2rem; margin-top: 10px; display: inline-block; border: 1px solid rgba(255,255,255,0.2); }
-        .q-display { background: rgba(0,0,0,0.3); padding: 25px; border-radius: 30px; margin-bottom: 25px; }
+        .q-display { background: rgba(0,0,0,0.3); padding: 25px; border-radius: 30px; margin-bottom: 25px; margin-top: 20px; }
         .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .opt-item { padding: 15px; background: rgba(255,255,255,0.05); border-radius: 15px; border: 2px solid transparent; text-align: left; transition: 0.5s; }
         .is-correct { border-color: var(--success) !important; background: rgba(16, 185, 129, 0.2) !important; box-shadow: 0 0 30px var(--success); }
         .is-wrong { border-color: var(--danger) !important; background: rgba(239, 68, 68, 0.2) !important; box-shadow: 0 0 30px var(--danger); }
-        .team-box { padding: 25px; border-radius: 35px; background: rgba(0,0,0,0.4); border: 2px solid rgba(255,255,255,0.1); position: relative; transition: 0.6s; }
         .team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .team-box { padding: 25px; border-radius: 35px; background: rgba(0,0,0,0.4); border: 2px solid rgba(255,255,255,0.1); transition: 0.6s; }
         .big-letter { font-size: 5rem; font-weight: 900; display: block; margin: 10px 0; }
         .controls { margin-top: 30px; display: flex; gap: 15px; justify-content: center; }
         .btn { padding: 15px 35px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
@@ -33,43 +71,80 @@
         .btn-reveal { background: var(--success); color: #fff; }
         .btn-reset { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.3); }
         .hidden { display: none !important; }
-        .secret-tag { color: #f1c40f; font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 10px; }
+
+        @keyframes pulseArrow {
+            0%, 100% { transform: translateY(-50%) translateX(0); opacity: 0.5; }
+            50% { transform: translateY(-50%) translateX(15px); opacity: 1; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="ultra-glass">
-        <div id="secret-tag" class="secret-tag hidden">🔒 MODE SECRET ACTIF (6-10)</div>
-        <div id="timer">01:00</div>
-        
-        <div id="q-area" class="hidden q-display">
-            <h2 id="q-text-main" style="margin-bottom: 20px;"></h2>
-            <div class="opt-grid" id="q-opts-main"></div>
-        </div>
-
-        <div class="team-grid">
-            <div class="team-box" id="card-p">
-                <div style="color:var(--pink); font-weight:800;">TEAM PINK</div>
-                <div class="score-badge">SCORE: <span id="score-p">0</span></div>
-                <span class="big-letter" id="ans-p">?</span>
-            </div>
-            <div class="team-box" id="card-v">
-                <div style="color:var(--purple); font-weight:800;">TEAM PURPLE</div>
-                <div class="score-badge">SCORE: <span id="score-v">0</span></div>
-                <span class="big-letter" id="ans-v">?</span>
-            </div>
-        </div>
-
-        <div class="controls">
-            <button class="btn btn-reset" onclick="resetAll()">RESET</button>
-            <button class="btn btn-reveal hidden" id="reveal-btn" onclick="showCorrection()">Correction</button>
-            <button class="btn btn-launch" id="action-btn" onclick="launch()">Lancer Question</button>
-        </div>
+    <div class="next-arrow" id="arrow-trigger" onclick="goToAdmin()">
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
     </div>
+
+    <section id="welcome-screen">
+        <div class="ultra-glass welcome-content">
+            <h1>BIENVENUE</h1>
+            <p>Préparez-vous pour une compétition d'excellence en Oncologie</p>
+            
+            <div class="rules-grid">
+                <div class="rule-card">
+                    <h3 style="margin-top:0">Phase 1 (Publique)</h3>
+                    <small>Questions 1 à 5. Les réponses et corrections sont affichées en direct pour tout le public.</small>
+                </div>
+                <div class="rule-card">
+                    <h3 style="margin-top:0">Phase 2 (Secrète)</h3>
+                    <small>Questions 6 à 10. Les choix des équipes restent cachés. Le gagnant sera révélé à la fin.</small>
+                </div>
+            </div>
+            <p style="margin-top: 40px; font-size: 0.9rem; opacity: 0.7;">Appuyez sur la flèche pour accéder au panneau de contrôle →</p>
+        </div>
+    </section>
+
+    <section id="control-screen">
+        <div class="ultra-glass admin-panel">
+            <div id="secret-tag" style="color:#f1c40f; font-size: 0.8rem; letter-spacing: 3px;" class="hidden">🔒 MODE SECRET ACTIVÉ</div>
+            <div id="timer">01:00</div>
+            
+            <div id="q-area" class="hidden q-display">
+                <h2 id="q-text-main"></h2>
+                <div class="opt-grid" id="q-opts-main"></div>
+            </div>
+
+            <div class="team-grid">
+                <div class="team-box" id="card-p">
+                    <div style="color:var(--pink); font-weight:800;">TEAM PINK</div>
+                    <div class="score-badge">SCORE: <span id="score-p">0</span></div>
+                    <span class="big-letter" id="ans-p">?</span>
+                </div>
+                <div class="team-box" id="card-v">
+                    <div style="color:var(--purple); font-weight:800;">TEAM PURPLE</div>
+                    <div class="score-badge">SCORE: <span id="score-v">0</span></div>
+                    <span class="big-letter" id="ans-v">?</span>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-reset" onclick="resetAll()">RESET</button>
+                <button class="btn btn-reveal hidden" id="reveal-btn" onclick="showCorrection()">Correction</button>
+                <button class="btn btn-launch" id="action-btn" onclick="launch()">Lancer Question</button>
+            </div>
+        </div>
+    </section>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script>
+        // التنقل بين الصفحات
+        function goToAdmin() {
+            document.getElementById('welcome-screen').style.transform = 'translateX(-100%)';
+            document.getElementById('control-screen').style.transform = 'translateX(-100%)';
+            document.getElementById('arrow-trigger').classList.add('hidden');
+        }
+
+        // إعدادات الفايربيس (نفس السابقة)
         const firebaseConfig = { databaseURL: "https://quiz-8016b-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref('competition');
@@ -90,11 +165,11 @@
         let curQ = 0, pScore = 0, vScore = 0;
         let pAns = "?", vAns = "?";
 
-        function resetAll() { if(confirm("Voulez-vous tout réinitialiser ?")) db.set({status:'waiting', currentQuestion:0, teamPink:"", teamPurple:"", scores:{pink:0, purple:0}, answers: ""}).then(()=>location.reload()); }
+        function resetAll() { if(confirm("Réinitialiser tout ?")) db.set({status:'waiting', currentQuestion:0, teamPink:"", teamPurple:"", scores:{pink:0, purple:0}, answers: ""}).then(()=>location.reload()); }
 
         function launch() {
             curQ++;
-            if(curQ > 10) return alert("Fin de la compétition!");
+            if(curQ > 10) return alert("Fin du Quiz!");
             db.update({ status:'start', currentQuestion: curQ, startTime: Date.now() });
             document.getElementById('action-btn').classList.add('hidden');
         }
