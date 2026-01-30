@@ -65,6 +65,10 @@
             
             db.on('value', snap => {
                 const d = snap.val() || {};
+                // أضف هذا السطر داخل الـ db.on('value', ...) في كود المتسابق
+if(!d.teamPink && !d.teamPurple) {
+    location.reload(); // هذا سيجعل الصفحة تعود لوضع التسجيل تلقائياً
+}
                 if(d.status === 'start' && curQ !== d.curQ) {
                     curQ = d.curQ;
                     launch(d.startTime);
@@ -114,4 +118,5 @@
     </script>
 </body>
 </html>
+
 
