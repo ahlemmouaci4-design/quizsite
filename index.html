@@ -1,69 +1,38 @@
 
+
 <!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Oncology | Team</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>Quiz Team</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;800&display=swap" rel="stylesheet">
     <style>
-        :root { --purple: #9d50bb; --pink: #ec4899; --glass: rgba(255, 255, 255, 0.1); }
-        body { 
-            margin: 0; font-family: 'Poppins', sans-serif; min-height: 100vh; 
-            display: flex; align-items: center; justify-content: center; background: #000;
-            background-image: url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
-            background-size: cover; background-position: center; color: #fff;
-        }
-        .glass-container { 
-            width: 90%; max-width: 420px; padding: 35px; border-radius: 35px;
-            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 25px 45px rgba(0,0,0,0.5);
-            text-align: center; transition: transform 0.3s ease;
-        }
-        h2 { font-weight: 800; letter-spacing: 1px; margin-bottom: 25px; text-transform: uppercase; }
-        input { 
-            width: 100%; padding: 15px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(0,0,0,0.3); color: #fff; text-align: center; margin-bottom: 20px; font-size: 1rem;
-        }
-        .opt-btn { 
-            width: 100%; padding: 14px; margin: 8px 0; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1);
-            background: rgba(255,255,255,0.05); color: #fff; font-size: 1rem; cursor: pointer;
-            transition: 0.3s; text-align: left; font-weight: 600;
-        }
-        .opt-btn:hover { background: rgba(255,255,255,0.15); transform: translateX(5px); }
-        .opt-btn.active { background: linear-gradient(45deg, var(--purple), var(--pink)); border: none; box-shadow: 0 0 15px rgba(236, 72, 153, 0.4); }
-        
-        .send-btn { 
-            width: 100%; padding: 16px; margin-top: 20px; border-radius: 50px; border: none;
-            background: #10b981; color: white; font-weight: 800; cursor: pointer;
-            text-transform: uppercase; letter-spacing: 2px; transition: 0.3s;
-        }
-        .send-btn:active { transform: scale(0.95); background: #059669; }
-        .send-btn:disabled { background: #374151; cursor: not-allowed; opacity: 0.5; }
-
-        #timer-box { font-size: 3rem; font-weight: 900; color: #f1c40f; margin-bottom: 10px; text-shadow: 0 0 10px rgba(241, 196, 15, 0.3); }
+        :root { --purple: #9d50bb; --pink: #ec4899; }
+        body { margin: 0; font-family: 'Poppins', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #000; color: #fff; background-image: url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'); background-size: cover; }
+        .glass { background: rgba(255,255,255,0.08); backdrop-filter: blur(25px); border-radius: 30px; padding: 30px; text-align: center; width: 90%; max-width: 400px; border: 1px solid rgba(255,255,255,0.1); }
+        .quiz-btn { width: 100%; padding: 15px; margin: 8px 0; border: none; border-radius: 15px; background: rgba(255,255,255,0.1); color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; text-align: left; }
+        .quiz-btn.active { background: var(--pink); border: 2px solid #fff; }
+        #timer { font-size: 3rem; color: #f1c40f; font-weight: 800; }
         .hidden { display: none !important; }
+        input { width: 100%; padding: 15px; border-radius: 10px; border: none; margin-bottom: 15px; text-align: center; }
     </style>
 </head>
 <body>
-
-    <div class="glass-container" id="main-box">
+    <div class="glass">
         <div id="reg-zone">
             <h2>Inscription</h2>
-            <input type="text" id="t-name" placeholder="Nom de votre équipe...">
-            <button class="send-btn" style="background: linear-gradient(45deg, var(--purple), var(--pink))" onclick="reg()">Rejoindre</button>
+            <input type="text" id="t-name" placeholder="Nom de l'équipe...">
+            <button class="quiz-btn" style="text-align:center; background: var(--purple)" onclick="reg()">REJOINDRE</button>
         </div>
-
         <div id="wait-zone" class="hidden">
-            <div style="font-size: 4rem; margin-bottom: 15px;">📡</div>
-            <p style="font-style: italic; opacity: 0.8;">Connexion établie... En attente du signal de l'administrateur.</p>
+            <h1 style="font-size: 3rem;">⏳</h1>
+            <p>Veuillez attendre la correction sur l'écran principal...</p>
         </div>
-
         <div id="quiz-zone" class="hidden">
-            <div id="timer-box">01:00</div>
-            <p id="q-text-ui" style="font-weight: 600; margin-bottom: 20px;"></p>
-            <div id="options-ui"></div>
-            <button id="final-send" class="send-btn" onclick="confirmSend()">Envoyer la réponse</button>
+            <div id="timer">01:00</div>
+            <div id="q-text-client" style="margin-bottom:20px; font-weight:600;"></div>
+            <div id="options-client"></div>
         </div>
     </div>
 
@@ -73,15 +42,13 @@
         const firebaseConfig = { databaseURL: "https://quiz-8016b-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref('competition');
+        let myType = localStorage.getItem('myType');
+        let curQ = 0;
 
         const quizData = [
             { q: "Quel est le principal marqueur du cancer de la prostate ?", options: ["PSA", "CEA", "CA-125", "AFP"] },
             { q: "Quelle mutation est recherchée dans le cancer du poumon ?", options: ["EGFR", "BRCA1", "HER2", "APC"] }
         ];
-
-        let myType = localStorage.getItem('myType');
-        let selectedLetter = "";
-        let curQ = 0;
 
         function reg() {
             const n = document.getElementById('t-name').value;
@@ -89,7 +56,7 @@
             db.once('value', s => {
                 const d = s.val();
                 let type = !d.teamPink ? "pink" : (!d.teamPurple ? "purple" : null);
-                if(!type) return alert("Session complète !");
+                if(!type) return alert("Complet!");
                 db.update({ [type === 'pink' ? 'teamPink' : 'teamPurple']: n });
                 myType = type; localStorage.setItem('myType', type);
                 showWait();
@@ -106,51 +73,38 @@
             const d = snap.val(); if(!d) return;
             if(d.status === 'start' && d.currentQuestion !== curQ) {
                 curQ = d.currentQuestion;
-                startQuizMode(d.startTime, curQ - 1);
+                startQ(d.startTime, curQ-1);
             }
-            if(d.status === 'waiting' && curQ !== 0) { localStorage.clear(); location.reload(); }
+            if(d.status === 'waiting') { document.getElementById('wait-zone').classList.add('hidden'); document.getElementById('reg-zone').classList.remove('hidden'); }
         });
 
-        function startQuizMode(start, idx) {
+        function startQ(start, idx) {
             document.getElementById('wait-zone').classList.add('hidden');
             document.getElementById('quiz-zone').classList.remove('hidden');
-            document.getElementById('final-send').disabled = false;
-            selectedLetter = "";
-
             const data = quizData[idx];
-            document.getElementById('q-text-ui').innerText = data.q;
-            const container = document.getElementById('options-ui');
+            document.getElementById('q-text-client').innerText = data.q;
+            const container = document.getElementById('options-client');
             container.innerHTML = '';
             data.options.forEach((opt, i) => {
                 const L = String.fromCharCode(65 + i);
-                container.innerHTML += `<button class="opt-btn" onclick="selectOpt('${L}', this)">${L}. ${opt}</button>`;
+                container.innerHTML += `<button class="quiz-btn opt-c" id="btn-${L}" onclick="send('${L}')">${L}: ${opt}</button>`;
             });
 
             const intv = setInterval(() => {
                 const rem = 60 - Math.floor((Date.now() - start)/1000);
                 if(rem <= 0) {
                     clearInterval(intv);
-                    document.getElementById('timer-box').innerText = "00:00";
-                    document.getElementById('final-send').disabled = true;
-                    setTimeout(showWait, 2500);
+                    showWait();
                 } else {
-                    document.getElementById('timer-box').innerText = `00:${rem.toString().padStart(2,'0')}`;
+                    document.getElementById('timer').innerText = `00:${rem.toString().padStart(2,'0')}`;
                 }
             }, 1000);
         }
 
-        function selectOpt(L, btn) {
-            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            selectedLetter = L;
-        }
-
-        function confirmSend() {
-            if(!selectedLetter) return alert("Choisissez une réponse !");
-            db.child(`answers/${myType}/${curQ}`).set(selectedLetter).then(() => {
-                document.getElementById('final-send').disabled = true;
-                document.getElementById('final-send').innerText = "Transmis ✓";
-            });
+        function send(letter) {
+            document.querySelectorAll('.opt-c').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-'+letter).classList.add('active');
+            db.child(`answers/${myType}/${curQ}`).set(letter);
         }
     </script>
 </body>
