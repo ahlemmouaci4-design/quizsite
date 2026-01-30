@@ -8,14 +8,14 @@
     <style>
         :root { --pink: #ec4899; --purple: #9d50bb; --success: #10b981; --danger: #ef4444; }
         body { margin: 0; font-family: 'Poppins', sans-serif; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000 url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center fixed; background-size: cover; color: #fff; overflow: hidden; }
-        .glass { background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(15px); border-radius: 30px; padding: 40px; border: 1px solid rgba(255,255,255,0.1); width: 90%; max-width: 850px; text-align: center; }
+        .glass { background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(15px); border-radius: 30px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); width: 90%; max-width: 800px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
         #timer { font-size: 4rem; font-weight: 900; color: #fff; margin: 0; text-shadow: 0 0 30px rgba(255,255,255,0.2); }
-        .q-card { background: rgba(255,255,255,0.05); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); margin: 25px 0; }
-        .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .opt-box { padding: 18px; background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); font-size: 1.2rem; }
-        .correct { border-color: var(--success) !important; background: rgba(16, 185, 129, 0.4) !important; box-shadow: 0 0 20px var(--success); transform: scale(1.05); }
-        .btn { padding: 15px 40px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; margin: 10px; font-size: 0.9rem; transition: 0.3s; }
-        .btn-danger { background: var(--danger); color: white; font-size: 0.7rem; padding: 10px 20px; opacity: 0.6; }
+        .q-card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); margin: 15px 0; }
+        .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .opt-box { padding: 12px; background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); font-size: 1.1rem; }
+        .correct { border-color: var(--success) !important; background: rgba(16, 185, 129, 0.4) !important; box-shadow: 0 0 20px var(--success); transform: scale(1.02); }
+        .btn { padding: 12px 30px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; margin: 5px; font-size: 0.8rem; transition: 0.3s; }
+        .btn-danger { background: var(--danger); color: white; font-size: 0.65rem; padding: 8px 20px; opacity: 0.6; }
         .btn-danger:hover { opacity: 1; }
         .hidden { display: none !important; }
         #winner-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
@@ -25,7 +25,7 @@
 
     <div id="winner-screen">
         <h2 style="font-size: 3rem; margin-bottom: 0;">FÉLICITATIONS !</h2>
-        <div id="winner-name" style="font-size: 10rem; font-weight: 900;">NOM</div>
+        <div id="winner-name" style="font-size: 7rem; font-weight: 900;">NOM</div>
         <button class="btn" style="background:#fff; margin-top:40px;" onclick="resetCompetition()">NOUVELLE SESSION</button>
     </div>
 
@@ -33,22 +33,22 @@
         <div id="timer">01:00</div>
         
         <div id="q-area" class="hidden q-card">
-            <h2 id="q-num" style="color:var(--pink); margin:0 0 15px 0;">QUESTION 1/10</h2>
-            <p id="q-text" style="font-size:1.6rem; font-weight:700; margin-bottom:20px;"></p>
+            <h2 id="q-num" style="color:var(--pink); margin:0 0 10px 0;">QUESTION 1/10</h2>
+            <p id="q-text" style="font-size:1.5rem; font-weight:700; margin-bottom:15px;"></p>
             <div class="opt-grid" id="q-opts"></div>
         </div>
 
-        <div style="display: flex; justify-content: space-around; margin-top: 30px; font-weight: 900; font-size: 1.6rem;">
+        <div style="display: flex; justify-content: space-around; margin-top: 15px; font-weight: 900; font-size: 1.4rem;">
             <div id="name-p" style="color:var(--pink);">ROSE</div>
             <div id="name-v" style="color:var(--purple);">VIOLETTE</div>
         </div>
 
-        <div style="margin-top:30px;">
+        <div style="margin-top:20px;">
             <button id="btn-next" class="btn" style="background:#fff; color:#000" onclick="launchNext()">Lancer Question</button>
             <button id="btn-corr" class="btn hidden" style="background:var(--success); color:#fff" onclick="showCorrection()">Correction</button>
-            <button id="btn-win" class="btn hidden" style="background:gold; color:#000" onclick="revealWinner()"> VOIR LE GAGNANT</button>
+            <button id="btn-win" class="btn hidden" style="background:gold; color:#000" onclick="revealWinner()">🏆 VOIR LE GAGNANT</button>
             <br>
-            <button class="btn btn-danger" onclick="resetCompetition()"> RÉINITIALISER TOUT LE QUIZ</button>
+            <button class="btn btn-danger" onclick="resetCompetition()">RÉINITIALISER TOUT LE QUIZ</button>
         </div>
     </div>
 
@@ -56,7 +56,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script>
         const config = { databaseURL: "https://quiz-8016b-default-rtdb.firebaseio.com/" };
-        firebase.initializeApp(config);
+        if (!firebase.apps.length) firebase.initializeApp(config);
         const db = firebase.database().ref('competition');
 
         const questions = [
@@ -75,18 +75,10 @@
         let cur = 0, scP = 0, scV = 0, timerObj;
         let tPink = "", tPurple = "";
 
-        // دالة إعادة المسابقة وتصفير كل شيء
         function resetCompetition() {
-            if(confirm("Voulez-vous vraiment TOUT réinitialiser ? Les équipes devront se réinscrire.")) {
-                db.set({
-                    status: 'waiting',
-                    curQ: 0,
-                    teamPink: null,
-                    teamPurple: null,
-                    answers: null
-                }).then(() => {
-                    location.reload();
-                });
+            if(confirm("Voulez-vous vraiment TOUT réinitialiser ?")) {
+                db.set({ status: 'waiting', curQ: 0, teamPink: null, teamPurple: null, answers: null })
+                .then(() => location.reload());
             }
         }
 
@@ -126,9 +118,6 @@
 
         db.on('value', snap => {
             const d = snap.val() || {};
-            // إذا تم تصفير المسابقة من قبل أدمن آخر أو جلسة أخرى، أنعش الصفحة
-            if(!d.teamPink && !d.teamPurple && cur > 0) location.reload();
-
             tPink = d.teamPink || "ROSE"; tPurple = d.teamPurple || "VIOLETTE";
             document.getElementById('name-p').innerText = tPink;
             document.getElementById('name-v').innerText = tPurple;
