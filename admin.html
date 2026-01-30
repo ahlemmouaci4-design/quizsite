@@ -17,24 +17,21 @@
         .container { width: 95%; max-width: 1100px; z-index: 10; }
         .glass-panel { background: var(--glass); backdrop-filter: blur(25px); border-radius: 40px; padding: 30px; border: 1px solid rgba(255,255,255,0.15); text-align: center; }
         
-        /* عرض السؤال للجمهور */
-        #question-display { margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; }
-        #q-text { font-size: 1.8rem; font-weight: 700; color: #fff; margin-bottom: 15px; }
+        #q-text { font-size: 1.8rem; font-weight: 700; color: #fff; margin-bottom: 20px; }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; }
         .opt-item { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); font-size: 1.1rem; }
-        .correct-opt { border-color: #10b981; background: rgba(16, 185, 129, 0.1); }
+        .correct-opt { border-color: #10b981 !important; background: rgba(16, 185, 129, 0.3) !important; box-shadow: 0 0 15px #10b981; }
 
-        #timer { font-size: 5rem; font-weight: 900; color: #f1c40f; margin: 10px 0; line-height: 1; }
+        #timer { font-size: 5rem; font-weight: 900; color: #f1c40f; margin: 10px 0; }
         
         .comparison-zone { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px; }
-        .ans-card { background: rgba(0,0,0,0.4); padding: 20px; border-radius: 25px; border: 3px solid transparent; }
+        .ans-card { background: rgba(0,0,0,0.4); padding: 20px; border-radius: 25px; border: 3px solid transparent; min-height: 150px;}
         .ans-card.pink { border-color: var(--pink); }
         .ans-card.purple { border-color: var(--purple); }
         .choice-letter { font-size: 5rem; font-weight: 900; display: block; }
 
-        .controls { margin-top: 30px; display: flex; gap: 15px; justify-content: center; }
-        .glass-btn { padding: 12px 25px; border-radius: 50px; border: 2px solid rgba(255,255,255,0.2); background: transparent; color: #fff; cursor: pointer; font-weight: 700; text-transform: uppercase; }
-        .glass-btn:disabled { opacity: 0.2; cursor: not-allowed; }
+        .controls { margin-top: 30px; display: flex; gap: 10px; justify-content: center; }
+        .glass-btn { padding: 10px 20px; border-radius: 50px; border: 2px solid rgba(255,255,255,0.2); background: transparent; color: #fff; cursor: pointer; font-weight: 700; text-transform: uppercase; font-size: 0.8rem;}
         
         #winner-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 2000; }
         .winner-frame { padding: 60px; border: 10px solid; border-radius: 50px; text-align: center; }
@@ -46,31 +43,30 @@
     <div class="container">
         <div class="glass-panel">
             <div id="question-display" class="hidden">
-                <div id="q-header" style="color:#f1c40f; font-weight:800; letter-spacing:2px;">QUESTION 1</div>
-                <div id="q-text">Chargement de la question...</div>
-                <div class="options-grid" id="q-options">
-                    </div>
+                <div id="q-header" style="color:#f1c40f; font-weight:800; letter-spacing:2px;">QUESTION</div>
+                <div id="q-text">Chargement...</div>
+                <div class="options-grid" id="q-options"></div>
             </div>
 
             <div id="timer">01:00</div>
 
             <div class="comparison-zone">
                 <div class="ans-card pink">
-                    <small style="color:var(--pink)">ÉQUIPE ROSE</small>
+                    <small style="color:var(--pink); font-weight: 900;">ÉQUIPE PINK</small>
+                    <div id="name-p" style="font-size: 1.2rem; color: #fff; margin-bottom: 10px;">(En attente...)</div>
                     <span class="choice-letter" id="ans-p-view">?</span>
-                    <div id="score-p-display" style="font-weight:bold">Score: 0</div>
                 </div>
                 <div class="ans-card purple">
-                    <small style="color:var(--purple)">ÉQUIPE VIOLETTE</small>
+                    <small style="color:var(--purple); font-weight: 900;">ÉQUIPE PURPLE</small>
+                    <div id="name-v" style="font-size: 1.2rem; color: #fff; margin-bottom: 10px;">(En attente...)</div>
                     <span class="choice-letter" id="ans-v-view">?</span>
-                    <div id="score-v-display" style="font-weight:bold">Score: 0</div>
                 </div>
             </div>
 
             <div class="controls">
-                <button class="glass-btn" style="border-color:#ff4b2b" onclick="resetAll()">RESET</button>
-                <button id="next-btn" class="glass-btn" style="border-color:#10b981; color:#10b981" onclick="nextQ()">LANCER QUESTION</button>
-                <button class="glass-btn" style="border-color:#3b82f6" onclick="showFinal()">FINALE</button>
+                <button class="glass-btn" onclick="resetAll()">RESET</button>
+                <button id="next-btn" class="glass-btn" style="color:#10b981" onclick="nextQ()">LANCER</button>
+                <button class="glass-btn" style="color:#3b82f6" onclick="showFinal()">FINALE</button>
             </div>
         </div>
     </div>
@@ -78,8 +74,8 @@
     <div id="winner-overlay">
         <div id="w-frame" class="winner-frame">
             <h1 id="w-name" style="font-size: 5rem; margin:0;"></h1>
-            <h2 id="w-score" style="font-size: 2rem; font-weight: 300;"></h2>
-            <button class="glass-btn" style="margin-top:40px" onclick="resetAll()">RETOUR</button>
+            <h2 id="w-score"></h2>
+            <button class="glass-btn" onclick="resetAll()">RETOUR</button>
         </div>
     </div>
 
@@ -90,29 +86,20 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref('competition');
 
-        // بنك الأسئلة
         const quizData = [
-            { q: "Quel est le principal marqueur tumoral du cancer de la prostate ?", options: ["PSA", "CEA", "CA-125", "AFP"], correct: "A" },
-            { q: "Quelle mutation est souvent recherchée dans le cancer du poumon ?", options: ["EGFR", "BRCA1", "HER2", "APC"], correct: "A" },
-            { q: "L'irradiation pré-opératoire s'appelle irradiation :", options: ["Adjuvante", "Néo-adjuvante", "Palliative", "Curative"], correct: "B" },
-            { q: "L'effet indésirable majeur de l'Adriamycine est la toxicité :", options: ["Rénale", "Hépatique", "Cardiaque", "Pulmonaire"], correct: "C" },
-            { q: "Quel virus est lié au cancer du col de l'utérus ?", options: ["EBV", "HPV", "HBV", "HIV"], correct: "B" },
-            { q: "Question 6...", options: ["A", "B", "C", "D"], correct: "A" },
-            { q: "Question 7...", options: ["A", "B", "C", "D"], correct: "A" },
-            { q: "Question 8...", options: ["A", "B", "C", "D"], correct: "A" },
-            { q: "Question 9...", options: ["A", "B", "C", "D"], correct: "A" },
-            { q: "Question 10...", options: ["A", "B", "C", "D"], correct: "A" }
+            { q: "Quel est le principal marqueur du cancer de la prostate ?", options: ["PSA", "CEA", "CA-125", "AFP"], correct: "A" },
+            { q: "Quelle mutation est recherchée dans le cancer du poumon ?", options: ["EGFR", "BRCA1", "HER2", "APC"], correct: "A" }
+            // أضف بقية الأسئلة هنا بنفس التنسيق
         ];
 
         let curQ = 0;
         let timerRunning = false;
 
-        function resetAll() { if(confirm("Tout effacer?")) db.set({status:'waiting', currentQuestion:0, scorePink:0, scorePurple:0, showResults:false, answers:{}}).then(()=>location.reload()); }
+        function resetAll() { if(confirm("Reset?")) db.set({status:'waiting', currentQuestion:0, scorePink:0, scorePurple:0, showResults:false, answers:{}, teamPink:"", teamPurple:""}).then(()=>location.reload()); }
 
         function nextQ() {
             if(timerRunning) return;
             curQ++;
-            if(curQ > quizData.length) return alert("Fin des questions!");
             db.update({ status:'start', currentQuestion: curQ, startTime: Date.now() });
         }
 
@@ -120,16 +107,17 @@
 
         db.on('value', snap => {
             const d = snap.val(); if(!d) return;
-            curQ = d.currentQuestion || 0;
-            document.getElementById('score-p-display').innerText = "Score: " + (d.scorePink || 0);
-            document.getElementById('score-v-display').innerText = "Score: " + (d.scorePurple || 0);
+            
+            // عرض الأسماء فور تسجيلها
+            document.getElementById('name-p').innerText = d.teamPink || "(En attente...)";
+            document.getElementById('name-v').innerText = d.teamPurple || "(En attente...)";
 
-            if(d.status === 'start' && curQ > 0) {
+            if(d.status === 'start' && d.currentQuestion > 0) {
+                curQ = d.currentQuestion;
                 document.getElementById('question-display').classList.remove('hidden');
                 updateQuestionDisplay(curQ - 1);
                 runTimer(d.startTime);
                 
-                // تحديث الحروف المختارة مباشرة
                 const ansP = (d.answers && d.answers.pink) ? d.answers.pink[curQ] || '?' : '?';
                 const ansV = (d.answers && d.answers.purple) ? d.answers.purple[curQ] || '?' : '?';
                 document.getElementById('ans-p-view').innerText = ansP;
@@ -139,54 +127,42 @@
             if(d.showResults) {
                 const isP = d.scorePink >= d.scorePurple;
                 document.getElementById('winner-overlay').style.display = 'flex';
-                const f = document.getElementById('w-frame');
-                f.style.borderColor = isP ? '#ec4899' : '#9d50bb';
                 document.getElementById('w-name').innerText = isP ? d.teamPink : d.teamPurple;
                 document.getElementById('w-name').style.color = isP ? '#ec4899' : '#9d50bb';
-                document.getElementById('w-score').innerText = "SCORE: " + (isP ? d.scorePink : d.scorePurple);
             }
         });
 
-        function updateQuestionDisplay(index) {
-            const data = quizData[index];
-            document.getElementById('q-header').innerText = "QUESTION " + (index + 1);
+        function updateQuestionDisplay(idx) {
+            const data = quizData[idx];
+            document.getElementById('q-header').innerText = "QUESTION " + (idx + 1);
             document.getElementById('q-text').innerText = data.q;
             const optGrid = document.getElementById('q-options');
             optGrid.innerHTML = '';
             data.options.forEach((opt, i) => {
                 const letter = String.fromCharCode(65 + i);
-                optGrid.innerHTML += `<div class="opt-item"><b>${letter}:</b> ${opt}</div>`;
+                optGrid.innerHTML += `<div class="opt-item" id="opt-${letter}"><b>${letter}:</b> ${opt}</div>`;
             });
         }
 
         function runTimer(start) {
             if(timerRunning) return;
             timerRunning = true;
-            const btn = document.getElementById('next-btn');
             const intv = setInterval(() => {
                 const rem = 60 - Math.floor((Date.now() - start)/1000);
                 if(rem <= 0) {
                     clearInterval(intv);
                     document.getElementById('timer').innerText = "00:00";
                     timerRunning = false;
-                    btn.disabled = false;
-                    btn.innerText = "LANCER QUESTION " + (curQ + 1);
-                    // تظليل الإجابة الصحيحة عند انتهاء الوقت (للمراجعة)
-                    highlightCorrectAnswer(curQ - 1);
+                    highlightCorrect(curQ - 1);
                 } else {
-                    document.getElementById('timer').innerText = "00:" + rem.toString().padStart(2,'0');
-                    btn.disabled = true;
-                    btn.innerText = "EN COURS (" + rem + "s)";
+                    document.getElementById('timer').innerText = `00:${rem.toString().padStart(2,'0')}`;
                 }
             }, 1000);
         }
 
-        function highlightCorrectAnswer(index) {
-            const correct = quizData[index].correct;
-            const opts = document.querySelectorAll('.opt-item');
-            opts.forEach(opt => {
-                if(opt.innerText.startsWith(correct)) opt.classList.add('correct-opt');
-            });
+        function highlightCorrect(idx) {
+            const correctLetter = quizData[idx].correct;
+            document.getElementById('opt-' + correctLetter).classList.add('correct-opt');
         }
     </script>
 </body>
