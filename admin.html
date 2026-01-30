@@ -1,74 +1,99 @@
+
 <!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Maestro | DataShow</title>
+    <title>Admin Maestro | Final Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --purple: #9d50bb; --pink: #ec4899; --glass: rgba(255, 255, 255, 0.08); }
+        :root { --purple: #9d50bb; --pink: #ec4899; --glass: rgba(255, 255, 255, 0.05); --success: #10b981; }
         body { 
-            margin: 0; font-family: 'Poppins', sans-serif; min-height: 100vh; 
+            margin: 0; font-family: 'Poppins', sans-serif; height: 100vh; 
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: #000; color: #fff; background-image: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
-            background-size: cover;
+            background: #000 url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed;
+            background-size: cover; color: #fff; overflow: hidden;
         }
-        .container { width: 95%; max-width: 1000px; }
-        .glass-panel { background: var(--glass); backdrop-filter: blur(30px); border-radius: 40px; padding: 40px; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        .container { width: 95%; height: 90vh; display: flex; flex-direction: column; gap: 20px; }
         
-        #timer { font-size: 6rem; font-weight: 900; color: #f1c40f; margin: 10px 0; transition: 0.3s; }
-        .q-card { background: rgba(0,0,0,0.4); padding: 25px; border-radius: 25px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.1); }
-        .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .opt-box { padding: 15px; background: rgba(255,255,255,0.05); border-radius: 12px; text-align: left; border: 2px solid transparent; }
-        .correct-blink { border-color: #10b981; background: rgba(16, 185, 129, 0.2); animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-
-        .team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-        .team-ans-card { padding: 20px; border-radius: 25px; border: 2px solid transparent; min-height: 120px; }
-        .pink-border { border-color: var(--pink); }
-        .purple-border { border-color: var(--purple); }
-        .big-letter { font-size: 5rem; font-weight: 900; line-height: 1; }
-
-        .admin-controls { margin-top: 40px; display: flex; gap: 15px; justify-content: center; }
-        .ctrl-btn { 
-            padding: 15px 30px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer;
-            text-transform: uppercase; transition: 0.3s;
+        .glass-panel { 
+            background: var(--glass); backdrop-filter: blur(30px); border-radius: 40px; 
+            padding: 30px; border: 1px solid rgba(255,255,255,0.1); 
+            flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;
+            position: relative;
         }
-        .btn-launch { background: #10b981; color: white; box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3); }
-        .btn-correct { background: #f1c40f; color: black; }
-        .btn-reset { background: #ef4444; color: white; }
-        .ctrl-btn:disabled { opacity: 0.2; transform: scale(0.9); cursor: not-allowed; }
+
+        #timer { font-size: 5rem; font-weight: 900; color: #f1c40f; margin: 0; }
+        
+        .q-card { background: rgba(0,0,0,0.5); padding: 30px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); }
+        #q-text { font-size: 2.2rem; font-weight: 700; margin: 20px 0; }
+        
+        .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .opt-box { padding: 20px; background: rgba(255,255,255,0.05); border-radius: 15px; border: 3px solid transparent; font-size: 1.3rem; text-align: left; }
+        .correct-blink { border-color: var(--success) !important; background: rgba(16, 185, 129, 0.3) !important; animation: blink 1s infinite; }
+        
+        .team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 20px; }
+        .team-ans-card { padding: 20px; border-radius: 25px; background: rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.1); text-align: center; }
+        .big-letter { font-size: 5rem; font-weight: 900; opacity: 0; transition: opacity 0.5s; }
+        .show-ans { opacity: 1 !important; }
+        .score-badge { font-size: 1.2rem; margin-top: 10px; background: rgba(255,255,255,0.1); padding: 5px 15px; border-radius: 20px; display: inline-block; }
+
+        /* منطقة الفائز */
+        #winner-screen {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.9); border-radius: 40px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 100; display: none; text-align: center;
+        }
+        .winner-name { font-size: 6rem; font-weight: 900; text-transform: uppercase; margin: 0; }
+        .winner-score { font-size: 3rem; color: #f1c40f; }
+
+        .admin-controls { display: flex; gap: 20px; justify-content: center; padding-bottom: 20px; }
+        .ctrl-btn { padding: 15px 40px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.3s; font-size: 1rem; }
+        .btn-launch { background: #fff; color: #000; box-shadow: 0 0 20px rgba(255,255,255,0.4); }
+        .btn-correct { background: var(--success); color: #fff; }
+        .btn-reset { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; }
+        
         .hidden { display: none !important; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     </style>
 </head>
 <body>
 
     <div class="container">
         <div class="glass-panel">
+            <div id="winner-screen">
+                <h3 style="color:#f1c40f; letter-spacing: 5px;">FÉLICITATIONS</h3>
+                <h1 class="winner-name" id="winner-text">TEAM</h1>
+                <div class="winner-score" id="winner-final-score">Score: 0</div>
+                <button class="ctrl-btn btn-reset" style="margin-top: 40px;" onclick="resetGame()">Nouveau Quiz</button>
+            </div>
+
             <div id="timer">01:00</div>
             
             <div id="question-area" class="hidden q-card">
-                <h2 id="q-title" style="margin:0; color:var(--pink)">QUESTION 1</h2>
-                <p id="q-text" style="font-size: 1.5rem; margin: 15px 0;"></p>
+                <h2 id="q-title" style="margin:0; color:var(--pink);">QUESTION</h2>
+                <p id="q-text"></p>
                 <div class="opt-grid" id="q-opts"></div>
             </div>
 
             <div class="team-grid">
-                <div class="team-ans-card pink-border">
-                    <div id="name-p" style="color:var(--pink); font-weight:800;">EQUIPE ROSE</div>
+                <div class="team-ans-card" id="card-p" style="border-bottom: 5px solid var(--pink);">
+                    <div id="name-p" style="color:var(--pink); font-weight:800;">ROSE</div>
                     <div class="big-letter" id="ans-p-view">?</div>
+                    <div class="score-badge">Score: <span id="val-p">0</span></div>
                 </div>
-                <div class="team-ans-card purple-border">
-                    <div id="name-v" style="color:var(--purple); font-weight:800;">EQUIPE VIOLETTE</div>
+                <div class="team-ans-card" id="card-v" style="border-bottom: 5px solid var(--purple);">
+                    <div id="name-v" style="color:var(--purple); font-weight:800;">VIOLETTE</div>
                     <div class="big-letter" id="ans-v-view">?</div>
+                    <div class="score-badge">Score: <span id="val-v">0</span></div>
                 </div>
             </div>
+        </div>
 
-            <div class="admin-controls">
-                <button class="ctrl-btn btn-reset" onclick="resetGame()">Reset</button>
-                <button id="correct-btn" class="ctrl-btn btn-correct hidden" onclick="showCorrection()">Correction</button>
-                <button id="next-btn" class="ctrl-btn btn-launch" onclick="nextQuestion()">Lancer Question 1</button>
-            </div>
+        <div class="admin-controls">
+            <button class="ctrl-btn btn-reset" onclick="resetGame()">Reset</button>
+            <button id="correct-btn" class="ctrl-btn btn-correct hidden" onclick="showCorrection()">Correction</button>
+            <button id="next-btn" class="ctrl-btn btn-launch" onclick="nextQuestion()">Lancer Question 1</button>
         </div>
     </div>
 
@@ -80,45 +105,89 @@
         const db = firebase.database().ref('competition');
 
         const quizData = [
-            { q: "Quel est le principal marqueur du cancer de la prostate ?", options: ["PSA", "CEA", "CA-125", "AFP"], correct: "A" },
-            { q: "Quelle mutation est recherchée dans le cancer du poumon ?", options: ["EGFR", "BRCA1", "HER2", "APC"], correct: "A" }
+            { q: "Q1: Quel est le principal marqueur du cancer de la prostate ?", options: ["PSA", "CEA", "CA-125", "AFP"], correct: "A" },
+            { q: "Q2: Quelle mutation est recherchée dans le cancer du poumon ?", options: ["EGFR", "BRCA1", "HER2", "APC"], correct: "A" },
+            // أضف بقية الـ 10 أسئلة هنا
         ];
 
-        let currentQ = 0;
-        let isTimeUp = false;
+        let currentQ = 0, pScore = 0, vScore = 0, timerInterval;
 
-        function resetGame() { if(confirm("Réinitialiser ?")) db.set({status:'waiting', currentQuestion:0, teamPink:"", teamPurple:""}).then(()=>location.reload()); }
+        function resetGame() { if(confirm("Réinitialiser ?")) db.set({status:'waiting', currentQuestion:0, answers: ""}).then(()=>location.reload()); }
 
         function nextQuestion() {
+            if (currentQ >= quizData.length) {
+                displayFinalWinner();
+                return;
+            }
             currentQ++;
             db.update({ status:'start', currentQuestion: currentQ, startTime: Date.now() });
             document.getElementById('next-btn').classList.add('hidden');
+            document.getElementById('ans-p-view').classList.remove('show-ans');
+            document.getElementById('ans-v-view').classList.remove('show-ans');
         }
 
         function showCorrection() {
             const correctLetter = quizData[currentQ-1].correct;
             document.getElementById('opt-'+correctLetter).classList.add('correct-blink');
+            
+            // جلب الإجابات الحالية للحساب
+            db.once('value', snap => {
+                const d = snap.val();
+                const ansP = (d.answers?.pink) ? d.answers.pink[currentQ] : '';
+                const ansV = (d.answers?.purple) ? d.answers.purple[currentQ] : '';
+                
+                if(ansP === correctLetter) pScore++;
+                if(ansV === correctLetter) vScore++;
+                
+                document.getElementById('val-p').innerText = pScore;
+                document.getElementById('val-v').innerText = vScore;
+                document.getElementById('ans-p-view').classList.add('show-ans');
+                document.getElementById('ans-v-view').classList.add('show-ans');
+            });
+
             document.getElementById('correct-btn').classList.add('hidden');
             document.getElementById('next-btn').classList.remove('hidden');
-            document.getElementById('next-btn').innerText = "Question Suivante";
+            document.getElementById('next-btn').innerText = (currentQ === quizData.length) ? "RÉSULTAT FINAL" : "Question Suivante";
+            db.update({ status: 'correction' });
+        }
+
+        function displayFinalWinner() {
+            const screen = document.getElementById('winner-screen');
+            const winText = document.getElementById('winner-text');
+            const winScore = document.getElementById('winner-final-score');
+            
+            screen.style.display = 'flex';
+            if (pScore > vScore) {
+                winText.innerText = document.getElementById('name-p').innerText;
+                winText.style.color = 'var(--pink)';
+                winScore.innerText = `Score Final: ${pScore}`;
+            } else if (vScore > pScore) {
+                winText.innerText = document.getElementById('name-v').innerText;
+                winText.style.color = 'var(--purple)';
+                winScore.innerText = `Score Final: ${vScore}`;
+            } else {
+                winText.innerText = "ÉGALITÉ !";
+                winText.style.color = "#fff";
+                winScore.innerText = `Score: ${pScore} - ${vScore}`;
+            }
+            document.querySelector('.admin-controls').style.display = 'none';
         }
 
         db.on('value', snap => {
             const d = snap.val(); if(!d) return;
-            document.getElementById('name-p').innerText = d.teamPink || "ROSE (En attente)";
-            document.getElementById('name-v').innerText = d.teamPurple || "VIOLETTE (En attente)";
+            document.getElementById('name-p').innerText = d.teamPink || "ROSE";
+            document.getElementById('name-v').innerText = d.teamPurple || "VIOLETTE";
 
             if(d.status === 'start') {
                 currentQ = d.currentQuestion;
                 updateDisplay(d.startTime);
-                const ansP = (d.answers && d.answers.pink) ? d.answers.pink[currentQ] || '?' : '?';
-                const ansV = (d.answers && d.answers.purple) ? d.answers.purple[currentQ] || '?' : '?';
-                document.getElementById('ans-p-view').innerText = ansP;
-                document.getElementById('ans-v-view').innerText = ansV;
+                document.getElementById('ans-p-view').innerText = (d.answers?.pink?.[currentQ]) || '?';
+                document.getElementById('ans-v-view').innerText = (d.answers?.purple?.[currentQ]) || '?';
             }
         });
 
         function updateDisplay(start) {
+            clearInterval(timerInterval);
             document.getElementById('question-area').classList.remove('hidden');
             const data = quizData[currentQ-1];
             document.getElementById('q-title').innerText = "QUESTION " + currentQ;
@@ -130,12 +199,13 @@
                 container.innerHTML += `<div class="opt-box" id="opt-${L}"><b>${L}:</b> ${opt}</div>`;
             });
 
-            const intv = setInterval(() => {
-                const rem = 60 - Math.floor((Date.now() - start)/1000);
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - start)/1000);
+                const rem = 60 - elapsed;
+                if(elapsed >= 30) document.getElementById('correct-btn').classList.remove('hidden');
                 if(rem <= 0) {
-                    clearInterval(intv);
+                    clearInterval(timerInterval);
                     document.getElementById('timer').innerText = "00:00";
-                    document.getElementById('correct-btn').classList.remove('hidden');
                 } else {
                     document.getElementById('timer').innerText = `00:${rem.toString().padStart(2,'0')}`;
                 }
