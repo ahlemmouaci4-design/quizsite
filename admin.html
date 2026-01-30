@@ -5,36 +5,63 @@
     <meta charset="UTF-8">
     <title>Master Admin | Live Show</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         :root { --pink: #ec4899; --purple: #9d50bb; --success: #10b981; --danger: #ef4444; }
         body { margin: 0; font-family: 'Poppins', sans-serif; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000 url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center fixed; background-size: cover; color: #fff; overflow: hidden; }
+        
         .glass { background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(15px); border-radius: 30px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); width: 90%; max-width: 800px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        
         #timer { font-size: 4rem; font-weight: 900; color: #fff; margin: 0; text-shadow: 0 0 30px rgba(255,255,255,0.2); }
+        
         .q-card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); margin: 15px 0; }
         .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .opt-box { padding: 12px; background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); font-size: 1.1rem; }
         .correct { border-color: var(--success) !important; background: rgba(16, 185, 129, 0.4) !important; box-shadow: 0 0 20px var(--success); transform: scale(1.02); }
+        
         .btn { padding: 12px 30px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; margin: 5px; font-size: 0.8rem; transition: 0.3s; }
         .btn-danger { background: var(--danger); color: white; font-size: 0.65rem; padding: 8px 20px; opacity: 0.6; }
-        .btn-danger:hover { opacity: 1; }
         .hidden { display: none !important; }
-        #winner-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
+
+        /* شاشة الفائز وتأثير الانفجار */
+        #winner-screen { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            display: none; flex-direction: column; align-items: center; 
+            justify-content: center; z-index: 9999; transition: background 1s;
+        }
+
+        #winner-name {
+            font-size: 8rem;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .explode-anim {
+            animation: explode 0.7s cubic-bezier(0.17, 0.89, 0.32, 1.49) forwards;
+            text-shadow: 0 0 50px rgba(255,255,255,0.6);
+        }
+
+        @keyframes explode {
+            0% { transform: scale(0); opacity: 0; filter: blur(20px); }
+            70% { transform: scale(1.4); opacity: 1; filter: blur(0px); }
+            100% { transform: scale(1); opacity: 1; }
+        }
     </style>
 </head>
 <body>
 
     <div id="winner-screen">
-        <h2 style="font-size: 3rem; margin-bottom: 0;">FÉLICITATIONS !</h2>
-        <div id="winner-name" style="font-size: 7rem; font-weight: 900;">NOM</div>
-        <button class="btn" style="background:#fff; margin-top:40px;" onclick="resetCompetition()">NOUVELLE SESSION</button>
+        <h2 style="font-size: 3rem; margin-bottom: 0; letter-spacing: 5px;">FÉLICITATIONS !</h2>
+        <div id="winner-name">NOM</div>
+        <button class="btn" style="background:#fff; color:#000; margin-top:50px;" onclick="resetCompetition()">NOUVELLE SESSION</button>
     </div>
 
     <div class="glass" id="ui-main">
         <div id="timer">01:00</div>
         
         <div id="q-area" class="hidden q-card">
-            <h2 id="q-num" style="color:var(--pink); margin:0 0 10px 0;">QUESTION 1/10</h2>
-            <p id="q-text" style="font-size:1.5rem; font-weight:700; margin-bottom:15px;"></p>
+            <h2 id="q-num" style="color:var(--pink); margin:0;">QUESTION 1/10</h2>
+            <p id="q-text" style="font-size:1.5rem; font-weight:700; margin:15px 0;"></p>
             <div class="opt-grid" id="q-opts"></div>
         </div>
 
@@ -48,7 +75,7 @@
             <button id="btn-corr" class="btn hidden" style="background:var(--success); color:#fff" onclick="showCorrection()">Correction</button>
             <button id="btn-win" class="btn hidden" style="background:gold; color:#000" onclick="revealWinner()">🏆 VOIR LE GAGNANT</button>
             <br>
-            <button class="btn btn-danger" onclick="resetCompetition()">RÉINITIALISER TOUT LE QUIZ</button>
+            <button class="btn btn-danger" onclick="resetCompetition()">RÉINITIALISER TOUT</button>
         </div>
     </div>
 
@@ -76,9 +103,8 @@
         let tPink = "", tPurple = "";
 
         function resetCompetition() {
-            if(confirm("Voulez-vous vraiment TOUT réinitialiser ?")) {
-                db.set({ status: 'waiting', curQ: 0, teamPink: null, teamPurple: null, answers: null })
-                .then(() => location.reload());
+            if(confirm("Tout réinitialiser ?")) {
+                db.set({ status: 'waiting', curQ: 0, teamPink: null, teamPurple: null, answers: null }).then(() => location.reload());
             }
         }
 
@@ -97,10 +123,7 @@
                 if(d.answers?.pink?.[cur] === correct) scP++;
                 if(d.answers?.purple?.[cur] === correct) scV++;
                 if(cur === 10) document.getElementById('btn-win').classList.remove('hidden');
-                else {
-                    document.getElementById('btn-next').classList.remove('hidden');
-                    document.getElementById('btn-next').innerText = "Suivant";
-                }
+                else { document.getElementById('btn-next').classList.remove('hidden'); }
             });
             db.update({ status: 'correction' });
             document.getElementById('btn-corr').classList.add('hidden');
@@ -110,10 +133,30 @@
         function revealWinner() {
             document.getElementById('ui-main').style.display = 'none';
             const winScr = document.getElementById('winner-screen');
+            const winName = document.getElementById('winner-name');
             winScr.style.display = 'flex';
-            if(scP > scV) { winScr.style.backgroundColor = '#ec4899'; document.getElementById('winner-name').innerText = tPink; }
-            else if(scV > scP) { winScr.style.backgroundColor = '#9d50bb'; document.getElementById('winner-name').innerText = tPurple; }
-            else { winScr.style.backgroundColor = '#333'; document.getElementById('winner-name').innerText = "ÉGALITÉ !"; }
+            
+            // تطبيق تأثير الانفجار
+            winName.classList.add('explode-anim');
+
+            if(scP > scV) { 
+                winScr.style.backgroundColor = '#ec4899'; 
+                winName.innerText = tPink; 
+            } else if(scV > scP) { 
+                winScr.style.backgroundColor = '#9d50bb'; 
+                winName.innerText = tPurple; 
+            } else { 
+                winScr.style.backgroundColor = '#333'; 
+                winName.innerText = "ÉGALITÉ !"; 
+            }
+
+            // إطلاق فرقعات الألوان (Confetti)
+            var end = Date.now() + (5 * 1000);
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ffffff', winScr.style.backgroundColor] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ffffff', winScr.style.backgroundColor] });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
         }
 
         db.on('value', snap => {
