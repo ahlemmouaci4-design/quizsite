@@ -1,60 +1,61 @@
+
 <!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <title>Control Center | White Timer Edition</title>
+    <title>Admin Maestro | 10 Questions Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --success: #10b981; --danger: #ef4444; }
+        :root { --success: #10b981; --danger: #ef4444; --pink: #ec4899; --purple: #9d50bb; }
         body { 
             margin: 0; font-family: 'Poppins', sans-serif; min-height: 100vh;
             background: url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed;
             background-size: cover; color: #fff; display: flex; align-items: center; justify-content: center;
         }
         .ultra-glass { 
-            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(45px);
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(50px) saturate(180%);
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 50px;
-            padding: 50px; width: 95%; max-width: 1100px; text-align: center;
+            padding: 40px; width: 95%; max-width: 1100px; text-align: center;
         }
-        /* العداد الأبيض */
-        #timer { font-size: 7rem; font-weight: 900; color: #ffffff; margin-bottom: 20px; letter-spacing: -2px; }
-        
-        .q-display { background: rgba(0,0,0,0.3); padding: 30px; border-radius: 30px; margin-bottom: 30px; }
-        .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .opt-item { padding: 20px; background: rgba(255,255,255,0.05); border-radius: 20px; border: 2px solid transparent; text-align: left; }
-        
+        #timer { font-size: 6rem; font-weight: 900; color: #ffffff; margin: 0; }
+        .score-badge { background: rgba(255,255,255,0.1); padding: 5px 20px; border-radius: 50px; font-size: 1.2rem; margin-top: 10px; display: inline-block; border: 1px solid rgba(255,255,255,0.2); }
+        .q-display { background: rgba(0,0,0,0.3); padding: 25px; border-radius: 30px; margin-bottom: 25px; }
+        .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .opt-item { padding: 15px; background: rgba(255,255,255,0.05); border-radius: 15px; border: 2px solid transparent; text-align: left; transition: 0.5s; }
         .is-correct { border-color: var(--success) !important; background: rgba(16, 185, 129, 0.2) !important; box-shadow: 0 0 30px var(--success); }
         .is-wrong { border-color: var(--danger) !important; background: rgba(239, 68, 68, 0.2) !important; box-shadow: 0 0 30px var(--danger); }
-
-        .team-box { padding: 30px; border-radius: 35px; background: rgba(0,0,0,0.4); border: 2px solid rgba(255,255,255,0.1); transition: 0.6s; }
-        .team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
-        .big-letter { font-size: 6.5rem; font-weight: 900; display: block; margin-top: 10px; }
-
-        .controls { margin-top: 40px; display: flex; gap: 20px; justify-content: center; }
-        .btn { padding: 18px 40px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+        .team-box { padding: 25px; border-radius: 35px; background: rgba(0,0,0,0.4); border: 2px solid rgba(255,255,255,0.1); position: relative; transition: 0.6s; }
+        .team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .big-letter { font-size: 5rem; font-weight: 900; display: block; margin: 10px 0; }
+        .controls { margin-top: 30px; display: flex; gap: 15px; justify-content: center; }
+        .btn { padding: 15px 35px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
         .btn-launch { background: #fff; color: #000; }
         .btn-reveal { background: var(--success); color: #fff; }
         .btn-reset { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.3); }
         .hidden { display: none !important; }
+        .secret-tag { color: #f1c40f; font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
     <div class="ultra-glass">
+        <div id="secret-tag" class="secret-tag hidden">🔒 MODE SECRET ACTIF (6-10)</div>
         <div id="timer">01:00</div>
         
         <div id="q-area" class="hidden q-display">
-            <h2 id="q-text-main" style="font-size: 2rem;"></h2>
+            <h2 id="q-text-main" style="margin-bottom: 20px;"></h2>
             <div class="opt-grid" id="q-opts-main"></div>
         </div>
 
         <div class="team-grid">
             <div class="team-box" id="card-p">
-                <div id="name-p" style="color:#ec4899; font-weight:800;">TEAM PINK</div>
+                <div style="color:var(--pink); font-weight:800;">TEAM PINK</div>
+                <div class="score-badge">SCORE: <span id="score-p">0</span></div>
                 <span class="big-letter" id="ans-p">?</span>
             </div>
             <div class="team-box" id="card-v">
-                <div id="name-v" style="color:#9d50bb; font-weight:800;">TEAM PURPLE</div>
+                <div style="color:var(--purple); font-weight:800;">TEAM PURPLE</div>
+                <div class="score-badge">SCORE: <span id="score-v">0</span></div>
                 <span class="big-letter" id="ans-v">?</span>
             </div>
         </div>
@@ -74,17 +75,26 @@
         const db = firebase.database().ref('competition');
 
         const quizData = [
-            { q: "Quel est le principal marqueur du cancer de la prostate ?", options: ["PSA", "CEA", "CA-125", "AFP"], correct: "A" },
-            { q: "Quelle mutation est recherchée dans le cancer du poumon ?", options: ["EGFR", "BRCA1", "HER2", "APC"], correct: "A" }
+            { q: "Question 1: ...?", options: ["A","B","C","D"], correct: "A" },
+            { q: "Question 2: ...?", options: ["A","B","C","D"], correct: "B" },
+            { q: "Question 3: ...?", options: ["A","B","C","D"], correct: "C" },
+            { q: "Question 4: ...?", options: ["A","B","C","D"], correct: "A" },
+            { q: "Question 5: ...?", options: ["A","B","C","D"], correct: "D" },
+            { q: "Question 6: ...?", options: ["A","B","C","D"], correct: "B" },
+            { q: "Question 7: ...?", options: ["A","B","C","D"], correct: "C" },
+            { q: "Question 8: ...?", options: ["A","B","C","D"], correct: "A" },
+            { q: "Question 9: ...?", options: ["A","B","C","D"], correct: "D" },
+            { q: "Question 10: ...?", options: ["A","B","C","D"], correct: "A" }
         ];
 
-        let curQ = 0;
+        let curQ = 0, pScore = 0, vScore = 0;
         let pAns = "?", vAns = "?";
 
-        function resetAll() { if(confirm("Reset total?")) db.set({status:'waiting', currentQuestion:0, teamPink:"", teamPurple:""}).then(()=>location.reload()); }
+        function resetAll() { if(confirm("Voulez-vous tout réinitialiser ?")) db.set({status:'waiting', currentQuestion:0, teamPink:"", teamPurple:"", scores:{pink:0, purple:0}, answers: ""}).then(()=>location.reload()); }
 
         function launch() {
             curQ++;
+            if(curQ > 10) return alert("Fin de la compétition!");
             db.update({ status:'start', currentQuestion: curQ, startTime: Date.now() });
             document.getElementById('action-btn').classList.add('hidden');
         }
@@ -92,25 +102,41 @@
         function showCorrection() {
             const correct = quizData[curQ-1].correct;
             document.getElementById('m-opt-'+correct).classList.add('is-correct');
-            document.getElementById('card-p').classList.add(pAns === correct ? 'is-correct' : 'is-wrong');
-            document.getElementById('card-v').classList.add(vAns === correct ? 'is-correct' : 'is-wrong');
+            
+            if(pAns === correct) { pScore++; db.child('scores/pink').set(pScore); }
+            if(vAns === correct) { vScore++; db.child('scores/purple').set(vScore); }
+
+            if(curQ <= 5) {
+                document.getElementById('card-p').classList.add(pAns === correct ? 'is-correct' : 'is-wrong');
+                document.getElementById('card-v').classList.add(vAns === correct ? 'is-correct' : 'is-wrong');
+            }
+
             document.getElementById('reveal-btn').classList.add('hidden');
             document.getElementById('action-btn').classList.remove('hidden');
-            document.getElementById('action-btn').innerText = "Suivant";
+            document.getElementById('action-btn').innerText = (curQ === 10) ? "RÉSULTAT FINAL" : "Question Suivante";
         }
 
         db.on('value', snap => {
             const d = snap.val(); if(!d) return;
-            document.getElementById('name-p').innerText = d.teamPink || "Attente...";
-            document.getElementById('name-v').innerText = d.teamPurple || "Attente...";
-            
+            pScore = d.scores?.pink || 0; vScore = d.scores?.purple || 0;
+            document.getElementById('score-p').innerText = pScore;
+            document.getElementById('score-v').innerText = vScore;
+
             if(d.status === 'start') {
                 curQ = d.currentQuestion;
                 renderMain(curQ - 1);
-                pAns = (d.answers && d.answers.pink) ? d.answers.pink[curQ] || '?' : '?';
-                vAns = (d.answers && d.answers.purple) ? d.answers.purple[curQ] || '?' : '?';
-                document.getElementById('ans-p').innerText = pAns;
-                document.getElementById('ans-v').innerText = vAns;
+                pAns = (d.answers?.pink) ? d.answers.pink[curQ] || '?' : '?';
+                vAns = (d.answers?.purple) ? d.answers.purple[curQ] || '?' : '?';
+                
+                if(curQ > 5) {
+                    document.getElementById('ans-p').innerText = (pAns !== '?') ? "✓" : "?";
+                    document.getElementById('ans-v').innerText = (vAns !== '?') ? "✓" : "?";
+                    document.getElementById('secret-tag').classList.remove('hidden');
+                } else {
+                    document.getElementById('ans-p').innerText = pAns;
+                    document.getElementById('ans-v').innerText = vAns;
+                    document.getElementById('secret-tag').classList.add('hidden');
+                }
                 startTimer(d.startTime);
             }
         });
@@ -125,6 +151,8 @@
                 const L = String.fromCharCode(65 + i);
                 container.innerHTML += `<div class="opt-item" id="m-opt-${L}"><b>${L}:</b> ${opt}</div>`;
             });
+            document.getElementById('card-p').className = "team-box";
+            document.getElementById('card-v').className = "team-box";
         }
 
         function startTimer(start) {
