@@ -4,45 +4,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Team</title>
+    <title>Oncology Quiz | Team</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;800&display=swap" rel="stylesheet">
     <style>
-        :root { --purple: #9d50bb; --pink: #ec4899; }
+        :root { 
+            --purple: #9d50bb; --pink: #ec4899; 
+            --glass-bg: rgba(255, 255, 255, 0.08); --glass-border: rgba(255, 255, 255, 0.12); 
+        }
+
         body { 
             margin: 0; font-family: 'Poppins', sans-serif; min-height: 100vh; 
-            display: flex; align-items: center; justify-content: center; background: #000; color: #fff;
+            display: flex; align-items: center; justify-content: center; 
+            background: #000; color: #fff; overflow: hidden;
             background-image: url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
-            background-size: cover;
+            background-size: cover; background-position: center;
         }
-        .glass { background: rgba(255,255,255,0.08); backdrop-filter: blur(20px); border-radius: 30px; padding: 40px; text-align: center; width: 85%; max-width: 400px; border: 1px solid rgba(255,255,255,0.1); }
-        .quiz-btn { width: 100%; padding: 20px; margin: 10px 0; border: none; border-radius: 15px; background: rgba(255,255,255,0.1); color: #fff; font-size: 1.5rem; font-weight: 800; cursor: pointer; transition: 0.3s; }
-        .quiz-btn:hover { background: var(--pink); transform: scale(1.05); }
-        .quiz-btn.selected { background: #10b981; }
-        #timer { font-size: 3rem; color: #f1c40f; margin-bottom: 10px; }
+
+        .glass-ui { 
+            width: 85%; max-width: 400px; z-index: 10;
+            background: var(--glass-bg); backdrop-filter: blur(20px); 
+            border: 1px solid var(--glass-border); border-radius: 40px; 
+            padding: 40px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
+        }
+
+        .quiz-btn { 
+            width: 100%; padding: 18px; margin: 12px 0; border: none; border-radius: 20px; 
+            background: rgba(255,255,255,0.1); color: #fff; font-size: 1.8rem; font-weight: 800; 
+            cursor: pointer; transition: 0.3s; 
+        }
+
+        .quiz-btn:hover:not(:disabled) { background: var(--pink); transform: scale(1.03); }
+        .quiz-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .quiz-btn.active { background: #10b981 !important; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
+
+        #timer-display { font-size: 3.5rem; font-weight: 800; color: #f1c40f; margin-bottom: 10px; }
+        .status-text { font-style: italic; opacity: 0.7; font-size: 0.9rem; margin-top: 15px; }
+        
+        input { 
+            width: 100%; padding: 15px; border-radius: 15px; border: 1px solid var(--glass-border); 
+            background: rgba(0,0,0,0.3); color: #fff; text-align: center; margin-bottom: 20px;
+        }
+        
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
-    <div class="glass">
+
+    <div class="glass-ui">
         <div id="reg-zone">
-            <input type="text" id="t-name" placeholder="Nom de l'équipe..." style="width:100%; padding:15px; border-radius:10px; margin-bottom:20px;">
-            <button class="quiz-btn" onclick="reg()">REJOINDRE</button>
+            <h2>INSCRIPTION</h2>
+            <input type="text" id="t-name" placeholder="Nom de l'équipe...">
+            <button class="quiz-btn" style="font-size: 1.2rem; background: linear-gradient(45deg, var(--purple), var(--pink));" onclick="reg()">REJOINDRE</button>
         </div>
 
         <div id="wait-zone" class="hidden">
-            <h2>⏳</h2>
-            <p>Attente de l'administrateur...</p>
+            <h1 style="font-size: 3rem;">...</h1>
+            <p>Veuillez attendre l'activation du quiz par l'administrateur.</p>
         </div>
 
         <div id="quiz-zone" class="hidden">
-            <div id="timer">01:00</div>
-            <div id="options">
-                <button class="quiz-btn" onclick="send('A')">A</button>
-                <button class="quiz-btn" onclick="send('B') Bryan">B</button>
-                <button class="quiz-btn" onclick="send('C')">C</button>
-                <button class="quiz-btn" onclick="send('D')">D</button>
+            <div id="timer-display">01:00</div>
+            <div id="options-container">
+                <button class="quiz-btn opt-btn" onclick="submitChoice('A')">A</button>
+                <button class="quiz-btn opt-btn" onclick="submitChoice('B')">B</button>
+                <button class="quiz-btn opt-btn" onclick="submitChoice('C')">C</button>
+                <button class="quiz-btn opt-btn" onclick="submitChoice('D')">D</button>
             </div>
-            <p id="sent-msg" class="hidden" style="color:#10b981">Réponse envoyée!</p>
+            <p id="msg-confirm" class="hidden" style="color:#10b981; font-weight:bold;">Réponse envoyée !</p>
         </div>
     </div>
 
@@ -52,8 +80,10 @@
         const firebaseConfig = { databaseURL: "https://quiz-8016b-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref('competition');
+
         let myType = localStorage.getItem('myType');
-        let curQ = 0;
+        let currentQ = 0;
+        let timerInt = null;
 
         function reg() {
             const n = document.getElementById('t-name').value;
@@ -61,9 +91,10 @@
             db.once('value', s => {
                 const d = s.val();
                 let type = !d.teamPink ? "pink" : (!d.teamPurple ? "purple" : null);
-                if(!type) return alert("Full!");
+                if(!type) return alert("Session complète !");
                 db.update({ [type === "pink" ? 'teamPink' : 'teamPurple']: n });
-                myType = type; localStorage.setItem('myType', type);
+                myType = type; 
+                localStorage.setItem('myType', type);
                 showWait();
             });
         }
@@ -76,36 +107,63 @@
 
         db.on('value', snap => {
             const d = snap.val(); if(!d) return;
-            if(d.status === 'start' && d.currentQuestion !== curQ) {
-                curQ = d.currentQuestion;
-                startQ(d.startTime);
+
+            // استعادة الجلسة في حال تحديث الصفحة
+            if(myType && d.status === 'waiting') {
+                showWait();
             }
-            if(d.status === 'waiting' && curQ !== 0) { localStorage.clear(); location.reload(); }
+
+            // إطلاق سؤال جديد
+            if(d.status === 'start' && d.currentQuestion !== currentQ) {
+                currentQ = d.currentQuestion;
+                activateQuiz(d.startTime);
+            }
+
+            // إعادة تصفير عند Reset
+            if(d.status === 'waiting' && currentQ !== 0) {
+                localStorage.clear();
+                location.reload();
+            }
         });
 
-        function startQ(start) {
+        function activateQuiz(startTime) {
             document.getElementById('wait-zone').classList.add('hidden');
             document.getElementById('quiz-zone').classList.remove('hidden');
-            document.getElementById('sent-msg').classList.add('hidden');
-            document.querySelectorAll('.quiz-btn').forEach(b => b.disabled = false);
+            document.getElementById('msg-confirm').classList.add('hidden');
             
-            const intv = setInterval(() => {
-                const rem = 60 - Math.floor((Date.now() - start)/1000);
+            const btns = document.querySelectorAll('.opt-btn');
+            btns.forEach(b => {
+                b.disabled = false;
+                b.classList.remove('active');
+            });
+
+            clearInterval(timerInt);
+            timerInt = setInterval(() => {
+                const rem = 60 - Math.floor((Date.now() - startTime) / 1000);
                 if(rem <= 0) {
-                    clearInterval(intv);
-                    document.getElementById('timer').innerText = "00:00";
-                    document.querySelectorAll('.quiz-btn').forEach(b => b.disabled = true);
-                    setTimeout(showWait, 3000);
+                    clearInterval(timerInt);
+                    document.getElementById('timer-display').innerText = "00:00";
+                    btns.forEach(b => b.disabled = true);
+                    setTimeout(showWait, 2000); // العودة للانتظار بعد دقيقة
                 } else {
-                    document.getElementById('timer').innerText = "00:" + rem.toString().padStart(2,'0');
+                    document.getElementById('timer-display').innerText = `00:${rem.toString().padStart(2, '0')}`;
                 }
             }, 1000);
         }
 
-        function send(letter) {
-            db.child(`answers/${myType}/${curQ}`).set(letter).then(() => {
-                document.getElementById('sent-msg').classList.remove('hidden');
-                document.querySelectorAll('.quiz-btn').forEach(b => b.disabled = true);
+        function submitChoice(letter) {
+            if(!myType || !currentQ) return;
+            
+            // تمييز الزر المختار
+            const btns = document.querySelectorAll('.opt-btn');
+            btns.forEach(b => {
+                b.classList.remove('active');
+                if(b.innerText === letter) b.classList.add('active');
+                b.disabled = true; // منع تغيير الإجابة بعد الاختيار
+            });
+
+            db.child(`answers/${myType}/${currentQ}`).set(letter).then(() => {
+                document.getElementById('msg-confirm').classList.remove('hidden');
             });
         }
     </script>
