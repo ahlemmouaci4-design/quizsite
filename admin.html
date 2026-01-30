@@ -84,7 +84,7 @@
         ];
 
         let curQ = 0;
-        let lastPinkAns = "?", lastPurpleAns = "?";
+        let lastPinkAns = " ", lastPurpleAns = " ";
 
         function startNext() {
             curQ++;
@@ -131,8 +131,8 @@
                 renderQuestion(curQ - 1);
                 handleTimer(d.startTime);
                 
-                lastPinkAns = (d.answers && d.answers.pink) ? d.answers.pink[curQ] || '?' : '?';
-                lastPurpleAns = (d.answers && d.answers.purple) ? d.answers.purple[curQ] || '?' : '?';
+                lastPinkAns = (d.answers && d.answers.pink) ? d.answers.pink[curQ] || ' ' : ' ';
+                lastPurpleAns = (d.answers && d.answers.purple) ? d.answers.purple[curQ] || ' ' : ' ';
                 document.getElementById('view-p').innerText = lastPinkAns;
                 document.getElementById('view-v').innerText = lastPurpleAns;
             }
