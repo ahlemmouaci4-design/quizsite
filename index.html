@@ -1,4 +1,7 @@
 
+
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -9,15 +12,13 @@
     <style>
         :root { --pink: #ec4899; --purple: #9d50bb; }
         body { margin: 0; font-family: 'Poppins', sans-serif; height: 100vh; display: flex; align-items: center; justify-content: center; background: #000 url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center fixed; background-size: cover; color: #fff; overflow: hidden; }
-        .glass { background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(20px); border-radius: 35px; padding: 35px; width: 85%; max-width: 380px; text-align: center; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
-        h2 { font-weight: 900; letter-spacing: 1px; margin-bottom: 25px; }
-        /* تصحيح خانة الاسم */
-        input { width: 100%; padding: 18px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: #fff; text-align: center; font-size: 1.1rem; box-sizing: border-box; margin-bottom: 20px; outline: none; }
-        input::placeholder { color: rgba(255,255,255,0.5); }
-        .btn-join { width: 100%; padding: 18px; border-radius: 50px; border: none; background: linear-gradient(45deg, var(--purple), var(--pink)); color: white; font-weight: 800; cursor: pointer; text-transform: uppercase; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-        .opt-btn { width: 100%; padding: 16px; margin: 10px 0; border-radius: 15px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); color: #fff; text-align: left; cursor: pointer; font-size: 1rem; transition: 0.3s; }
+        .glass { background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(20px); border-radius: 35px; padding: 30px; width: 85%; max-width: 380px; text-align: center; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+        h2 { font-weight: 900; letter-spacing: 1px; margin-bottom: 20px; }
+        input { width: 100%; padding: 15px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: #fff; text-align: center; font-size: 1.1rem; box-sizing: border-box; margin-bottom: 20px; outline: none; }
+        .btn-join { width: 100%; padding: 16px; border-radius: 50px; border: none; background: linear-gradient(45deg, var(--purple), var(--pink)); color: white; font-weight: 800; cursor: pointer; text-transform: uppercase; }
+        .opt-btn { width: 100%; padding: 14px; margin: 10px 0; border-radius: 15px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); color: #fff; text-align: left; cursor: pointer; font-size: 1rem; transition: 0.2s; }
         .opt-btn.active { background: var(--pink); border-color: #fff; transform: scale(1.02); }
-        #timer { font-size: 4.5rem; font-weight: 900; color: #fff; margin-bottom: 20px; text-shadow: 0 0 15px rgba(255,255,255,0.3); }
+        #timer { font-size: 4rem; font-weight: 900; color: #fff; margin-bottom: 15px; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -30,7 +31,7 @@
         </div>
 
         <div id="wait-zone" class="hidden">
-            <div style="font-size: 4rem; margin-bottom:10px;"> </div>
+            <div style="font-size: 3rem; margin-bottom:10px;">⏳</div>
             <h2 id="display-name" style="color:var(--pink); margin:0;">---</h2>
             <p id="wait-msg" style="opacity:0.7">Attente du Master...</p>
         </div>
@@ -46,36 +47,40 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script>
         const config = { databaseURL: "https://quiz-8016b-default-rtdb.firebaseio.com/" };
-        firebase.initializeApp(config);
+        if (!firebase.apps.length) firebase.initializeApp(config);
         const db = firebase.database().ref('competition');
 
-        let myRole = "", curQ = 0, timer, choice = "";
+        let myRole = "", curQ = 0, timerObj, choice = "";
 
         async function join() {
             const name = document.getElementById('t-name').value.trim();
             if(!name) return;
             const snap = await db.once('value');
             const d = snap.val() || {};
+            
             if(!d.teamPink) { await db.update({ teamPink: name }); myRole = "pink"; }
             else if(!d.teamPurple) { await db.update({ teamPurple: name }); myRole = "purple"; }
-            else return alert("Plein!");
+            else return alert("Désolé, la session est pleine!");
             
             document.getElementById('display-name').innerText = name;
             showZone('wait-zone');
             
-            db.on('value', snap => {
-            if(!d.teamPink && !d.teamPurple) {
-            location.reload(); 
-            }
+            // مستمع البيانات الرئيسي للمتسابق
+            db.on('value', snapshot => {
+                const data = snapshot.val() || {};
                 
-                const d = snap.val() || {};
-                
-                if(d.status === 'start' && curQ !== d.curQ) {
-                    curQ = d.curQ;
-                    launch(d.startTime);
-                } else if(d.status === 'correction' || d.status === 'waiting') {
+                // التزامن: إذا قام الأدمن بالتصفير، يتم تحديث صفحة المتسابق فوراً
+                if(!data.teamPink && !data.teamPurple && myRole !== "") {
+                    location.reload();
+                    return;
+                }
+
+                if(data.status === 'start' && curQ !== data.curQ) {
+                    curQ = data.curQ;
+                    launch(data.startTime);
+                } else if(data.status === 'correction' || data.status === 'waiting') {
                     showZone('wait-zone');
-                    document.getElementById('wait-msg').innerText = curQ >= 10 ? "Quiz terminé! 🏆" : "Attente du suivant...";
+                    document.getElementById('wait-msg').innerText = curQ >= 10 ? "Quiz terminé! 🏆" : "Attente de la question suivante...";
                 }
             });
         }
@@ -89,10 +94,14 @@
                 div.innerHTML += `<button class="opt-btn" id="b-${L}" onclick="select('${L}')">OPTION ${L}</button>`;
             });
             
-            clearInterval(timer);
-            timer = setInterval(() => {
+            clearInterval(timerObj);
+            timerObj = setInterval(() => {
                 const rem = 60 - Math.floor((Date.now() - start)/1000);
-                if(rem <= 0) { document.getElementById('timer').innerText="00:00"; showZone('wait-zone'); }
+                if(rem <= 0) { 
+                    document.getElementById('timer').innerText="00:00"; 
+                    showZone('wait-zone');
+                    clearInterval(timerObj);
+                }
                 else document.getElementById('timer').innerText = `00:${rem.toString().padStart(2,'0')}`;
             }, 1000);
         }
@@ -107,7 +116,7 @@
             if(!choice) return;
             db.child('answers').child(myRole).child(curQ).set(choice);
             showZone('wait-zone');
-            document.getElementById('wait-msg').innerText = "Réponse enregistrée !";
+            document.getElementById('wait-msg').innerText = "Réponse envoyée avec succès !";
         }
 
         function showZone(id) {
@@ -119,6 +128,3 @@
     </script>
 </body>
 </html>
-
-
-
