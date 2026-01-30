@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Maestro | Compact Edition</title>
+    <title>Admin Maestro | Synced Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --purple: #9d50bb; --pink: #ec4899; --glass: rgba(255, 255, 255, 0.05); --success: #10b981; }
@@ -22,8 +22,7 @@
             flex-grow: 1; display: flex; flex-direction: column; position: relative; overflow: hidden;
         }
 
-        /* عداد أصغر وموضع ذكي */
-        #timer { font-size: 3.5rem; font-weight: 900; color: #f1c40f; text-align: center; margin: 0; line-height: 1; }
+        #timer { font-size: 3.5rem; font-weight: 900; color: #f1c40f; text-align: center; margin: 0; line-height: 1; text-shadow: 0 0 20px rgba(241, 196, 15, 0.5); }
         
         .q-card { background: rgba(0,0,0,0.6); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); margin: 10px 0; flex-grow: 1; }
         #q-text { font-size: 1.8rem; font-weight: 700; margin: 10px 0; line-height: 1.2; }
@@ -44,7 +43,7 @@
         }
 
         .admin-controls { display: flex; gap: 10px; justify-content: center; padding: 10px 0; background: rgba(0,0,0,0.2); border-radius: 50px; }
-        .ctrl-btn { padding: 10px 25px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; }
+        .ctrl-btn { padding: 10px 25px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; transition: 0.3s; }
         .btn-launch { background: #fff; color: #000; }
         .btn-correct { background: var(--success); color: #fff; }
         .btn-reset { background: #ef4444; color: white; padding: 8px 15px; font-size: 0.7rem; }
@@ -113,7 +112,12 @@
         function nextQuestion() {
             if (currentQ >= quizData.length) { displayFinalWinner(); return; }
             currentQ++;
-            db.update({ status:'start', currentQuestion: currentQ, startTime: Date.now() });
+            // نرسل وقت الخادم بدقة
+            db.update({ 
+                status:'start', 
+                currentQuestion: currentQ, 
+                startTime: firebase.database.ServerValue.TIMESTAMP 
+            });
             document.getElementById('next-btn').classList.add('hidden');
             document.getElementById('ans-p-view').classList.remove('show-ans');
             document.getElementById('ans-v-view').classList.remove('show-ans');
@@ -138,6 +142,7 @@
             document.getElementById('next-btn').classList.remove('hidden');
             document.getElementById('next-btn').innerText = (currentQ === quizData.length) ? "FIN" : "Suivant";
             db.update({ status: 'correction' });
+            clearInterval(timerInterval);
         }
 
         function displayFinalWinner() {
@@ -155,9 +160,12 @@
             const d = snap.val(); if(!d) return;
             document.getElementById('name-p').innerText = d.teamPink || "ROSE";
             document.getElementById('name-v').innerText = d.teamPurple || "VIOLETTE";
+            
             if(d.status === 'start' && d.currentQuestion !== currentQ) {
-                currentQ = d.currentQuestion; updateDisplay(d.startTime);
+                currentQ = d.currentQuestion;
+                updateDisplay(d.startTime);
             }
+            
             if(d.status === 'start') {
                 document.getElementById('ans-p-view').innerText = d.answers?.pink?.[currentQ] || '?';
                 document.getElementById('ans-v-view').innerText = d.answers?.purple?.[currentQ] || '?';
@@ -176,12 +184,22 @@
                 const L = String.fromCharCode(65 + i);
                 container.innerHTML += `<div class="opt-box" id="opt-${L}"><b>${L}:</b> ${opt}</div>`;
             });
+
+            // عداد ذكي يعتمد على الفرق بين الوقت الحالي ووقت البداية المسجل
             timerInterval = setInterval(() => {
-                const elapsed = Math.floor((Date.now() - start)/1000);
+                const now = Date.now();
+                const elapsed = Math.floor((now - start) / 1000);
                 const rem = 60 - elapsed;
-                if(elapsed >= 30) document.getElementById('correct-btn').classList.remove('hidden');
-                if(rem <= 0) { clearInterval(timerInterval); document.getElementById('timer').innerText = "00:00"; }
-                else { document.getElementById('timer').innerText = `00:${rem.toString().padStart(2,'0')}`; }
+
+                if (elapsed >= 30) document.getElementById('correct-btn').classList.remove('hidden');
+                
+                if (rem <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('timer').innerText = "00:00";
+                    document.getElementById('correct-btn').classList.remove('hidden');
+                } else {
+                    document.getElementById('timer').innerText = `00:${rem.toString().padStart(2, '0')}`;
+                }
             }, 1000);
         }
     </script>
