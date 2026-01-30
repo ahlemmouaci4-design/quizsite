@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inscription Quiz</title>
+    <title>Quiz Inscription</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --pink: #ec4899; --purple: #9d50bb; }
@@ -11,52 +12,50 @@
             margin: 0; font-family: 'Poppins', sans-serif; height: 100vh; 
             display: flex; align-items: center; justify-content: center;
             background: #000 url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center center fixed;
-            background-size: cover; color: #fff;
+            background-size: cover; color: #fff; overflow: hidden;
         }
         .ultra-glass { 
-            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(30px); 
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(40px); 
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px; 
-            padding: 40px 20px; width: 85%; max-width: 350px; text-align: center;
+            padding: 30px; width: 85%; max-width: 350px; text-align: center;
         }
         input { 
             width: 100%; padding: 15px; border-radius: 15px; border: 2px solid rgba(255,255,255,0.2); 
-            background: rgba(0,0,0,0.6); color: #fff; text-align: center; margin-bottom: 20px; font-size: 1.1rem; box-sizing: border-box;
+            background: rgba(0,0,0,0.8); color: #fff; text-align: center; margin-bottom: 20px; font-size: 1.1rem; box-sizing: border-box;
         }
-        input:focus { border-color: var(--pink); outline: none; }
         .main-btn { 
             width: 100%; padding: 15px; border-radius: 50px; border: none; 
             background: linear-gradient(45deg, var(--purple), var(--pink)); 
-            color: white; font-weight: 700; cursor: pointer; text-transform: uppercase; font-size: 1rem;
+            color: white; font-weight: 700; cursor: pointer; text-transform: uppercase;
         }
-        #timer { font-size: 3.5rem; font-weight: 900; color: #f1c40f; margin: 10px 0; }
-        .opt-btn { width: 100%; padding: 15px; margin: 10px 0; border-radius: 15px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; cursor: pointer; font-weight: bold; }
+        .opt-btn { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: #fff; cursor: pointer; font-size: 1.1rem; text-align: left; }
         .opt-btn.active { background: var(--pink); border-color: #fff; box-shadow: 0 0 15px var(--pink); }
+        #timer { font-size: 3.5rem; font-weight: 900; color: #f1c40f; margin-bottom: 10px; }
         .hidden { display: none !important; }
         .pulse { animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
     </style>
 </head>
 <body>
 
     <div class="ultra-glass">
         <div id="reg-zone">
-            <h2 style="margin-top:0">BIENVENUE</h2>
-            <p style="font-size:0.9rem; opacity:0.8; margin-bottom:20px">Entrez le nom de votre équipe</p>
-            <input type="text" id="t-name" placeholder="Nom de l'équipe..." autocomplete="off">
-            <button class="main-btn" onclick="registerTeam()">Rejoindre le Quiz</button>
+            <h2 style="margin-top:0">INSCRIPTION</h2>
+            <input type="text" id="t-name" placeholder="Nom de l'équipe..." maxlength="15">
+            <button class="main-btn" onclick="joinQuiz()">REJOINDRE</button>
         </div>
 
         <div id="wait-zone" class="hidden">
-            <div style="font-size: 4rem; margin-bottom: 15px;" class="pulse">🧬</div>
-            <h2 id="display-team-name" style="margin:0; color:var(--pink)">---</h2>
-            <p style="opacity: 0.7;">En attente de l'administrateur...</p>
+            <div style="font-size: 4rem;" class="pulse">🧬</div>
+            <h2 id="display-team-name" style="margin:10px 0; color:var(--pink);">---</h2>
+            <p style="opacity: 0.6;">Attente du lancement...</p>
         </div>
 
         <div id="quiz-zone" class="hidden">
             <div id="timer">01:00</div>
             <div id="options-container"></div>
-            <button id="valider-btn" class="main-btn" style="background:#10b981; margin-top:15px" onclick="confirmChoice()">VALIDER</button>
-            <p id="status-msg" style="margin-top:15px; color:#10b981; font-weight:bold; opacity:0;">Réponse enregistrée ✓</p>
+            <button id="valider-btn" class="main-btn" style="background:#10b981; margin-top:20px" onclick="confirmChoice()">VALIDER</button>
+            <p id="status-msg" style="margin-top:10px; color:#10b981; font-weight:bold; opacity:0;">✓ Envoyé</p>
         </div>
     </div>
 
@@ -67,65 +66,64 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref('competition');
 
-        let myType = localStorage.getItem('quiz_team_type'); 
+        let myRole = localStorage.getItem('role'); // pink or purple
         let currentQ = 0;
         let timerInterval;
 
-        // إذا كان مسجلاً مسبقاً، اذهب للانتظار
-        if(myType) { 
-            checkStatus(); 
-        }
-
-        function registerTeam() {
-            const name = document.getElementById('t-name').value.trim();
-            if(!name) { alert("Veuillez saisir un nom !"); return; }
-
-            db.once('value').then(snap => {
-                const data = snap.val() || {};
-                let updates = {};
-                
-                if (!data.teamPink) {
-                    updates['teamPink'] = name;
-                    myType = 'pink';
-                } else if (!data.teamPurple) {
-                    updates['teamPurple'] = name;
-                    myType = 'purple';
-                } else {
-                    alert("Le quiz est complet (2 équipes max)");
-                    return;
-                }
-
-                db.update(updates).then(() => {
-                    localStorage.setItem('quiz_team_type', myType);
-                    checkStatus();
-                });
-            });
-        }
-
-        function checkStatus() {
+        // التحقق عند فتح الصفحة
+        if(myRole) {
             document.getElementById('reg-zone').classList.add('hidden');
             document.getElementById('wait-zone').classList.remove('hidden');
-            document.getElementById('quiz-zone').classList.add('hidden');
+        }
 
-            db.on('value', snap => {
-                const d = snap.val() || {};
-                const myName = (myType === 'pink' ? d.teamPink : d.teamPurple);
-                document.getElementById('display-team-name').innerText = myName || "Équipe";
+        async function joinQuiz() {
+            const name = document.getElementById('t-name').value.trim();
+            if(!name) return;
 
+            const snapshot = await db.once('value');
+            const data = snapshot.val() || {};
+
+            if (!data.teamPink) {
+                await db.update({ teamPink: name });
+                myRole = 'pink';
+            } else if (!data.teamPurple) {
+                await db.update({ teamPurple: name });
+                myRole = 'purple';
+            } else {
+                alert("Désolé, les deux places sont occupées !");
+                return;
+            }
+
+            localStorage.setItem('role', myRole);
+            location.reload();
+        }
+
+        db.on('value', snap => {
+            const d = snap.val() || {};
+            
+            // إذا ضغط الأدمن Reset، يتم تصفير المتسابق
+            if(d.status === 'waiting' || !d.teamPink) {
+                localStorage.removeItem('role');
+                if(!d.teamPink && !d.teamPurple) location.reload();
+            }
+
+            if(myRole) {
+                document.getElementById('display-team-name').innerText = (myRole === 'pink' ? d.teamPink : d.teamPurple);
+                
                 if(d.status === 'start') {
                     if(currentQ !== d.currentQuestion) {
                         currentQ = d.currentQuestion;
-                        startQuiz(d.startTime);
+                        launchQuestion(d.startTime);
                     }
                 } else {
                     document.getElementById('quiz-zone').classList.add('hidden');
                     document.getElementById('wait-zone').classList.remove('hidden');
                     clearInterval(timerInterval);
                 }
-            });
-        }
+            }
+        });
 
-        function startQuiz(startTime) {
+        function launchQuestion(startTime) {
             document.getElementById('wait-zone').classList.add('hidden');
             document.getElementById('quiz-zone').classList.remove('hidden');
             document.getElementById('status-msg').style.opacity = "0";
@@ -133,13 +131,14 @@
             
             const container = document.getElementById('options-container');
             container.innerHTML = '';
-            ["A", "B", "C", "D"].forEach(L => {
-                container.innerHTML += `<button class="opt-btn" id="btn-${L}" onclick="selectOpt('${L}')">OPTION ${L}</button>`;
+            ["A","B","C","D"].forEach(L => {
+                container.innerHTML += `<button class="opt-btn" id="btn-${L}" onclick="select('${L}')">OPTION ${L}</button>`;
             });
 
             clearInterval(timerInterval);
             timerInterval = setInterval(() => {
-                const rem = 60 - Math.floor((Date.now() - startTime)/1000);
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const rem = 60 - elapsed;
                 document.getElementById('timer').innerText = `00:${rem > 0 ? rem.toString().padStart(2,'0') : '00'}`;
                 if(rem <= 0) {
                     clearInterval(timerInterval);
@@ -148,16 +147,16 @@
             }, 1000);
         }
 
-        let localChoice = "";
-        function selectOpt(L) {
+        let choice = "";
+        function select(L) {
             document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('btn-'+L).classList.add('active');
-            localChoice = L;
+            choice = L;
         }
 
         function confirmChoice() {
-            if(!localChoice) return;
-            db.child(`answers/${myType}/${currentQ}`).set(localChoice).then(() => {
+            if(!choice || !myRole) return;
+            db.child('answers').child(myRole).child(currentQ).set(choice).then(() => {
                 document.getElementById('status-msg').style.opacity = "1";
                 document.getElementById('valider-btn').disabled = true;
             });
@@ -165,4 +164,3 @@
     </script>
 </body>
 </html>
-
