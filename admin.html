@@ -1,10 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oncology Quiz | ADMIN SUPREME</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>Oncology Quiz | ADMIN CONTROL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;900&display=swap" rel="stylesheet">
     <style>
         :root { 
             --purple: #9d50bb; --pink: #ec4899; 
@@ -14,112 +15,113 @@
         body { 
             margin: 0; font-family: 'Poppins', sans-serif; min-height: 100vh; 
             display: flex; align-items: center; justify-content: center; 
-            background: #000; color: #fff; overflow: hidden;
-            background-image: url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
+            background: #050505; color: #fff;
+            background-image: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
             background-size: cover; background-position: center;
         }
 
-        .glass-ui { 
-            width: 95%; max-width: 850px; z-index: 10;
+        .main-container { width: 95%; max-width: 800px; display: flex; flex-direction: column; gap: 20px; }
+
+        .glass-panel { 
             background: var(--glass-bg); backdrop-filter: blur(25px); 
-            border: 1px solid var(--glass-border); border-radius: 40px; 
-            padding: 40px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
+            border: 1px solid var(--glass-border); border-radius: 30px; 
+            padding: 30px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
         }
 
-        /* عداد الوقت في الأدمن */
-        #admin-timer {
-            font-size: 2.5rem; font-weight: 800; color: #f1c40f;
-            margin-bottom: 20px; text-shadow: 0 0 15px rgba(241, 196, 15, 0.4);
+        /* عداد الوقت الخاص بكل سؤال */
+        #question-timer {
+            font-size: 3rem; font-weight: 900; color: #f1c40f;
+            margin: 10px 0; text-shadow: 0 0 20px rgba(241, 196, 15, 0.5);
         }
 
-        .status-grid { display: flex; gap: 20px; justify-content: center; margin-bottom: 30px; }
-        .team-card { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: 25px; padding: 20px; position: relative; }
-        .score-val { font-size: 4rem; font-weight: 900; }
+        .status-grid { display: flex; gap: 15px; margin-bottom: 20px; }
+        .team-card { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: 20px; padding: 15px; }
+        .score-val { font-size: 3rem; font-weight: 900; margin: 5px 0; }
 
-        .status-text { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; display: block; margin-bottom: 8px; }
+        .correction-box {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;
+            background: rgba(0,0,0,0.3); padding: 20px; border-radius: 20px; border: 1px dashed var(--glass-border);
+        }
 
-        .controls { display:flex; gap:15px; justify-content:center; border-top: 1px solid var(--glass-border); padding-top: 25px; }
+        .team-ans { padding: 15px; border-radius: 12px; font-size: 0.9rem; background: rgba(255,255,255,0.03); min-height: 60px; }
+
+        .controls { display:flex; gap:10px; justify-content:center; margin-top: 20px; }
         
         .glass-btn { 
             padding: 12px 25px; border-radius: 12px; border: 2px solid var(--glass-border); 
-            background: transparent; color: #fff; font-weight: 700; 
-            cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 0.8rem;
+            background: transparent; color: #fff; font-weight: 700; cursor: pointer; transition: 0.3s;
+            text-transform: uppercase; font-size: 0.8rem;
         }
-        
         .btn-red { border-color: #ff4b2b; color: #ff4b2b; }
         .btn-green { border-color: #10b981; color: #10b981; }
         .btn-blue { border-color: #3b82f6; color: #3b82f6; }
         .glass-btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
 
-        /* شاشة الفائز السينمائية */
         #winner-overlay {
-            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(50px);
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(60px);
             display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000;
         }
 
-        /* أضواء المسرح Spotlights */
-        .spotlight {
-            position: absolute; top: -20%; width: 40vw; height: 140vh;
-            background: radial-gradient(circle at 50% 0%, rgba(255,255,255,0.15) 0%, transparent 70%);
-            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-            transform-origin: top center; z-index: 2050;
+        .winner-frame {
+            padding: 50px; border-radius: 40px; border: 10px solid; text-align: center;
+            background: rgba(255,255,255,0.05); box-shadow: 0 0 80px rgba(0,0,0,0.5);
         }
-        #light1 { left: 10%; animation: swing 4s infinite ease-in-out; }
-        #light2 { right: 10%; animation: swing 4s infinite ease-in-out reverse; }
-        @keyframes swing { 0% { transform: rotate(-15deg); } 50% { transform: rotate(15deg); } 100% { transform: rotate(-15deg); } }
 
-        #winner-canvas { position: absolute; inset: 0; opacity: 0.6; }
-        .winner-content { position: relative; z-index: 2100; text-align: center; }
-        #countdown-final { font-size: 12rem; font-weight: 900; }
-
-        .shining-name {
-            font-size: 6.5rem; font-weight: 900; text-transform: uppercase;
+        .shining-text {
+            font-size: 5rem; font-weight: 900; text-transform: uppercase;
             background: linear-gradient(90deg, transparent, #fff, transparent);
             background-size: 200% 100%; -webkit-background-clip: text; background-clip: text;
-            animation: shine 3s infinite linear; position: relative;
+            animation: shine 3s infinite linear;
         }
-
         @keyframes shine { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div class="glass-ui">
-        <div id="admin-timer">00:00</div>
-        
-        <div class="status-grid">
-            <div class="team-card">
-                <span id="label-p" class="status-text" style="color: #aaa;">EN ATTENTE</span>
-                <h2 id="name-p" style="color: var(--pink); margin: 5px 0;">Équipe Rose</h2>
-                <div class="score-val" id="score-p" style="color: var(--pink);">0</div>
+    <div class="main-container">
+        <div class="glass-panel">
+            <h2 id="question-header" style="font-size: 1rem; opacity: 0.6; margin: 0;">QUESTION 1 / 10</h2>
+            <div id="question-timer">01:00</div>
+            
+            <div class="status-grid">
+                <div class="team-card">
+                    <span style="color:var(--pink); font-size:0.7rem; font-weight:800;">TEAM PINK</span>
+                    <div class="score-val" id="score-p">0</div>
+                </div>
+                <div class="team-card">
+                    <span style="color:var(--purple); font-size:0.7rem; font-weight:800;">TEAM PURPLE</span>
+                    <div class="score-val" id="score-v">0</div>
+                </div>
             </div>
 
-            <div class="team-card">
-                <span id="label-v" class="status-text" style="color: #aaa;">EN ATTENTE</span>
-                <h2 id="name-v" style="color: var(--purple); margin: 5px 0;">Équipe Violette</h2>
-                <div class="score-val" id="score-v" style="color: var(--purple);">0</div>
+            <div class="controls">
+                <button class="glass-btn btn-red" onclick="resetComp()">Réinitialiser</button>
+                <button class="glass-btn btn-green" id="next-q-btn" onclick="triggerNextQuestion()">Lancer Question 1</button>
+                <button class="glass-btn btn-blue" onclick="showFinal()">Terminer & Résultats</button>
             </div>
         </div>
 
-        <div class="controls">
-            <button class="glass-btn btn-red" onclick="resetComp()">Réinitialiser</button>
-            <button class="glass-btn btn-green" onclick="startQuiz()">Lancer le Quiz</button>
-            <button class="glass-btn btn-blue" onclick="showFinal()">Afficher Résultats</button>
+        <div class="glass-panel" id="correction-area">
+            <h3 style="font-size: 0.8rem; color: #f1c40f;">RÉPONSES EN DIRECT (PHASE 1)</h3>
+            <div class="correction-box">
+                <div class="team-ans">
+                    <div style="color:var(--pink); font-weight:bold; margin-bottom:5px;">PINK TEAM:</div>
+                    <div id="ans-pink">...</div>
+                </div>
+                <div class="team-ans">
+                    <div style="color:var(--purple); font-weight:bold; margin-bottom:5px;">PURPLE TEAM:</div>
+                    <div id="ans-purple">...</div>
+                </div>
+            </div>
         </div>
     </div>
 
     <div id="winner-overlay">
-        <div id="light1" class="spotlight"></div>
-        <div id="light2" class="spotlight"></div>
-        <canvas id="winner-canvas"></canvas>
-        <div class="winner-content">
-            <div id="countdown-final">10</div>
-            <div id="winner-announcement" class="hidden">
-                <h3 style="letter-spacing: 12px; opacity: 0.7;">LE CHAMPION EST</h3>
-                <h1 id="winner-name" class="shining-name"></h1>
-                <h2 id="winner-score" style="font-size: 3rem; font-weight: 300;"></h2>
-            </div>
+        <div id="winner-frame" class="winner-frame">
+            <h3 style="letter-spacing: 10px; color: #fff;">VICTOIRE</h3>
+            <h1 id="winner-name" class="shining-text"></h1>
+            <h2 id="winner-score" style="color: #fff; opacity: 0.8;"></h2>
+            <button class="glass-btn" style="margin-top:20px; border-color:#fff;" onclick="resetComp()">Menu Principal</button>
         </div>
     </div>
 
@@ -130,114 +132,92 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref('competition');
 
-        let isAnnouncing = false;
-        let localInterval = null;
+        let currentQ = 0;
+        let timerInt = null;
 
-        function resetComp() { 
-            if(confirm("Tout réinitialiser ?")) {
-                isAnnouncing = false;
-                document.getElementById('winner-overlay').style.display = 'none';
-                clearInterval(localInterval);
-                document.getElementById('admin-timer').innerText = "00:00";
-                db.set({ status: 'waiting', teamPink: "", teamPurple: "", scorePink: 0, scorePurple: 0, showResults: false, finishedPink: false, finishedPurple: false }); 
+        function resetComp() {
+            if(confirm("Réinitialiser ?")) {
+                db.set({
+                    status: 'waiting', teamPink: "", teamPurple: "",
+                    scorePink: 0, scorePurple: 0, currentQuestion: 0,
+                    startTime: 0, showResults: false, answers: {}
+                }).then(() => location.reload());
             }
         }
 
-        function startQuiz() { db.update({ status: 'start', startTime: Date.now() }); }
+        // إطلاق السؤال الموالي وتصفير العداد
+        function triggerNextQuestion() {
+            currentQ++;
+            if(currentQ > 10) return alert("Fin du quiz!");
+            
+            db.update({
+                status: 'start',
+                currentQuestion: currentQ,
+                startTime: Date.now() // ضبط وقت البداية الجديد للعداد
+            });
+        }
+
         function showFinal() { db.update({ showResults: true }); }
 
         db.on('value', snap => {
             const d = snap.val(); if(!d) return;
-            
+
+            currentQ = d.currentQuestion || 0;
             document.getElementById('score-p').innerText = d.scorePink || 0;
             document.getElementById('score-v').innerText = d.scorePurple || 0;
-            document.getElementById('name-p').innerText = d.teamPink || "Équipe Rose";
-            document.getElementById('name-v').innerText = d.teamPurple || "Équipe Violette";
+            document.getElementById('question-header').innerText = `QUESTION ${currentQ} / 10`;
+            document.getElementById('next-q-btn').innerText = `Lancer Question ${currentQ + 1}`;
 
-            updateStatusLabel('label-p', d.teamPink, d.status, d.finishedPink);
-            updateStatusLabel('label-v', d.teamPurple, d.status, d.finishedPurple);
-
-            // تشغيل عداد الثواني الخاص بالمسابقة في لوحة الأدمن
-            if(d.status === 'start' && d.startTime && !localInterval) {
-                localInterval = setInterval(() => {
-                    const rem = 60 - Math.floor((Date.now() - d.startTime)/1000);
-                    document.getElementById('admin-timer').innerText = `00:${rem > 0 ? rem.toString().padStart(2,'0') : '00'}`;
-                    if(rem <= 0) clearInterval(localInterval);
-                }, 1000);
+            // تحديث العداد
+            if(d.status === 'start' && d.startTime) {
+                updateTimer(d.startTime);
             }
 
-            if(d.showResults && !isAnnouncing) runWinnerSequence(d);
-            else if(!d.showResults) { isAnnouncing = false; document.getElementById('winner-overlay').style.display = 'none'; }
+            // تحديث الإجابات (أول 5 أسئلة فقط)
+            if(currentQ <= 5) {
+                document.getElementById('ans-pink').innerText = (d.answers && d.answers.pink) ? (d.answers.pink[currentQ] || '...') : '...';
+                document.getElementById('ans-purple').innerText = (d.answers && d.answers.purple) ? (d.answers.purple[currentQ] || '...') : '...';
+                document.getElementById('correction-area').style.opacity = "1";
+            } else {
+                document.getElementById('ans-pink').innerText = "Caché (Phase 2)";
+                document.getElementById('ans-purple').innerText = "Caché (Phase 2)";
+                document.getElementById('correction-area').style.opacity = "0.5";
+            }
+
+            if(d.showResults) displayWinner(d);
         });
 
-        function updateStatusLabel(id, name, status, fin) {
-            const el = document.getElementById(id);
-            if(!name) { el.innerText = "EN ATTENTE"; el.style.color = "#aaa"; }
-            else if(fin) { el.innerText = "TERMINÉ"; el.style.color = "#10b981"; }
-            else if(status === 'start') { el.innerText = "RÉPOND"; el.style.color = "#3b82f6"; }
-            else { el.innerText = "PRÊT"; el.style.color = "#f1c40f"; }
-        }
-
-        function runWinnerSequence(d) {
-            isAnnouncing = true;
-            const overlay = document.getElementById('winner-overlay');
-            overlay.style.display = 'flex';
-            let sec = 10;
-            document.getElementById('countdown-final').innerText = sec;
-            
-            const t = setInterval(() => {
-                if(!isAnnouncing) { clearInterval(t); return; }
-                sec--;
-                document.getElementById('countdown-final').innerText = sec;
-                if(sec <= 0) {
-                    clearInterval(t);
-                    document.getElementById('countdown-final').classList.add('hidden');
-                    revealWinner(d);
+        function updateTimer(startTime) {
+            clearInterval(timerInt);
+            timerInt = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const remaining = 60 - elapsed;
+                
+                if(remaining <= 0) {
+                    document.getElementById('question-timer').innerText = "00:00";
+                    document.getElementById('question-timer').style.color = "#ff4b2b";
+                    clearInterval(timerInt);
+                } else {
+                    document.getElementById('question-timer').innerText = `00:${remaining.toString().padStart(2, '0')}`;
+                    document.getElementById('question-timer').style.color = "#f1c40f";
                 }
             }, 1000);
         }
 
-        function revealWinner(d) {
-            const isPink = d.scorePink >= d.scorePurple;
-            const name = isPink ? d.teamPink : d.teamPurple;
-            const color = isPink ? "#ec4899" : "#9d50bb";
+        function displayWinner(d) {
+            const isP = d.scorePink >= d.scorePurple;
+            const name = isP ? d.teamPink : d.teamPurple;
+            const color = isP ? "#ec4899" : "#9d50bb";
+            
+            document.getElementById('winner-overlay').style.display = 'flex';
+            const frame = document.getElementById('winner-frame');
+            frame.style.borderColor = color;
+            frame.style.boxShadow = `0 0 60px ${color}`;
             
             const nEl = document.getElementById('winner-name');
             nEl.innerText = name || "CHAMPION";
             nEl.style.color = color;
-            nEl.style.textShadow = `0 0 50px ${color}`;
-            
-            document.getElementById('winner-score').innerText = `SCORE: ${isPink ? d.scorePink : d.scorePurple}`;
-            document.getElementById('winner-announcement').classList.remove('hidden');
-            initSphere(color);
-        }
-
-        function initSphere(ballColor) {
-            const canvas = document.getElementById('winner-canvas');
-            const ctx = canvas.getContext('2d');
-            let w = canvas.width = window.innerWidth;
-            let h = canvas.height = window.innerHeight;
-            const particles = [];
-            for (let i = 0; i < 1200; i++) {
-                particles.push({ phi: Math.acos(-1 + (2 * i) / 1200), theta: Math.sqrt(1200 * Math.PI) * Math.acos(-1 + (2 * i) / 1200), r: 240 });
-            }
-            let angle = 0;
-            function draw() {
-                if(!isAnnouncing) return;
-                ctx.clearRect(0, 0, w, h);
-                ctx.save(); ctx.translate(w / 2, h / 2);
-                angle += 0.007;
-                particles.forEach(p => {
-                    const x = p.r * Math.sin(p.phi + angle) * Math.cos(p.theta + angle);
-                    const y = p.r * Math.sin(p.phi + angle) * Math.sin(p.theta + angle);
-                    const z = p.r * Math.cos(p.phi + angle);
-                    const scale = 600 / (600 - z);
-                    ctx.fillStyle = ballColor; ctx.beginPath();
-                    ctx.arc(x * scale, y * scale, scale * 1.3, 0, Math.PI * 2); ctx.fill();
-                });
-                ctx.restore(); requestAnimationFrame(draw);
-            }
-            draw();
+            document.getElementById('winner-score').innerText = `SCORE: ${isP ? d.scorePink : d.scorePurple}`;
         }
     </script>
 </body>
