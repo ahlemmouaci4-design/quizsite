@@ -120,7 +120,7 @@
         const db = firebase.database().ref('competition');
 
         const questions = [
-            { q: "Premier site métastatique du cancer colorectal ?", opts: ["Poumon", "Foie", "Os", "Cerveau"], c: "B" },
+            { q: " Quels sont les principaux organes atteints dans la maladie de von Hippel-Lindau?", opts: ["peau , muqueuses , viscères", " rétine, cervelet (S.N.C)", " rétine , peau , méninges", "peau , méninges"], c: "B" },
             { q: "Gène associé au syndrome de Lynch ?", opts: ["BRCA1", "APC", "MMR", "HER2"], c: "C" },
             { q: "Le PSA est spécifique de quel organe ?", opts: ["Vessie", "Rein", "Prostate", "Testicule"], c: "C" },
             { q: "Base du protocole Folfox ?", opts: ["Cisplatine", "Oxaliplatine", "Docétaxel", "Irinitécane"], c: "B" },
@@ -128,8 +128,8 @@
             { q: "Cause principale cancer col utérin ?", opts: ["EBV", "HPV", "VHB", "VIH"], c: "B" },
             { q: "Traitement utilisant les rayons X ?", opts: ["Chimio", "Immuno", "Radio", "Hormono"], c: "C" },
             { q: "Cible du Trastuzumab ?", opts: ["EGFR", "VEGF", "HER2", "PD-L1"], c: "C" },
-            { q: "Principal risque cancer poumon ?", opts: ["Alcool", "Tabac", "Sucre", "Pollution"], c: "B" },
-            { q: "Nom d'une tumeur non cancéreuse ?", opts: ["Maligne", "Métastatique", "Bénigne", "Invasive"], c: "C" }
+            { q: "Principal risque cancer poumon ?", opts: ["Hemangiome capillaire", "Angiosarcoma ", "Rhabdosarcome", "Rhabdomyome"], c: "B" },
+            { q: "Quel est l’organe le plus fréquemment atteint par le léiomyome?", opts: ["vessie", "estomac", "uterus", "derme"], c: "C" }
         ];
 
         let cur = 0, scP = 0, scV = 0, timerObj, tPink = "", tPurple = "";
