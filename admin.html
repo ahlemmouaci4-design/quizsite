@@ -1,124 +1,114 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Master Admin | Ultra Glass Edition</title>
+    <title>Master Admin | Fixed Layout</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         :root { --pink: #ec4899; --purple: #9d50bb; --success: #10b981; --danger: #ef4444; }
         
+        /* تثبيت أبعاد الجسم ومنع التمرير */
+        * { box-sizing: border-box; } 
         body { 
-            margin: 0; font-family: 'Poppins', sans-serif; height: 100vh; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            margin: 0; font-family: 'Poppins', sans-serif; 
+            height: 100vh; width: 100vw;
+            display: flex; align-items: center; justify-content: center; 
             background: #000 url('https://images.pexels.com/photos/4225880/pexels-photo-4225880.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2') no-repeat center fixed; 
             background-size: cover; color: #fff; overflow: hidden; 
         }
 
-        /* --- شاشة الترحيب فائقة الشفافية --- */
+        /* --- شاشة الترحيب: مثبتة لتناسب الشاشة تماماً --- */
         #welcome-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.1); backdrop-filter: blur(50px); -webkit-backdrop-filter: blur(50px);
             display: flex; align-items: center; justify-content: center; z-index: 10000;
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: 0.6s ease-in-out;
         }
 
         .welcome-content {
-            position: relative; width: 80%; max-width: 1000px;
-            padding: 60px; border-radius: 40px;
+            position: relative; width: 90%; max-width: 900px;
+            padding: 40px; border-radius: 40px;
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: left;
         }
 
-        /* --- السهم الجانبي الجذاب --- */
+        /* السهم الجانبي: تم ضبط موضعه ليبقى داخل الحاوية */
         .next-arrow-btn {
-            position: absolute; right: -30px; top: 50%; transform: translateY(-50%);
-            width: 80px; height: 80px; border-radius: 50%;
+            position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+            width: 70px; height: 70px; border-radius: 50%;
             background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3);
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: 0.4s; backdrop-filter: blur(10px);
-            animation: pulseRight 2s infinite;
+            cursor: pointer; transition: 0.3s; animation: pulseRight 2s infinite;
         }
 
-        .next-arrow-btn:hover { background: rgba(255, 255, 255, 0.2); transform: translateY(-50%) scale(1.1); border-color: #fff; }
-
-        @keyframes pulseRight {
-            0%, 100% { transform: translateY(-50%) translateX(0); box-shadow: 0 0 0 rgba(255,255,255,0); }
-            50% { transform: translateY(-50%) translateX(15px); box-shadow: 0 0 20px rgba(255,255,255,0.2); }
-        }
-
-        /* --- تنسيق الزجاج (Glassmorphism) --- */
+        /* --- الواجهة الرئيسية: تم ضغط المسافات لتناسب الشاشة --- */
         .glass {
-            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border-radius: 35px; padding: 35px; border: 1px solid rgba(255, 255, 255, 0.15);
-            width: 90%; max-width: 800px; text-align: center; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(25px);
+            border-radius: 30px; padding: 20px; border: 1px solid rgba(255, 255, 255, 0.4);
+            width: 95%; max-width: 750px; max-height: 95vh; /* تضمن عدم خروجها من الشاشة */
+            text-align: center; display: flex; flex-direction: column; justify-content: space-around;
         }
 
-        .fade-out { opacity: 0; visibility: hidden; transform: scale(1.05); }
-
-        #timer { font-size: 5rem; font-weight: 900; margin: 10px 0; text-shadow: 0 0 30px rgba(255,255,255,0.3); }
-        .q-card { background: rgba(255,255,255,0.03); padding: 25px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.1); margin: 20px 0; }
-        .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .opt-box { padding: 15px; background: rgba(255,255,255,0.05); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); font-size: 1.2rem; }
-        .correct { border-color: var(--success) !important; background: rgba(16, 185, 129, 0.3) !important; box-shadow: 0 0 20px var(--success); }
+        #timer { font-size: 3.5rem; font-weight: 900; margin: 5px 0; }
+        .q-card { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); margin: 10px 0; }
+        .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .opt-box { padding: 10px; background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); font-size: 1rem; }
         
-        .btn { padding: 15px 35px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+        .btn { padding: 12px 25px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.3s; margin: 5px; }
         .btn-main { background: #fff; color: #000; }
-        .btn-danger { background: var(--danger); color: white; opacity: 0.4; font-size: 0.7rem; margin-top: 20px; }
+        .btn-danger { background: var(--danger); color: white; opacity: 0.4; font-size: 0.6rem; padding: 6px 15px; }
+        
+        .fade-out { opacity: 0; visibility: hidden; }
         .hidden { display: none !important; }
 
-        /* --- انفجار الفائز --- */
-        #winner-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
-        #winner-name { font-size: 8rem; font-weight: 900; text-transform: uppercase; }
-        .explode { animation: explodeAnim 0.7s cubic-bezier(0.17, 0.89, 0.32, 1.49) forwards; }
-        @keyframes explodeAnim {
-            0% { transform: scale(0); opacity: 0; filter: blur(20px); }
-            70% { transform: scale(1.3); opacity: 1; filter: blur(0px); }
-            100% { transform: scale(1); }
+        @keyframes pulseRight {
+            0%, 100% { transform: translateY(-50%) translateX(0); }
+            50% { transform: translateY(-50%) translateX(10px); }
         }
+
+        /* شاشة الفائز */
+        #winner-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
+        #winner-name { font-size: 6rem; font-weight: 900; text-transform: uppercase; text-align: center;}
     </style>
 </head>
 <body>
 
     <div id="welcome-screen">
         <div class="welcome-content">
-            <h1 style="font-size: 4rem; font-weight: 900; margin: 0; letter-spacing: 4px;">QUIZ SHOW<br><span style="color: var(--pink);">ADMIN PANEL</span></h1>
-            <p style="font-size: 1.4rem; opacity: 0.6; margin-top: 20px;">Gestion du direct et statistiques en temps réel.</p>
-            
+            <h1 style="font-size: 3rem; margin: 0;">QUIZ SHOW<br><span style="color: var(--pink);">ADMIN</span></h1>
+            <p style="opacity: 0.6;">Cliquez sur la flèche pour gérer le live</p>
             <div class="next-arrow-btn" onclick="startExperience()">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
             </div>
         </div>
     </div>
 
     <div id="winner-screen">
-        <h2 style="font-size: 2.5rem; letter-spacing: 8px;">AND THE WINNER IS</h2>
         <div id="winner-name">TEAM</div>
-        <button class="btn btn-main" style="margin-top:40px" onclick="resetCompetition()">RESTART</button>
+        <button class="btn btn-main" onclick="resetCompetition()">RESTART</button>
     </div>
 
     <div class="glass" id="ui-main">
         <div id="timer">01:00</div>
         
         <div id="q-area" class="hidden q-card">
-            <h2 id="q-num" style="color:var(--pink); margin:0;">QUESTION 1/10</h2>
-            <p id="q-text" style="font-size:1.6rem; font-weight:700; margin:15px 0;"></p>
+            <h2 id="q-num" style="color:var(--pink); margin:0; font-size: 1.2rem;">QUESTION</h2>
+            <p id="q-text" style="font-size:1.3rem; font-weight:700; margin:10px 0;"></p>
             <div class="opt-grid" id="q-opts"></div>
         </div>
 
-        <div style="display: flex; justify-content: space-around; margin: 25px 0; font-weight: 900; font-size: 1.8rem;">
+        <div style="display: flex; justify-content: space-around; margin: 10px 0; font-weight: 900; font-size: 1.4rem;">
             <div id="name-p" style="color:var(--pink);">ROSE</div>
             <div id="name-v" style="color:var(--purple);">VIOLETTE</div>
         </div>
 
         <div>
-            <button id="btn-next" class="btn btn-main" onclick="launchNext()">LANCER QUESTION</button>
+            <button id="btn-next" class="btn btn-main" onclick="launchNext()">LANCER</button>
             <button id="btn-corr" class="btn hidden" style="background:var(--success); color:#fff" onclick="showCorrection()">CORRECTION</button>
-            <button id="btn-win" class="btn hidden" style="background:gold; color:#000" onclick="revealWinner()">🏆 VOIR LE GAGNANT</button>
+            <button id="btn-win" class="btn hidden" style="background:gold; color:#000" onclick="revealWinner()">🏆 GAGNANT</button>
             <br>
-            <button class="btn btn-danger" onclick="resetCompetition()">RESET ALL</button>
+            <button class="btn btn-danger" onclick="resetCompetition()">RESET</button>
         </div>
     </div>
 
@@ -146,7 +136,7 @@
 
         function startExperience() {
             document.getElementById('welcome-screen').classList.add('fade-out');
-            setTimeout(() => document.getElementById('welcome-screen').style.display = 'none', 800);
+            setTimeout(() => document.getElementById('welcome-screen').style.display = 'none', 600);
         }
 
         function resetCompetition() {
@@ -180,8 +170,6 @@
             const winScr = document.getElementById('winner-screen');
             const winName = document.getElementById('winner-name');
             winScr.style.display = 'flex';
-            winName.classList.add('explode');
-
             let winBg = scP > scV ? '#ec4899' : (scV > scP ? '#9d50bb' : '#333');
             winName.innerText = scP > scV ? tPink : (scV > scP ? tPurple : "ÉGALITÉ !");
             winScr.style.backgroundColor = winBg;
